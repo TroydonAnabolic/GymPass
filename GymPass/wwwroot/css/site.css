@@ -214,14 +214,29 @@ textarea {
 /* ==========================================================================
  Landing Page
  ========================================================================== */
+
+.main-nav {
+    display: flex;
+    padding: .2rem .5rem;
+    font-size: 2rem;
+    position: absolute;
+    right: 1rem;
+    top: .8rem;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 85%;
+}
+
 .main-gym, .not-in-use {
     background-color: cadetblue;
     height: 60%;
     max-width: 100%;
+    position: relative;
 }
-    .main-gym-icon {
-    background-image:url('../images/main-gym-img1.jpg');
-    background-size:cover;
+
+.main-gym-icon {
+    background-image: url('../images/main-gym-img1.jpg');
+    background-size: cover;
     background-repeat: no-repeat;
     height: 100%;
     max-width: 100%;
@@ -231,113 +246,153 @@ textarea {
     opacity: 0.5;
 }
 
+.title-name {
+    color: white;
+    padding: 1.5rem;
+    font-size: 2rem;
+}
+
+.main-pop-cont {
+    background-color: cadetblue;
+    display: inline-block; /* TODO: Remove if not needed later, this ensures background used for testing*/
+    padding: 1.5rem 1rem;
+    position: absolute;
+    margin-top: auto;
+    bottom: 1rem;
+    right: 1rem;
+}
+
+.access {
+    text-align: center;
+    position: relative;
+}
+
+/* TODO: Add Unlocked to activate with javascript/C# to stay unlocked pic while counter is not 0*/
+.locked, .unlocked {
+    font-size: 12rem;
+    display: inline-block;
+}
+
+.progress {
+    width: 50%;
+    position: absolute;
+    top: 80%;
+    right: 25%;
+}
+
+.door-status {
+    position: absolute;
+    top: 85%;
+    right: 35%;
+}
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     .main-gym-icon {
-        
     }
-}
 
-/* Small devices (portrait tablets and large phones, 600px and up) */
-@media only screen and (min-width: 600px) {
+    .title-name {
+        font-size: 1.5rem;
+    }
 
-}
+    /* Small devices (portrait tablets and large phones, 600px and up) */
+    @media only screen and (min-width: 600px) {
+    }
 
-/* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (min-width: 768px) {
-}
+    /* Medium devices (landscape tablets, 768px and up) */
+    @media only screen and (min-width: 768px) {
+    }
 
-/* Large devices (laptops/desktops, 992px and up) */
-@media only screen and (min-width: 992px) {
-}
+    /* Large devices (laptops/desktops, 992px and up) */
+    @media only screen and (min-width: 992px) {
+    }
 
-/* Extra large devices (large laptops and desktops, 1200px and up) */
-@media only screen and (min-width: 1200px) {
-}
+    /* Extra large devices (large laptops and desktops, 1200px and up) */
+    @media only screen and (min-width: 1200px) {
+    }
 
-/* ==========================================================================
+    /* ==========================================================================
    EXAMPLE Media Queries for Responsive Design.
    These examples override the primary ('mobile first') styles.
    Modify as content requires.
    ========================================================================== */
-@media only screen and (min-width: 35em) {
-    /* Style adjustments for viewports that meet the condition */
-}
+    @media only screen and (min-width: 35em) {
+        /* Style adjustments for viewports that meet the condition */
+    }
 
-@media print, (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 1.25dppx), (min-resolution: 120dpi) {
-    /* Style adjustments for high resolution devices */
-}
+    @media print, (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 1.25dppx), (min-resolution: 120dpi) {
+        /* Style adjustments for high resolution devices */
+    }
 
-/* ==========================================================================
+    /* ==========================================================================
    Print styles.
    Inlined to avoid the additional HTTP request:
    https://www.phpied.com/delay-loading-your-print-css/
    ========================================================================== */
 
-@media print {
-    *,
-    *:before,
-    *:after {
-        background: transparent !important;
-        color: #000 !important;
-        /* Black prints faster */
-        -webkit-box-shadow: none !important;
-        box-shadow: none !important;
-        text-shadow: none !important;
-    }
-
-    a,
-    a:visited {
-        text-decoration: underline;
-    }
-
-        a[href]:after {
-            content: " (" attr(href) ")";
+    @media print {
+        *,
+        *:before,
+        *:after {
+            background: transparent !important;
+            color: #000 !important;
+            /* Black prints faster */
+            -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
         }
 
-    abbr[title]:after {
-        content: " (" attr(title) ")";
-    }
-    /*
+        a,
+        a:visited {
+            text-decoration: underline;
+        }
+
+            a[href]:after {
+                content: " (" attr(href) ")";
+            }
+
+        abbr[title]:after {
+            content: " (" attr(title) ")";
+        }
+        /*
      * Don't show links that are fragment identifiers,
      * or use the `javascript:` pseudo protocol
      */
-    a[href^="#"]:after,
-    a[href^="javascript:"]:after {
-        content: "";
-    }
+        a[href^="#"]:after,
+        a[href^="javascript:"]:after {
+            content: "";
+        }
 
-    pre {
-        white-space: pre-wrap !important;
-    }
+        pre {
+            white-space: pre-wrap !important;
+        }
 
-    pre,
-    blockquote {
-        border: 1px solid #999;
-        page-break-inside: avoid;
-    }
-    /*
+        pre,
+        blockquote {
+            border: 1px solid #999;
+            page-break-inside: avoid;
+        }
+        /*
      * Printing Tables:
      * https://web.archive.org/web/20180815150934/http://css-discuss.incutio.com/wiki/Printing_Tables
      */
-    thead {
-        display: table-header-group;
-    }
+        thead {
+            display: table-header-group;
+        }
 
-    tr,
-    img {
-        page-break-inside: avoid;
-    }
+        tr,
+        img {
+            page-break-inside: avoid;
+        }
 
-    p,
-    h2,
-    h3 {
-        orphans: 3;
-        widows: 3;
-    }
+        p,
+        h2,
+        h3 {
+            orphans: 3;
+            widows: 3;
+        }
 
-    h2,
-    h3 {
-        page-break-after: avoid;
+        h2,
+        h3 {
+            page-break-after: avoid;
+        }
     }
-}
