@@ -214,17 +214,21 @@ textarea {
 /* ==========================================================================
  Landing Page
  ========================================================================== */
-.main-gym {
+.main-gym, .not-in-use {
     background-color: cadetblue;
     height: 60%;
     max-width: 100%;
 }
     .main-gym-icon {
-    background-image:url('../images/main-gym-img.jpg');
+    background-image:url('../images/main-gym-img1.jpg');
     background-size:cover;
     background-repeat: no-repeat;
     height: 100%;
     max-width: 100%;
+}
+
+.not-in-use {
+    opacity: 0.5;
 }
 
 /* Extra small devices (phones, 600px and down) */

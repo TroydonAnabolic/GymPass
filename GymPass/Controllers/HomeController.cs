@@ -12,7 +12,13 @@ namespace GymPass.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+          private bool inUse; 
+        public bool InUse
+        {
+            get { return true; }   // get method
+            set { inUse = true; }  // set method
 
+        }
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
@@ -20,6 +26,8 @@ namespace GymPass.Controllers
 
         public IActionResult Index()
         {
+            
+            InUse = true;
             return View();
         }
 

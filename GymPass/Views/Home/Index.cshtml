@@ -2,10 +2,13 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="main-gym text-center">
-    <div class="main-gym-icon">
-        <div class="main-nav-button">
+@* TODO: Conditionally highlight class or lowered opacity depending on database value if person is inside the gym *@
 
+    <div class="@(true?" main-gym":"not-in-use")"> @* e.g <div class="@(Model.CanEdit?"visible-item":"hidden-item")">Some links</div>*@
+        <div class="main-gym-icon">
+            <div class="main-nav-button">
+
+            </div>
         </div>
     </div>
-</div>
+
