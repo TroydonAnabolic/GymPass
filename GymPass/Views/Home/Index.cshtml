@@ -5,37 +5,57 @@
 @* TODO: Conditionally highlight class or lowered opacity depending on database value if person is inside the gym *@
 
 
-    <div class="@(true?" main-gym":"not-in-use")">
-        @* e.g <div class="@(Model.CanEdit?"visible-item":"hidden-item")">Some links</div> OR see if I can use JavaScript/ jQuery so it is more transferrable to Python *@
-        <div class="main-gym-icon">
-            <div class="title-name">
-                SMART PASS
-            </div>
+<div class="@(true?" main-gym":"not-in-use")">
+    @* e.g <div class="@(Model.CanEdit?"visible-item":"hidden-item")">Some links</div> OR see if I can use JavaScript/ jQuery so it is more transferrable to Python *@
+    <div class="main-gym-icon">
+        <div class="title-name">
+            SMART PASS
+        </div>
 
-            @* Start Navigation *@
-            <div class="main-nav">
-                <i class="fa fa-bars"></i>
-            </div>
-            @* End Navigation *@
+        @* Start Navigation *@
+        <nav class="main-nav">
+            <i class="fa fa-bars" onclick="openNav()"></i>
+        </nav>
 
-            <div class="main-pop-cont">
-                realtime population icons
-            </div>
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="#">Unlock Door</a>
+            <a href="#">Select Facility</a>
+            <a href="#">Dashboard</a>
+            @*<div >
+                <a href="#">Contact</a>
+            </div>*@
+
+
+
+
+            <a>
+                <div id="logout-main">
+                    <i class="fa fa-sign-out"></i>
+                </div>
+            </a>
+        </div>
+
+        @* End Navigation *@
+
+        <div class="main-pop-cont">
+            realtime population icons
         </div>
     </div>
+</div>
 
-    <div class="access">
-        <div class="access-container">
-            <div class="locked">
-                <i class="fa fa-lock"></i>
-            </div>
-            <br />
-            <div class="progress">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-            </div>
-            <div class="door-status">
-                DOOR: OPEN/CLOSE
-            </div>
+<div class="access">
+    <div class="access-container">
+        <div class="locked">
+            <i class="fa fa-lock"></i>
+        </div>
+        <br />
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+        </div>
+        <div class="door-status">
+            DOOR: OPEN/CLOSE
         </div>
     </div>
+</div>
 
