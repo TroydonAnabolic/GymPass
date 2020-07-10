@@ -224,7 +224,7 @@ textarea {
     top: .8rem;
     color: #fff;
     border: 2px solid #fff;
-    border-radius: 85%;
+    border-radius: 25%;
 }
 
 .main-gym, .not-in-use {
@@ -267,23 +267,24 @@ textarea {
     position: relative;
 }
 
+.access-container {
+    display: inline-block;
+    margin-top: 5%;
+}
+
 /* TODO: Add Unlocked to activate with javascript/C# to stay unlocked pic while counter is not 0*/
 .locked, .unlocked {
     font-size: 12rem;
     display: inline-block;
+    line-height: 0px; /* This removes the vertical margin */
 }
 
 .progress {
-    width: 50%;
-    position: absolute;
-    top: 80%;
-    right: 25%;
+
 }
 
 .door-status {
-    position: absolute;
-    top: 85%;
-    right: 35%;
+ padding-top: 1rem;
 }
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
