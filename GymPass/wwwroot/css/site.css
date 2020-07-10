@@ -252,7 +252,7 @@ textarea {
 }
 
 /* Select the first 4 a elements*/
-    .sidenav a:nth-child(-n+4) {
+    .sidenav a:nth-child(-n+3) {
         padding: 1rem;
         text-decoration: none;
         font-size: 25px;
@@ -260,13 +260,15 @@ textarea {
         display: inline-block;
         transition: 0.3s;
         margin: 2rem 1rem;
+    }
+    
+    .border-nav {
         border: 1px solid grey;
         border-radius: 5%;
     }
-
-        .sidenav a:hover {
-            color: #f1f1f1;
-        }
+    .sidenav a:hover {
+        color: #f1f1f1;
+    }
 
     .sidenav .closebtn {
         position: absolute;
@@ -274,10 +276,10 @@ textarea {
         font-size: 36px;
         margin-left: 50px;
     }
-
-    .hover-border {
-        border: 1px solid blue;
+    .nav-other {
+        margin-top: 2rem;
     }
+
 
     .closebtn {
         left: 0.5rem;
@@ -285,9 +287,7 @@ textarea {
         line-height: 0px;
     }
 
-.sidenav a:nth-child(1) {
-    border: none;
-}
+
 
 #logout-main {
     padding: 10px 10px 10px 32px;
@@ -301,9 +301,8 @@ textarea {
     border-radius: 25%;
     margin-top: 4rem;
 }
-
-/* End Main navigation*/
-.main-gym, .not-in-use {
+    /* End Main navigation*/
+    .main-gym, .not-in-use {
     background-color: cadetblue;
     height: 60%;
     max-width: 100%;
@@ -345,12 +344,12 @@ textarea {
 
 .access-container {
     display: inline-block;
-    margin-top: 5%;
+    margin-top: 6%;
 }
 
 /* TODO: Add Unlocked to activate with javascript/C# to stay unlocked pic while counter is not 0*/
 .locked, .unlocked {
-    font-size: 12rem;
+    font-size: 13rem;
     display: inline-block;
     line-height: 0px; /* This removes the vertical margin */
     color: #032763;
