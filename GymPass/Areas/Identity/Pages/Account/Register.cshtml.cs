@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using System.Net.Mail;
 
 namespace GymPass.Areas.Identity.Pages.Account
 {
@@ -80,8 +81,12 @@ namespace GymPass.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                // assigns username to be email
+                MailAddress address = new MailAddress(Input.Email);
+                string userName = address.User;
+
                 var user = new ApplicationUser { 
-                    UserName = Input.Email,
+                    UserName = userName,
                     Email = Input.Email,
                     FirstName = Input.FirstName
                 };

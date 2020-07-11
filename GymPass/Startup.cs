@@ -30,6 +30,9 @@ namespace GymPass
         {
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddDbContext<FacilityContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("FacilityContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
