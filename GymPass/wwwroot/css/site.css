@@ -233,6 +233,7 @@ textarea {
     cursor: pointer;
     border: 1px solid white;
     border-radius: 15%;
+    z-index: 2;
 }
 
 
@@ -328,13 +329,36 @@ textarea {
 }
 
 .main-pop-cont {
-    background-color: cadetblue;
     display: inline-block; /* TODO: Remove if not needed later, this ensures background used for testing*/
-    padding: 1.5rem 1rem;
     position: absolute;
-    margin-top: auto;
     bottom: 1rem;
     right: 1rem;
+    width: 14rem;
+    height: 4rem;
+    font-size: 0; /* This will make the inline blocks touch*/
+    border: 1px solid #fff;
+}
+.realtime-indicator {
+    position: relative;
+    width: 25%;
+    border: 1px solid #fff;
+    height: 100%;
+    font-size: .6rem;
+    float: left;
+    color: #fff;
+    text-align: center;
+}
+
+.realtime-icons {
+    height: 75%;
+    width: 100%;
+    border: 1px solid #fff;
+    background-color: #fff;
+}
+
+.realtime-icons img {
+    max-height: 100%;
+    max-width: 100%;
 }
 
 .access {
