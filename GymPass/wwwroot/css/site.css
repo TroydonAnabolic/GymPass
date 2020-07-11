@@ -429,12 +429,22 @@ header {
         max-height: 100%;
     }
 
-    .banner h1 {
+    .banner h1{
         position: absolute;
-        top: 50%;
+        top: 65%;
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -65%); /* Center absolute position items like this */
     }
+    .banner .logo {
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -60%); /* Center absolute position items like this */
+    }
+
+        .logo {
+            max-width: 5rem;
+        }
 
 .fingerprint {
     margin: auto;
