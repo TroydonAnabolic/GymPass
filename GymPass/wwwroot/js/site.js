@@ -21,4 +21,9 @@ $(document).ready(function () {
         $(this).css("border", "1px solid grey");
     });
 
+    // TODO: jQuery method to hide nav bar when on main home page 
+    //if ($(top.location.pathname === 'https://localhost:44314/Index')) {
+    ///* magic ... */
+    //    $('header').css("display", "none");
+    //}
 });

@@ -8,14 +8,19 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/normalize.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/ed77362d70.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
 <body>
     @*<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GYMPass</a>*@
 
- 
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <main role="main" class="pb-3">
+        <header>
+            @* Navigation *@
+
+        </header>
+        @RenderBody()
+    </main>
 
     <footer class="border-top footer text-muted">
         <div class="container">

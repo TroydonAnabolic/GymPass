@@ -4,6 +4,8 @@
 
 }
 
+
+
 @* TODO: Conditionally highlight class or lowered opacity depending on database value if person is inside the gym *@
 
 @* Start Navigation *@
@@ -84,3 +86,9 @@
     </div>
 </div>
 
+@* Hide the top navigation bar when on main page *@
+<script>
+    $(document).ready(function () {
+        $("header").hide();
+    });
+</script>
