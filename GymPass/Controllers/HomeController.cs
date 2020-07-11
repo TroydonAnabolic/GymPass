@@ -6,21 +6,30 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using GymPass.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace GymPass.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<HomeController> logger
+            )
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
             _logger = logger;
         }
 
         public IActionResult Index()
         {
-            
+
             return View();
         }
 
