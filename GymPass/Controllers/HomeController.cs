@@ -35,14 +35,32 @@ namespace GymPass.Controllers
             _facilityContext = facilityContext;
         }
 
-        [BindProperty]
-        public Facility Facility { get; set; }
 
+        // GET: Home/Index/1
+        // TODO: We begin using id = 1 for now, later will implement dynamically changing this ID number, if it is null then redirect to action choose gym
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
+            // Get the default gym for a user and set it to be the Id
+            var user = await _userManager.GetUserAsync(User);
 
-            var facilityData = await _facilityContext.Facilities.ToListAsync();
+            if (user.Id == null)
+            {
+                return NotFound();
+            }
+
+
+
+            if (id == null)
+            {
+                return RedirectToAction("Index", "Facilities");
+            }
+
+            var facility = await _facilityContext.Facilities.FindAsync(id);
+            if (facility == null)
+            {
+                return NotFound();
+            }
 
             ViewBag.DoorOpened = false;
 

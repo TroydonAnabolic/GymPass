@@ -12,6 +12,8 @@ namespace GymPass.Models
         public string LastName { get; set; }
         public int UsernameChangeLimit { get; set; } = 10;
         public byte[] ProfilePicture { get; set; }
+        public string DefaultGym { get; set; }
+
 
         // Facility Details
         public bool IsInsideGym { get; set; }
