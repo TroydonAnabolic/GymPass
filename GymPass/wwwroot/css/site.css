@@ -310,13 +310,11 @@ button.nav-link.btn.text-light.main-logout {
     font-size: 1rem;
 }
 
-i.fa.fa-sign-out {
+svg.svg-inline--fa.fa-sign-out-alt.fa-w-16, #logout-main > button > svg {
     font-size: 8rem;
     display: block;
 }
 
-.fa {
-}
 /* End Main navigation*/
 
 /* Navigation for other pages */
@@ -415,14 +413,19 @@ header {
 
 /* TODO: Add Unlocked to activate with javascript/C# to stay unlocked pic while counter is not 0*/
 .locked, .unlocked {
-    font-size: 13rem;
+    font-size: 10rem;
     display: inline-block;
-    line-height: 0px; /* This removes the vertical margin */
+    line-height: 2px; /* This removes the vertical margin */
     color: #032763;
+    margin-top: 1rem;
+}
+
+body > main > div.access > div > div.progress {
+    margin-top: 1rem;
 }
 
 .door-status {
-    padding-top: 1rem;
+    padding-top: 2rem;
 }
 
 /* Login style */

@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@model GymPass.Models.Facility
+
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
@@ -28,13 +30,12 @@
                 <a href="#">Contact</a>
             </div>*@
 
-                <form id="logout-main" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit" class="nav-link btn text-light main-logout" >
-                        <i class="fa fa-sign-out">
-                        </i>
-                        Logout
-                    </button>
-                </form>
+        <form id="logout-main" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button type="submit" class="nav-link btn text-light main-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </form>
     </div>
 
     @* End Navigation *@
@@ -79,9 +80,24 @@
 
     <div class="access">
         <div class="access-container">
-            <div class="locked">
-                <i class="fa fa-lock"></i>
-            </div>
+
+            @{
+                // If the door is not currently opened show the lock symbol
+                if (!ViewBag.DoorOpened)
+                {
+                    <div class="locked">
+                        <i class="fa fa-lock"></i>
+                    </div>
+                }
+                // if the door is opened show the unlocked symbol
+                else if (ViewBag.DoorOpened)
+                {
+                    <div class="unlocked">
+                        <i class="fas fa-lock-open"></i>
+                    </div>
+                }
+            }
+
             <br />
             <div class="progress">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
@@ -93,9 +109,9 @@
     </div>
 }
 
-    @* Hide the top navigation bar when on main page *@
-    <script>
-        $(document).ready(function () {
-            $("header").hide();
-        });
-    </script>
+@* Hide the top navigation bar when on main page *@
+<script>
+    $(document).ready(function () {
+        $("header").hide();
+    });
+</script>

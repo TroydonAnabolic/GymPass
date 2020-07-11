@@ -8,8 +8,14 @@
   <ItemGroup>
     <Compile Remove="Data\Migrations\20200711085813_Updated Custom Properties2.cs" />
     <Compile Remove="Data\Migrations\20200711085813_Updated Custom Properties2.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200711122750_Update Logic.cs" />
+    <Compile Remove="Data\Migrations\20200711122750_Update Logic.Designer.cs" />
     <Compile Remove="Migrations\20200711111157_Update Logic.cs" />
     <Compile Remove="Migrations\20200711111157_Update Logic.Designer.cs" />
+    <Compile Remove="Migrations\20200711122649_Update Logic.cs" />
+    <Compile Remove="Migrations\20200711122649_Update Logic.Designer.cs" />
+    <Compile Remove="Migrations\20200711122727_Update Logic.cs" />
+    <Compile Remove="Migrations\20200711122727_Update Logic.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,7 +14,9 @@ namespace GymPass.Controllers
     {
         private readonly FacilityContext _context;
 
-        public FacilitiesController(FacilityContext context)
+        public FacilitiesController(
+            FacilityContext context
+            )
         {
             _context = context;
         }
