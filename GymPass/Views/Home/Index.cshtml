@@ -28,15 +28,13 @@
                 <a href="#">Contact</a>
             </div>*@
 
-            <div id="logout-main">
-                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-
-                    <i class="fa fa-sign-out">
-                        <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-                    </i>
+                <form id="logout-main" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="nav-link btn text-light main-logout" >
+                        <i class="fa fa-sign-out">
+                        </i>
+                        Logout
+                    </button>
                 </form>
-
-            </div>
     </div>
 
     @* End Navigation *@

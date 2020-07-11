@@ -244,7 +244,7 @@ textarea {
     z-index: 1;
     top: 0;
     right: 0;
-    background-color: #032763;
+    background-color: #007bff;
     overflow-x: hidden;
     transition: 0.5s;
     padding-top: 60px;
@@ -290,9 +290,12 @@ textarea {
     line-height: 0px;
 }
 
-
-
 #logout-main {
+    display: inline-block;
+}
+
+button.nav-link.btn.text-light.main-logout {
+    display: block;
     padding: 10px 10px 10px 32px;
     text-decoration: none;
     text-align: center;
@@ -303,6 +306,16 @@ textarea {
     margin-left: auto;
     border-radius: 25%;
     margin-top: 4rem;
+    text-shadow: 0 0 20px black;
+    font-size: 1rem;
+}
+
+i.fa.fa-sign-out {
+    font-size: 8rem;
+    display: block;
+}
+
+.fa {
 }
 /* End Main navigation*/
 

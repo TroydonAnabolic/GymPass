@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using GymPass.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GymPass.Controllers
 {
@@ -27,6 +28,7 @@ namespace GymPass.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
 
