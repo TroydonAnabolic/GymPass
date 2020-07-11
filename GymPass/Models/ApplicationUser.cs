@@ -15,6 +15,6 @@ namespace GymPass.Models
 
         // Facility Details
         public bool IsInsideGym { get; set; }
-
+        public bool OpenDoorRequest { get; set; }
     }
 }
