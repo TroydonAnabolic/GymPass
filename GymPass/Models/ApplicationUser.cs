@@ -19,5 +19,6 @@ namespace GymPass.Models
         public bool IsUsingCardioRoom{ get; set; }
         public bool IsUsingStretchRoom { get; set; }
         public bool OpenDoorRequest { get; set; }
+        public bool ExitGymRequest { get; set; }
     }
 }

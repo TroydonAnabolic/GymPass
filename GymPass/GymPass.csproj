@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\20200711085813_Updated Custom Properties2.cs" />
+    <Compile Remove="Data\Migrations\20200711085813_Updated Custom Properties2.Designer.cs" />
+    <Compile Remove="Migrations\20200711111157_Update Logic.cs" />
+    <Compile Remove="Migrations\20200711111157_Update Logic.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.5" />
@@ -13,10 +20,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\Facility\" />
   </ItemGroup>
 
 </Project>
