@@ -32,8 +32,8 @@ namespace GymPass.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DefaultGym")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DefaultGym")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")

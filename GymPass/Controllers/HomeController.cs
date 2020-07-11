@@ -41,7 +41,7 @@ namespace GymPass.Controllers
         [Authorize]
         public async Task<IActionResult> Index(int? id)
         {
-            // Get the default gym for a user and set it to be the Id
+            // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
 
             if (user.Id == null)
@@ -49,7 +49,7 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
-
+            id = user.DefaultGym;
 
             if (id == null)
             {

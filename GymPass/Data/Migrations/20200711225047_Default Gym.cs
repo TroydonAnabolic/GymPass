@@ -2,23 +2,29 @@
 
 namespace GymPass.Data.Migrations
 {
-    public partial class AddDefaultGym : Migration
+    public partial class DefaultGym : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
+            migrationBuilder.AlterColumn<int>(
                 name: "DefaultGym",
                 schema: "Identity",
                 table: "User",
-                nullable: true);
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
+                oldNullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            migrationBuilder.AlterColumn<string>(
                 name: "DefaultGym",
                 schema: "Identity",
-                table: "User");
+                table: "User",
+                type: "nvarchar(max)",
+                nullable: true,
+                oldClrType: typeof(int));
         }
     }
 }

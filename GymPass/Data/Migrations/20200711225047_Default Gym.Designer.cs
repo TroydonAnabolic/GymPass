@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymPass.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200711224456_Add Default Gym")]
-    partial class AddDefaultGym
+    [Migration("20200711225047_Default Gym")]
+    partial class DefaultGym
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,8 +34,8 @@ namespace GymPass.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DefaultGym")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DefaultGym")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
