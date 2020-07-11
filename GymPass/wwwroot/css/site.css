@@ -252,7 +252,7 @@ textarea {
     text-align: center;
 }
 
-/* Select the first 4 a elements*/
+    /* Select the first 4 a elements*/
     .sidenav a:nth-child(-n+3) {
         padding: 1rem;
         text-decoration: none;
@@ -262,31 +262,33 @@ textarea {
         transition: 0.3s;
         margin: 2rem 1rem;
     }
-    
-    .border-nav {
-        border: 1px solid grey;
-        border-radius: 5%;
-    }
-    .sidenav a:hover {
-        color: #f1f1f1;
-    }
 
-    .sidenav .closebtn {
-        position: absolute;
-        top: 0;
-        font-size: 36px;
-        margin-left: 50px;
-    }
-    .nav-other {
-        margin-top: 2rem;
-    }
+.border-nav {
+    border: 1px solid grey;
+    border-radius: 5%;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.nav-other {
+    margin-top: 2rem;
+}
 
 
-    .closebtn {
-        left: 0.5rem;
-        top: 0.5rem;
-        line-height: 0px;
-    }
+.closebtn {
+    left: 0.5rem;
+    top: 0.5rem;
+    line-height: 0px;
+}
 
 
 
@@ -302,7 +304,7 @@ textarea {
     border-radius: 25%;
     margin-top: 4rem;
 }
-    /* End Main navigation*/
+/* End Main navigation*/
 
 /* Navigation for other pages */
 
@@ -311,10 +313,25 @@ header {
     max-width: 100%;
     min-width: 100%;
     height: 5rem;
-    background-color: cadetblue;
+    background-color: #032763;
+    font-size: 3rem;
+    color: white;
+    vertical-align: central;
+    text-align: center;
 }
 
-    .main-gym, .not-in-use {
+.back-button {
+    float: left;
+    margin-left: 1rem;
+    position: absolute;
+}
+/* End Nav */
+
+.vert-centr {
+    margin-top: 20%;
+}
+
+.main-gym, .not-in-use {
     background-color: cadetblue;
     height: 60%;
     max-width: 100%;
@@ -349,6 +366,7 @@ header {
     font-size: 0; /* This will make the inline blocks touch*/
     border: 1px solid #fff;
 }
+
 .realtime-indicator {
     position: relative;
     width: 25%;
@@ -367,10 +385,10 @@ header {
     background-color: #fff;
 }
 
-.realtime-icons img {
-    max-height: 100%;
-    max-width: 100%;
-}
+    .realtime-icons img {
+        max-height: 100%;
+        max-width: 100%;
+    }
 
 .access {
     text-align: center;
@@ -390,127 +408,152 @@ header {
     color: #032763;
 }
 
-.progress {
-
-}
-
 .door-status {
- padding-top: 1rem;
+    padding-top: 1rem;
 }
-/* Extra small devices (phones, 600px and down) */
-@media only screen and (max-width: 600px) {
-    .main-gym-icon {
+
+/* Login style */
+.banner {
+    display: block;
+        position: relative;
+    /*background-image: url('../images/gympass-banner.png');
+    background-repeat: no-repeat;
+    background-size: contain;*/
+    width: 100%;
+    height: 10rem;
+    line-height: 0;
+}
+
+    .banner img {
+        width: 100%;
+        max-height: 100%;
     }
 
-    .title-name {
-        font-size: 1.5rem;
+    .banner h1 {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
-    /* Small devices (portrait tablets and large phones, 600px and up) */
-    @media only screen and (min-width: 600px) {
+.fingerprint {
+    margin: auto;
+    height: 4rem;
+}
 
-
+    .fingerprint img {
+        max-height: 100%;
+        max-width: 100%;
     }
-/* End navigation animation*/
+    /* Extra small devices (phones, 600px and down) */
+    @media only screen and (max-width: 600px) {
+        .main-gym-icon {
+        }
 
-    /* Medium devices (landscape tablets, 768px and up) */
-    @media only screen and (min-width: 768px) {
+        .title-name {
+            font-size: 1.5rem;
+        }
 
+        /* Small devices (portrait tablets and large phones, 600px and up) */
+        @media only screen and (min-width: 600px) {
+        }
+        /* End navigation animation*/
 
+        /* Medium devices (landscape tablets, 768px and up) */
+        @media only screen and (min-width: 768px) {
+        }
 
-    }
+        /* Large devices (laptops/desktops, 992px and up) */
+        @media only screen and (min-width: 992px) {
+        }
 
-    /* Large devices (laptops/desktops, 992px and up) */
-    @media only screen and (min-width: 992px) {
-    }
+        /* Extra large devices (large laptops and desktops, 1200px and up) */
+        @media only screen and (min-width: 1200px) {
+        }
 
-    /* Extra large devices (large laptops and desktops, 1200px and up) */
-    @media only screen and (min-width: 1200px) {
-    }
-
-    /* ==========================================================================
+        /* ==========================================================================
    EXAMPLE Media Queries for Responsive Design.
    These examples override the primary ('mobile first') styles.
    Modify as content requires.
    ========================================================================== */
-    @media only screen and (min-width: 35em) {
-        /* Style adjustments for viewports that meet the condition */
-    }
+        @media only screen and (min-width: 35em) {
+            /* Style adjustments for viewports that meet the condition */
+        }
 
-    @media print, (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 1.25dppx), (min-resolution: 120dpi) {
-        /* Style adjustments for high resolution devices */
-    }
+        @media print, (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 1.25dppx), (min-resolution: 120dpi) {
+            /* Style adjustments for high resolution devices */
+        }
 
-    /* ==========================================================================
+        /* ==========================================================================
    Print styles.
    Inlined to avoid the additional HTTP request:
    https://www.phpied.com/delay-loading-your-print-css/
    ========================================================================== */
 
-    @media print {
-        *,
-        *:before,
-        *:after {
-            background: transparent !important;
-            color: #000 !important;
-            /* Black prints faster */
-            -webkit-box-shadow: none !important;
-            box-shadow: none !important;
-            text-shadow: none !important;
-        }
-
-        a,
-        a:visited {
-            text-decoration: underline;
-        }
-
-            a[href]:after {
-                content: " (" attr(href) ")";
+        @media print {
+            *,
+            *:before,
+            *:after {
+                background: transparent !important;
+                color: #000 !important;
+                /* Black prints faster */
+                -webkit-box-shadow: none !important;
+                box-shadow: none !important;
+                text-shadow: none !important;
             }
 
-        abbr[title]:after {
-            content: " (" attr(title) ")";
-        }
-        /*
+            a,
+            a:visited {
+                text-decoration: underline;
+            }
+
+                a[href]:after {
+                    content: " (" attr(href) ")";
+                }
+
+            abbr[title]:after {
+                content: " (" attr(title) ")";
+            }
+            /*
      * Don't show links that are fragment identifiers,
      * or use the `javascript:` pseudo protocol
      */
-        a[href^="#"]:after,
-        a[href^="javascript:"]:after {
-            content: "";
-        }
+            a[href^="#"]:after,
+            a[href^="javascript:"]:after {
+                content: "";
+            }
 
-        pre {
-            white-space: pre-wrap !important;
-        }
+            pre {
+                white-space: pre-wrap !important;
+            }
 
-        pre,
-        blockquote {
-            border: 1px solid #999;
-            page-break-inside: avoid;
-        }
-        /*
+            pre,
+            blockquote {
+                border: 1px solid #999;
+                page-break-inside: avoid;
+            }
+            /*
      * Printing Tables:
      * https://web.archive.org/web/20180815150934/http://css-discuss.incutio.com/wiki/Printing_Tables
      */
-        thead {
-            display: table-header-group;
-        }
+            thead {
+                display: table-header-group;
+            }
 
-        tr,
-        img {
-            page-break-inside: avoid;
-        }
+            tr,
+            img {
+                page-break-inside: avoid;
+            }
 
-        p,
-        h2,
-        h3 {
-            orphans: 3;
-            widows: 3;
-        }
+            p,
+            h2,
+            h3 {
+                orphans: 3;
+                widows: 3;
+            }
 
-        h2,
-        h3 {
-            page-break-after: avoid;
+            h2,
+            h3 {
+                page-break-after: avoid;
+            }
         }
-    }

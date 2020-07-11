@@ -16,8 +16,11 @@
 
     <main role="main" class="pb-3">
         <header>
-            @* Navigation *@
-
+            <div class="back-button">
+                @* Navigation *@
+                <i class="fa fa-arrow-circle-left"></i>
+            </div>
+            @ViewData["Title"]
         </header>
         @RenderBody()
     </main>
