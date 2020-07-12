@@ -36,11 +36,6 @@ namespace GymPass.Controllers
             _facilityContext = facilityContext;
         }
 
-        [BindProperty]
-        Facility Facility { get; set; }
-        [BindProperty]
-        public InputModel Input { get; set; }
-
         // GET: Home/Index/1
         // TODO: We begin using id = 1 for now, later will implement dynamically changing this ID number, if it is null then redirect to action choose gym
         [Authorize]
@@ -69,9 +64,6 @@ namespace GymPass.Controllers
             
             ViewBag.DoorOpened = facility.DoorOpened;
 
-            //Facility.DoorOpened = true;
-            await LoadAsync(user);
-
             return View(facility);
         }
 
@@ -99,7 +91,6 @@ namespace GymPass.Controllers
 
             if (!ModelState.IsValid)
             {
-                await LoadAsync(user);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -119,7 +110,6 @@ namespace GymPass.Controllers
                             facility.NumberOfClientsInGym--;
                             _facilityContext.Update(facility);
                             await _facilityContext.SaveChangesAsync();
-                            await _userManager.UpdateAsync(user);
                             // TODO: if statements, if viewbag, user selected if they are using cardio equip, then increment cardio etc.
                         }
                         // if the user is not in the gym, then say this user is not in the gym, and increase the number of ppl in the gym
@@ -129,10 +119,7 @@ namespace GymPass.Controllers
                             user.IsInsideGym = true;
                             _facilityContext.Update(facility);
                             await _facilityContext.SaveChangesAsync();
-                            await _userManager.UpdateAsync(user);
                         }
-
-                        // TODO: Change status to door opened
                     }
                     // when we are leaving we set open door and door opened to false
                     else if (facility.IsOpenDoorRequested == false)
@@ -140,8 +127,6 @@ namespace GymPass.Controllers
                         facility.DoorOpened = false;
                         user.IsInsideGym = false;
                     }
-
-
 
                     // save the opened door and user
                     _facilityContext.Update(facility);
@@ -157,8 +142,8 @@ namespace GymPass.Controllers
                     facility.DoorOpened = false;
                     _facilityContext.Update(facility);
                     await _facilityContext.SaveChangesAsync();
-
                 }
+
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!FacilityExists(facility.FacilityID))
@@ -190,18 +175,5 @@ namespace GymPass.Controllers
         {
             return _facilityContext.Facilities.Any(e => e.FacilityID == id);
         }
-
-        private async Task LoadAsync(ApplicationUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
-        }
-
     }
 }

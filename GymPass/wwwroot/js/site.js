@@ -12,8 +12,10 @@ function closeNav() {
 }
 
 $(document).ready(function () {
-    //$('div.sidenav a:nth-child(1), div.sidenav a:nth-child(2), div.sidenav a:nth-child(3)').css("border", "1px solid grey");
 
+    /*
+    *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
+    */
     $('.border-nav').mouseenter(function () {
         $(this).css("border", "1px solid blue");
     });
@@ -21,9 +23,25 @@ $(document).ready(function () {
         $(this).css("border", "1px solid grey");
     });
 
-    // TODO: jQuery method to hide nav bar when on main home page 
-    //if ($(top.location.pathname === 'https://localhost:44314/Index')) {
-    ///* magic ... */
-    //    $('header').css("display", "none");
-    //}
+    /*
+     *  ------------------------------------------------ Landing Page Scripts ----------------------------------------------------------------
+     */
+
+    // on page load we pre-select the checbox depending on if its opened or closed
+    $('#open-door').prop('checked', true);
+    $('#close-door').prop('checked', false);
+
+    // allows the changed icon to show unlocked icon change before the server applies the change from the delayed refresh
+    $("body > main > div.access > div > form > div:nth-child(3) > button").click(function () {
+        // only when it shows locked class
+        if ($(this).hasClass("locked")) {
+            // we remove the class and add the other class to this button
+            $('body > main > div.access > div > form > div:nth-child(3) > button > svg').remove();
+            $(this)
+                // .remove("<i class='fa fa-lock'></i>")
+                .append("<i class='fas fa-lock-open'></i>")
+                .addClass("unlocked")
+                .removeClass("locked");
+        }
+    });
 });
