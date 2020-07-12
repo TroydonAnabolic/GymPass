@@ -100,12 +100,21 @@ namespace GymPass.Controllers
                         facility.DoorOpened = true;
                         // TODO: Change status to door opened
                     }
+                    // when we are leaving we set open door and door opened to false
+                    else if (facility.IsOpenDoorRequested == false)
+                    {
+                        facility.DoorOpened = false;
+                    }
 
                     // save the opened door
                     _facilityContext.Update(facility);
                     await _facilityContext.SaveChangesAsync();
 
+                    // Now jQuery will show the icon unlocked image, which only changes view not submit value
+
                     // await statement 5 second timer
+                 //   System.Threading.Thread.Sleep(facility.DoorCloseTimer);
+                    // When 5 second timer finishes, refresh the page again
 
                 }
                 catch (DbUpdateConcurrencyException)
