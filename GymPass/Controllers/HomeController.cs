@@ -98,8 +98,8 @@ namespace GymPass.Controllers
             {
                 try
                 {
-                    // if door open is requested from the view then open the door
-                    if (facilityView.IsOpenDoorRequested == true)
+                    // if door open is requested from the view then open the door, also access must be granted
+                    if (facilityView.IsOpenDoorRequested == true) // TODOL && user.AccessGrantedToFacility - try and use/replicate input model as per index page of user to save user input
                     {
                         facility.DoorOpened = true;
 
@@ -131,7 +131,6 @@ namespace GymPass.Controllers
                     // save the opened door and user
                     _facilityContext.Update(facility);
                     await _facilityContext.SaveChangesAsync();
-                    await _userManager.UpdateAsync(user);
 
                     // Now jQuery will show the icon unlocked image, which only changes view to show unlocked icon not submit value, jquery will also be used to set the checkbox value based on click
 
@@ -142,6 +141,7 @@ namespace GymPass.Controllers
                     facility.DoorOpened = false;
                     _facilityContext.Update(facility);
                     await _facilityContext.SaveChangesAsync();
+                    await _userManager.UpdateAsync(user);
                 }
 
                 catch (DbUpdateConcurrencyException)

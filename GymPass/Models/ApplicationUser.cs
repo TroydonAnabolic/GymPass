@@ -16,7 +16,7 @@ namespace GymPass.Models
 
 
         // Facility Details
-      // TODO:  public bool AccessGrantedToFacility { get; set; }
+        public bool AccessGrantedToFacility { get; set; }
         public bool IsInsideGym { get; set; }
         public bool IsUsingWeightsRoom { get; set; }
         public bool IsUsingCardioRoom{ get; set; }

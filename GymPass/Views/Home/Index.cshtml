@@ -78,31 +78,52 @@
     </div>
 
     <div class="access">
+        @* Button to trigger camera scan
+            <div id="deep-lens-camera" class="camera">
+                <form asp-action="Index">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="FacilityID" />
+                    <div class="form-group form-check hidden">
+                        <label class="form-check-label">
+                            <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="locked nav-link btn">
+                            SCAN
+                        </button>
+                    </div>
+                </form>
+            </div> *@
+        @* Button to unlock gate *@
         <div class="access-container">
-
-
             @{
                 // If the door is not currently opened show the lock symbol
                 if (!ViewBag.DoorOpened)
                 {
                     // Hide these form inputs and automatically post set values on click
 
-                    <form asp-action="Index">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="FacilityID" />
-                        <div class="form-group form-check hidden">
-                            <label class="form-check-label">
-                                <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="locked nav-link btn">
-                                <i class="fa fa-lock"></i>
-                            </button>
-                        </div>
-                    </form>
+                        <form asp-action="Index">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="FacilityID" />
+                            <div class="form-group form-check hidden">
+                                <label class="form-check-label">
+                                    <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                                </label>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input id="open-door" class="form-check-input" asp-for="@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility" />
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="locked nav-link btn">
+                                    <i class="fa fa-lock"></i>
+                                </button>
+                            </div>
+                        </form>
                     // TODO:
-                  //  ViewBag.CompletedGymEntries = false;
+                    //  ViewBag.CompletedGymEntries = false;
                     // make a partial view here, inside the partial view, have a modal inside with a separate form, this will allow you to select what you will lose
                     // there will be an option to skip for those who wish to skip it
                     // within the modal, have the form submit button to complete the modal post and set the ViewBad.CompletedGymEntries = true,
@@ -117,7 +138,7 @@
                         <input type="hidden" asp-for="FacilityID" />
                         <div class="form-group form-check hidden">
                             <label class="form-check-label">
-                                <input id="close-door" class="form-check-input" asp-for="IsOpenDoorRequested " /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                                <input id="deep-lens-scan" class="form-check-input" asp-for="IsOpenDoorRequested " /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
                             </label>
                         </div>
                         <div class="form-group">
@@ -135,8 +156,10 @@
             </div>
             <div class="door-status">
                 @* TODO This alert comes up if unauthorized personell enters, when someone else enters, will use button on screen saying Entered gym (with a hidden attribute so it does not ruin UI),
-                    that will be revealed during testing to trigger theoretical camera, however we presume the camera sensor does what button does *@
-                UNAUTHORIZED ACCESS!
+                    that will be revealed during testing to trigger theoretical camera, however we presume the camera sensor does what button does
+                      Also make the camera Highlight in red and grow and shrink when access failed for 5 seconds *@
+
+                SCANNING! UNAUTHORIZED ACCESS!
             </div>
         </div>
     </div>
