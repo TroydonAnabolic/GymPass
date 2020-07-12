@@ -35,6 +35,8 @@ namespace GymPass.Controllers
             _facilityContext = facilityContext;
         }
 
+        [BindProperty]
+        Facility Facility { get; set; }
 
         // GET: Home/Index/1
         // TODO: We begin using id = 1 for now, later will implement dynamically changing this ID number, if it is null then redirect to action choose gym
@@ -61,12 +63,65 @@ namespace GymPass.Controllers
             {
                 return NotFound();
             }
-
-            ViewBag.DoorOpened = false;
+            
+            ViewBag.DoorOpened = facility.DoorOpened;
 
             //Facility.DoorOpened = true;
 
-            return View();
+            return View(facility);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(int id, [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facility)
+        {
+            // Get the default gym for a user and set it to be the Id for the gym being edited
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user.Id == null)
+            {
+                return NotFound();
+            }
+
+            id = user.DefaultGym;
+
+            if (id != facility.FacilityID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // if door open is requested then open the door
+                    if (facility.IsOpenDoorRequested == true)
+                    {
+                        facility.DoorOpened = true;
+                        // TODO: Change status to door opened
+                    }
+
+                    // save the opened door
+                    _facilityContext.Update(facility);
+                    await _facilityContext.SaveChangesAsync();
+
+                    // await statement 5 second timer
+
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FacilityExists(facility.FacilityID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(facility);
         }
 
         public IActionResult Privacy()
@@ -78,6 +133,11 @@ namespace GymPass.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private bool FacilityExists(int id)
+        {
+            return _facilityContext.Facilities.Any(e => e.FacilityID == id);
         }
     }
 }
