@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
-@model GymPass.Models.Facility
+﻿@model GymPass.Models.Facility
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -41,7 +40,7 @@
     @* End Navigation *@
 
     @* Blur out the main gym icon when not inside *@
-    <div class="@(true ? " main-gym" : "not-in-use")">
+    <div class="@(@UserManager.GetUserAsync(User).Result.IsInsideGym ? " main-gym" : "not-in-use")">
         @* e.g <div class="@(Model.CanEdit?"visible-item":"hidden-item")">Some links</div> OR see if I can use JavaScript/ jQuery so it is more transferrable to Python *@
         <div class="main-gym-icon">
             <div class="title-name">
@@ -72,7 +71,7 @@
                     <div class="realtime-icons">
                         <img src="~/images/Capacity/capacity-80.png" />
                     </div>
-                    40
+                    @Model.NumberOfClientsInGym
                 </div>
             </div>
         </div>
@@ -102,6 +101,13 @@
                             </button>
                         </div>
                     </form>
+                    // TODO:
+                  //  ViewBag.CompletedGymEntries = false;
+                    // make a partial view here, inside the partial view, have a modal inside with a separate form, this will allow you to select what you will lose
+                    // there will be an option to skip for those who wish to skip it
+                    // within the modal, have the form submit button to complete the modal post and set the ViewBad.CompletedGymEntries = true,
+                    // inside the control use an await statement to ensure, redirect to page is not
+                    // executed until the modal is posted, and the value of ViewBag.CompletedGymEntries is done.
                 }
                 // if the door is opened show the unlocked symbol
                 else if (ViewBag.DoorOpened)

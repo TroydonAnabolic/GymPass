@@ -16,6 +16,8 @@
     <Compile Remove="Migrations\20200711122649_Update Logic.Designer.cs" />
     <Compile Remove="Migrations\20200711122727_Update Logic.cs" />
     <Compile Remove="Migrations\20200711122727_Update Logic.Designer.cs" />
+    <Compile Remove="Migrations\20200712060943_Add Nullable Avoid Defaults.cs" />
+    <Compile Remove="Migrations\20200712060943_Add Nullable Avoid Defaults.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

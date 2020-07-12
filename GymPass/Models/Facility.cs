@@ -9,12 +9,12 @@ namespace GymPass.Models
     {
         public int FacilityID { get; set; }
         public string FacilityName { get; set; }
-        public int NumberOfClientsInGym { get; set; }
-        public int NumberOfClientsUsingWeightRoom { get; set; }
-        public int NumberOfClientsUsingCardioRoom { get; set; }
-        public int NumberOfClientsUsingStretchRoom{ get; set; }
-        public bool IsOpenDoorRequested { get; set; } = false;
-        public bool DoorOpened { get; set; } = false;
+        public int? NumberOfClientsInGym { get; set; }
+        public int? NumberOfClientsUsingWeightRoom { get; set; }
+        public int? NumberOfClientsUsingCardioRoom { get; set; }
+        public int? NumberOfClientsUsingStretchRoom{ get; set; }
+        public bool IsOpenDoorRequested { get; set; } 
+        public bool DoorOpened { get; set; } 
         public TimeSpan DoorCloseTimer { get; set; } = TimeSpan.FromSeconds(5);
 
         //public bool IsDeepLensRequested { get; set; } = false;

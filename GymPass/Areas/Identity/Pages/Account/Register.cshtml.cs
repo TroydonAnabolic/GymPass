@@ -67,6 +67,12 @@ namespace GymPass.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            // TODO: Option to select default gym on sign up
+            //[Required]
+            //[DataType(DataType.Text)]
+            //[Display(Name = "Select Default Gym")]
+            //public string SelectDefaultGym { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -88,7 +94,8 @@ namespace GymPass.Areas.Identity.Pages.Account
                 var user = new ApplicationUser { 
                     UserName = userName,
                     Email = Input.Email,
-                    FirstName = Input.FirstName
+                    FirstName = Input.FirstName,
+                    DefaultGym = 1 // hard code to be default gym for now
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
