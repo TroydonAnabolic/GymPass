@@ -110,7 +110,7 @@ namespace GymPass.Controllers
                     _facilityContext.Update(facility);
                     await _facilityContext.SaveChangesAsync();
 
-                    // Now jQuery will show the icon unlocked image, which only changes view not submit value
+                    // Now jQuery will show the icon unlocked image, which only changes view to show unlocked icon not submit value, jquery will also be used to set the checkbox value based on click
 
                     // await statement 5 second timer
                  //   System.Threading.Thread.Sleep(facility.DoorCloseTimer);

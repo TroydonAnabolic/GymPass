@@ -93,7 +93,7 @@
                         <input type="hidden" asp-for="FacilityID" />
                         <div class="form-group form-check">
                             <label class="form-check-label">
-                                <input class="form-check-input" asp-for="IsOpenDoorRequested" checked/> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                                <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
                             </label>
                         </div>
                         <div class="form-group">
@@ -111,7 +111,7 @@
                         <input type="hidden" asp-for="FacilityID" />
                         <div class="form-group form-check">
                             <label class="form-check-label">
-                                <input class="form-check-input" asp-for="IsOpenDoorRequested " /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                                <input id="close-door" class="form-check-input" asp-for="IsOpenDoorRequested " /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
                             </label>
                         </div>
                         <div class="form-group">
@@ -138,8 +138,14 @@
 <script>
     $(document).ready(function () {
         $("header").hide();
-        //$(".add-attr").click(function () {
-        //    $('input[type="checkbox"]').attr("checked", "checked");
-        //});
+        // on page load we pre-select the checbox depending on if its opened or closed
+        $('#open-door').prop('checked', true);
+        $('#close-door').prop('checked', false);
+
+        // when we click the lock button we remove the checkbox, regardless on whether the door is opened or not
+       // $("body > main > div.access > div > form > div:nth-child(3) > button").click(function () {
+       ////     $('#open-door').prop('checked', false);
+       //     $('#close-door').prop('checked', false);
+       // });
     });
 </script>
