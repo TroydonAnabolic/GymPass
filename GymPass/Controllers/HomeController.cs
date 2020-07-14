@@ -61,7 +61,7 @@ namespace GymPass.Controllers
             {
                 return NotFound();
             }
-            
+
             ViewBag.DoorOpened = facility.DoorOpened;
 
             return View(facility);
@@ -81,6 +81,7 @@ namespace GymPass.Controllers
 
             id = user.DefaultGym;
 
+            // note that variable facility is the database values, facilityView, binds data from the view
             var facility = await _facilityContext.Facilities.FindAsync(id);
 
 
@@ -97,36 +98,62 @@ namespace GymPass.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
-                    // if door open is requested from the view then open the door, also access must be granted
-                    if (facilityView.IsOpenDoorRequested == true) // TODOL && user.AccessGrantedToFacility - try and use/replicate input model as per index page of user to save user input
+                { // maybe make is open door requested a user property
+                    // if door open is requested from the view by clicking the button, then run the below logic to test if user is authorized and also apply crowdsensing functions
+                    if (facilityView.IsOpenDoorRequested == true)
                     {
-                        facility.DoorOpened = true;
+                        // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
+                        // TODO: Add facial recognition scan and geo location detection
+                        
+                        user.IsCameraScanSuccessful = true;
+                        user.IsWithin10m = true;
 
-                        // if the user is already in the gym, then say this user is not in the gym, and decrease the number of ppl in the gym
-                        if (user.IsInsideGym)
+                        // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
+                        if (user.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
                         {
-                            user.IsInsideGym = false;
-                            facility.NumberOfClientsInGym--;
-                            _facilityContext.Update(facility);
-                            await _facilityContext.SaveChangesAsync();
-                            // TODO: if statements, if viewbag, user selected if they are using cardio equip, then increment cardio etc.
+                            user.AccessGrantedToFacility = true;
                         }
-                        // if the user is not in the gym, then say this user is not in the gym, and increase the number of ppl in the gym
-                        else if (!user.IsInsideGym)
+                        // if camera scan is not successful
+                        else if (!user.IsCameraScanSuccessful && !user.IsWithin10m)
                         {
-                            facility.NumberOfClientsInGym++;
-                            user.IsInsideGym = true;
-                            _facilityContext.Update(facility);
-                            await _facilityContext.SaveChangesAsync();
+                            user.AccessGrantedToFacility = false;
                         }
+
+                        if (user.AccessGrantedToFacility)
+                        {
+                            facility.DoorOpened = true;
+                            // if the user is not in the gym, then say this user is not in the gym, and increase the number of ppl in the gym by 1
+                            if (!user.IsInsideGym)
+                            {
+                                facility.NumberOfClientsInGym++;
+                                user.IsInsideGym = true;
+                                _facilityContext.Update(facility);
+                                await _facilityContext.SaveChangesAsync();
+                            }
+                            // if the user is already in the gym, then make is user in gym false, and decrease the number of ppl in the gym by 1
+                            else if (user.IsInsideGym)
+                            {
+                                user.IsInsideGym = false;
+                                facility.NumberOfClientsInGym--;
+                                user.IsCameraScanSuccessful = false;
+                                user.IsWithin10m = false;
+                                user.AccessGrantedToFacility = false;
+                                _facilityContext.Update(facility);
+                                await _facilityContext.SaveChangesAsync();
+                                // TODO: if statements, if viewbag, user selected if they are using cardio equip, then increment cardio etc.
+                            }
+                        } // end access granted
+
                     }
-                    // when we are leaving we set open door and door opened to false
-                    else if (facility.IsOpenDoorRequested == false)
-                    {
-                        facility.DoorOpened = false;
-                        user.IsInsideGym = false;
-                    }
+
+                    // make sure door open is no longer requested
+
+                    //// TODO: when we reach midnight and, set everyones as out of the gym
+                    //if (!facility.is24SevenGym user.IsInsideGym && DateTime.Today)
+                    //{
+                    //    facility.NumberOfClientsInGym = 0;
+                    //    user.IsInsideGym = false;
+                    //}
 
                     // save the opened door and user
                     _facilityContext.Update(facility);
@@ -156,6 +183,7 @@ namespace GymPass.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
+
             }
             return View(facility);
         }

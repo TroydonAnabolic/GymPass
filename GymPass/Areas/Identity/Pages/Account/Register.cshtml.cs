@@ -69,10 +69,10 @@ namespace GymPass.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
 
             // TODO: Option to select default gym on sign up
-            //[Required]
-            //[DataType(DataType.Text)]
-            //[Display(Name = "Select Default Gym")]
-            //public string SelectDefaultGym { get; set; }
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Select Default Gym")]
+            public int SelectDefaultGym { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)

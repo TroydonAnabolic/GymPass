@@ -17,11 +17,15 @@ namespace GymPass.Models
 
         // Facility Details
         public bool AccessGrantedToFacility { get; set; }
+        public bool IsCameraScanSuccessful { get; set; }
+        public bool IsWithin10m { get; set; }
         public bool IsInsideGym { get; set; }
         public bool IsUsingWeightsRoom { get; set; }
         public bool IsUsingCardioRoom{ get; set; }
         public bool IsUsingStretchRoom { get; set; }
         public bool OpenDoorRequest { get; set; }
         public bool ExitGymRequest { get; set; }
+
+
     }
 }

@@ -7,10 +7,6 @@
     ViewData["Title"] = "Home Page";
 }
 
-
-
-@* TODO: Conditionally highlight class or lowered opacity depending on database value if person is inside the gym *@
-
 @* Start Navigation *@
 @if (SignInManager.IsSignedIn(User))
 {
@@ -41,7 +37,6 @@
 
     @* Blur out the main gym icon when not inside *@
     <div class="@(@UserManager.GetUserAsync(User).Result.IsInsideGym ? " main-gym" : "not-in-use")">
-        @* e.g <div class="@(Model.CanEdit?"visible-item":"hidden-item")">Some links</div> OR see if I can use JavaScript/ jQuery so it is more transferrable to Python *@
         <div class="main-gym-icon">
             <div class="title-name">
                 GYM PASS
@@ -78,24 +73,6 @@
     </div>
 
     <div class="access">
-        @* Button to trigger camera scan
-            <div id="deep-lens-camera" class="camera">
-                <form asp-action="Index">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="FacilityID" />
-                    <div class="form-group form-check hidden">
-                        <label class="form-check-label">
-                            <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="locked nav-link btn">
-                            SCAN
-                        </button>
-                    </div>
-                </form>
-            </div> *@
-        @* Button to unlock gate *@
         <div class="access-container">
             @{
                 // If the door is not currently opened show the lock symbol
@@ -103,25 +80,28 @@
                 {
                     // Hide these form inputs and automatically post set values on click
 
-                        <form asp-action="Index">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="hidden" asp-for="FacilityID" />
-                            <div class="form-group form-check hidden">
-                                <label class="form-check-label">
-                                    <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
-                                </label>
-                            </div>
-                            <div class="form-group form-check">
-                                <label class="form-check-label">
-                                    <input id="open-door" class="form-check-input" asp-for="@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility" />
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="locked nav-link btn">
-                                    <i class="fa fa-lock"></i>
-                                </button>
-                            </div>
-                        </form>
+                    <form asp-action="Index">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="FacilityID" />
+
+                        <div class="form-group form-check hidden">
+                            <label class="form-check-label">
+                                <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                            </label>
+                        </div>
+
+                        @if (@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility)
+                        {
+                            // open a modal with further form groups asking for training duration and equipment to use with a continue button to close modal.
+                            
+                        }
+
+                        <div class="form-group">
+                            <button type="submit" class="locked nav-link btn">
+                                <i class="fa fa-lock"></i>
+                            </button>
+                        </div>
+                    </form>
                     // TODO:
                     //  ViewBag.CompletedGymEntries = false;
                     // make a partial view here, inside the partial view, have a modal inside with a separate form, this will allow you to select what you will lose
@@ -154,13 +134,39 @@
             <div class="progress">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
             </div>
-            <div class="door-status">
-                @* TODO This alert comes up if unauthorized personell enters, when someone else enters, will use button on screen saying Entered gym (with a hidden attribute so it does not ruin UI),
-                    that will be revealed during testing to trigger theoretical camera, however we presume the camera sensor does what button does
-                      Also make the camera Highlight in red and grow and shrink when access failed for 5 seconds *@
+            @* TODO This alert comes up if unauthorized personell enters, when someone else enters, will use button on screen saying Entered gym (with a hidden attribute so it does not ruin UI),
+        that will be revealed during testing to trigger theoretical camera, however we presume the camera sensor does what button does
+          Also make the camera Highlight in red and grow and shrink when access failed for 5 seconds *@
 
-                SCANNING! UNAUTHORIZED ACCESS!
-            </div>
+            @{
+                // TODO : Change this to use javascript and the inner will be c#
+                if (true)
+                {
+                    // use javascript to show scanning for 3 seconds instead TODO
+                    <div class="door-status temp-scan hidden">
+                        SCANNING
+                    </div>
+                    // access is granted is shown when the server has access granted
+                    if (@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility)
+                    {
+                        <div class="door-status">
+                            WELCOME @UserManager.GetUserAsync(User).Result.FirstName!
+                        </div>
+                    }
+                    else if (!@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility) // show access denied for 3 seconds
+                    {
+                        <div class="door-status">
+                            ACCESS DENIED!
+                        </div>
+                    }
+                }
+                // if open door was not requested when show nothing
+                else if (!Model.IsOpenDoorRequested)
+                {
+                    <div class="door-status">
+                    </div>
+                }
+            }
         </div>
     </div>
 }

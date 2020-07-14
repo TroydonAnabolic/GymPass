@@ -421,7 +421,7 @@ header {
 }
 
 body > main > div.access > div > div.progress {
-    margin-top: 1rem;
+/*    margin-top: 1rem;*/
 }
 
 .door-status {
