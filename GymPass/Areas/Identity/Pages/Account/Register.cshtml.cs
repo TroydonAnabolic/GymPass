@@ -87,12 +87,8 @@ namespace GymPass.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                // assigns username to be email
-                MailAddress address = new MailAddress(Input.Email);
-                string userName = address.User;
-
                 var user = new ApplicationUser { 
-                    UserName = userName,
+                    UserName = Input.Email,
                     Email = Input.Email,
                     FirstName = Input.FirstName,
                     DefaultGym = 1 // hard code to be default gym for now
@@ -115,8 +111,7 @@ namespace GymPass.Areas.Identity.Pages.Account
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { 
-                            email = Input.Email, returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
                     else
                     {
