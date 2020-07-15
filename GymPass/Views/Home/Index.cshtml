@@ -174,7 +174,8 @@
                     <div class="door-status temp-scan hidden">
                         SCANNING
                     </div>
-                    if (!ViewBag.AccessGrantedToFacility && Model.IsOpenDoorRequested) // show access denied for 3 seconds
+                    // use of view bag as we cannot get access granted property value until the data is saved to the database, whilst view bag
+                    if (!ViewBag.AccessGrantedToFacility && Model.IsOpenDoorRequested) // 
                     {
                         <div class="door-status">ACCESS DENIED!</div>
                     }
@@ -203,17 +204,26 @@
         // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
         // after 4 seconds it will remove scanning
         $("body > main > div.access > div > form > div:nth-child(3) > button > svg").click(function () {
-            $("body > main > div.access > div > div.door-status.temp-scan.hidden").removeClass("hidden");
+         //   $("body > main > div.access > div > div.door-status.temp-scan.hidden").delay(2000).removeClass("hidden");
               //  .delay(500).addClass("hidden");
+
+            var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
+            setTimeout(function () {
+                scan.addClass('hidden');
+            }, 3000);
+
+            //var accessDenied = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
+            //accessDenied(function () {
+            //    scan.addClass('hidden');
+            //}, 2000);
 
             // after scanning is complete, and page refreshes, if user is welcome, wait 5 seconds for the page refresh then leave welcome on the screen while user is inside the gym
             if ($('body > main > div.access > div > div:nth-child(4):contains("WELCOME")').length > 0) {
-                $('body > main > div.access > div > div:nth-child(4):contains("WELCOME")').removeClass("hidden")
+                $('body > main > div.access > div > div:nth-child(4):contains("WELCOME")').removeClass("hidden");
             }
             // on page refresh, if it is access denied then hide after page refresh, 
-            else if ($('body > main > div.access > div > div:nth-child(4):contains("WELCOME")').length > 0) {
-                $('body > main > div.access > div > div:nth-child(4):contains("ACCESS DENIED")').removeClass("hidden")
-                    .delay(200).addClass("hidden");
+            else if ($('body > main > div.access > div > div:nth-child(4):contains("ACCESS")').length > 0) {
+                $('body > main > div.access > div > div:nth-child(4):contains("ACCESS")');
             }
         });
     });

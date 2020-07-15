@@ -43,8 +43,8 @@ namespace GymPass.Controllers
         {
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
+            // initiall set the access view bag to false, as this will prevent null exception
             ViewBag.AccessGrantedToFacility = false;
-
 
             if (user.Id == null)
             {
@@ -106,7 +106,9 @@ namespace GymPass.Controllers
                     {
                         // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
                         // TODO: Add facial recognition scan and geo location detection
-                        
+
+
+
                         user.IsCameraScanSuccessful = true;
                         user.IsWithin10m = true;
 
@@ -130,6 +132,7 @@ namespace GymPass.Controllers
                             {
                                 facility.NumberOfClientsInGym++;
                                 user.IsInsideGym = true;
+                                // TODO: await modal being filled, possibly use view bag to pass data, this will prevent the door from closing
                                 _facilityContext.Update(facility);
                                 await _facilityContext.SaveChangesAsync();
                             }
@@ -145,35 +148,36 @@ namespace GymPass.Controllers
                                 await _facilityContext.SaveChangesAsync();
                                 // TODO: if statements, if viewbag, user selected if they are using cardio equip, then increment cardio etc.
                             }
+
                         } // end access granted
 
+                        // make sure door open is no longer requested
+
+                        //// TODO: when we reach midnight and, set everyones as out of the gym
+                        //if (!facility.is24SevenGym user.IsInsideGym && DateTime.Today)
+                        //{
+                        //    facility.NumberOfClientsInGym = 0;
+                        //    user.IsInsideGym = false;
+                        //}
+
+                        // save the opened door and user
+                        _facilityContext.Update(facility);
+                        await _facilityContext.SaveChangesAsync();
+
+                        // Now jQuery will show the icon unlocked image, which only changes view to show unlocked icon not submit value, jquery will also be used to set the checkbox value based on click
+
+                        // await statement 5 second timer before closing only if door is open, if the door is closed, it automatically closes
+                        if (facility.DoorOpened && user.AccessGrantedToFacility) System.Threading.Thread.Sleep(8000);
+                        else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
+
+                        // When 5 second timer finishes, we close the door again automatically
+                        // facility.IsOpenDoorRequested = false;
+                        facility.DoorOpened = false;
+                        _facilityContext.Update(facility);
+                        await _facilityContext.SaveChangesAsync();
+                        await _userManager.UpdateAsync(user);
                     }
-
-                    // make sure door open is no longer requested
-
-                    //// TODO: when we reach midnight and, set everyones as out of the gym
-                    //if (!facility.is24SevenGym user.IsInsideGym && DateTime.Today)
-                    //{
-                    //    facility.NumberOfClientsInGym = 0;
-                    //    user.IsInsideGym = false;
-                    //}
-
-                    // save the opened door and user
-                    _facilityContext.Update(facility);
-                    await _facilityContext.SaveChangesAsync();
-
-                    // Now jQuery will show the icon unlocked image, which only changes view to show unlocked icon not submit value, jquery will also be used to set the checkbox value based on click
-
-                    // await statement 5 second timer before closing only if door is open, if the door is closed, it automatically closes
-                    if (facility.DoorOpened) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
-                    // When 5 second timer finishes, we close the door again automatically
-                    // facility.IsOpenDoorRequested = false;
-                    facility.DoorOpened = false;
-                    _facilityContext.Update(facility);
-                    await _facilityContext.SaveChangesAsync();
-                    await _userManager.UpdateAsync(user);
                 }
-
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!FacilityExists(facility.FacilityID))
