@@ -15,7 +15,7 @@ namespace GymPass.Models
         public int? NumberOfClientsUsingStretchRoom{ get; set; }
         public bool IsOpenDoorRequested { get; set; } 
         public bool DoorOpened { get; set; } 
-        public TimeSpan DoorCloseTimer { get; set; } = TimeSpan.FromSeconds(8);
+        public TimeSpan DoorCloseTimer { get; set; } = TimeSpan.FromSeconds(5);
 
         //public bool IsDeepLensRequested { get; set; } = false;
         //public bool IsWithin10m { get; set; } = false;

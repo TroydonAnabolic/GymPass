@@ -43,6 +43,8 @@ namespace GymPass.Controllers
         {
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
+            ViewBag.AccessGrantedToFacility = false;
+
 
             if (user.Id == null)
             {
@@ -112,6 +114,7 @@ namespace GymPass.Controllers
                         if (user.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
                         {
                             user.AccessGrantedToFacility = true;
+                            ViewBag.AccessGrantedToFacility = true;
                         }
                         // if camera scan is not successful
                         else if (!user.IsCameraScanSuccessful && !user.IsWithin10m)
@@ -130,7 +133,7 @@ namespace GymPass.Controllers
                                 _facilityContext.Update(facility);
                                 await _facilityContext.SaveChangesAsync();
                             }
-                            // if the user is already in the gym, then make is user in gym false, and decrease the number of ppl in the gym by 1
+                            // if the user is already in the gym, when button is pushed then make reset all access to false, and decrement the number of ppl in the gym by 1
                             else if (user.IsInsideGym)
                             {
                                 user.IsInsideGym = false;

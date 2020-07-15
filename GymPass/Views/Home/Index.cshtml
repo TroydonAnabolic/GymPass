@@ -73,6 +73,12 @@
     </div>
 
     <div class="access">
+
+        <!-- Button trigger modal TO DO: Once i finish animation for access denied appearing only for 3 seconds, and scanning followed by success --> 
+        @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+            Launch demo modal
+        </button>*@
+
         <div class="access-container">
             @{
                 // If the door is not currently opened show the lock symbol
@@ -84,7 +90,7 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input type="hidden" asp-for="FacilityID" />
 
-                        <div class="form-group form-check hidden">
+                        <div class="form-group form-check hidden" style="height:0px;">
                             <label class="form-check-label">
                                 <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
                             </label>
@@ -93,7 +99,27 @@
                         @if (@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility)
                         {
                             // open a modal with further form groups asking for training duration and equipment to use with a continue button to close modal.
-                            
+                            @* Start Modal for training intentions *@
+                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ...
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @* End Modal for training intentions *@
                         }
 
                         <div class="form-group">
@@ -110,6 +136,8 @@
                     // inside the control use an await statement to ensure, redirect to page is not
                     // executed until the modal is posted, and the value of ViewBag.CompletedGymEntries is done.
                 }
+
+
                 // if the door is opened show the unlocked symbol
                 else if (ViewBag.DoorOpened)
                 {
@@ -121,6 +149,7 @@
                                 <input id="deep-lens-scan" class="form-check-input" asp-for="IsOpenDoorRequested " /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
                             </label>
                         </div>
+
                         <div class="form-group">
                             <button type="submit" class="unlocked nav-link btn">
                                 <i class="fas fa-lock-open"></i>
@@ -130,7 +159,6 @@
                 }
             }
 
-            <br />
             <div class="progress">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
             </div>
@@ -139,32 +167,28 @@
           Also make the camera Highlight in red and grow and shrink when access failed for 5 seconds *@
 
             @{
-                // TODO : Change this to use javascript and the inner will be c#
-                if (true)
+                // Only when the user is not inside the gym do we trigger the status messages (given it is pressed, this ensures it is not trigerred when trying to leave)
+                if ( !@UserManager.GetUserAsync(User).Result.IsInsideGym)
                 {
-                    // use javascript to show scanning for 3 seconds instead TODO
+                    // using jQuery we remove hidden attribute on button push, when user is not inside gym.
                     <div class="door-status temp-scan hidden">
                         SCANNING
                     </div>
-                    // access is granted is shown when the server has access granted
+                    if (!ViewBag.AccessGrantedToFacility && Model.IsOpenDoorRequested) // show access denied for 3 seconds
+                    {
+                        <div class="door-status">ACCESS DENIED!</div>
+                    }
+                }
+                // if user is inside the gym, show welcome message
+                else if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
+                {
+                    // access is granted is shown when the server has access granted (page was refreshed)
                     if (@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility)
                     {
                         <div class="door-status">
                             WELCOME @UserManager.GetUserAsync(User).Result.FirstName!
                         </div>
                     }
-                    else if (!@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility) // show access denied for 3 seconds
-                    {
-                        <div class="door-status">
-                            ACCESS DENIED!
-                        </div>
-                    }
-                }
-                // if open door was not requested when show nothing
-                else if (!Model.IsOpenDoorRequested)
-                {
-                    <div class="door-status">
-                    </div>
                 }
             }
         </div>
@@ -176,5 +200,21 @@
     $(document).ready(function () {
         $("header").hide();
 
+        // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
+        // after 4 seconds it will remove scanning
+        $("body > main > div.access > div > form > div:nth-child(3) > button > svg").click(function () {
+            $("body > main > div.access > div > div.door-status.temp-scan.hidden").removeClass("hidden");
+              //  .delay(500).addClass("hidden");
+
+            // after scanning is complete, and page refreshes, if user is welcome, wait 5 seconds for the page refresh then leave welcome on the screen while user is inside the gym
+            if ($('body > main > div.access > div > div:nth-child(4):contains("WELCOME")').length > 0) {
+                $('body > main > div.access > div > div:nth-child(4):contains("WELCOME")').removeClass("hidden")
+            }
+            // on page refresh, if it is access denied then hide after page refresh, 
+            else if ($('body > main > div.access > div > div:nth-child(4):contains("WELCOME")').length > 0) {
+                $('body > main > div.access > div > div:nth-child(4):contains("ACCESS DENIED")').removeClass("hidden")
+                    .delay(200).addClass("hidden");
+            }
+        });
     });
 </script>
