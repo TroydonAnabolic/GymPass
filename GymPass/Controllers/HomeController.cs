@@ -69,6 +69,15 @@ namespace GymPass.Controllers
             // access denied message is normally true
             ViewBag.AccessDeniedMsgRecieved = true;
 
+            //// if the time since access is granted, we redirect the user that only displays a page to submit data for the training intentions
+            /// it will have the option to skip, which will just navigate the user back to home page
+            /// possibly will have the page look like a replica of the dashboard, only have it with a reduced opacity, by making the modal load on page load.
+            /// TODO: Create a controller action, in facility controller, that allows this above mentioned functionality.
+            if (DateTime.Now <= (user.TimeAccessGranted.AddSeconds(15)))
+            {
+                return RedirectToAction("ViewWithModal");
+            }
+
             // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
             if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
             ViewBag.AccessDeniedMsgRecieved = false;
@@ -114,13 +123,14 @@ namespace GymPass.Controllers
                         // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
                         // TODO: Add facial recognition scan and geo location detection
 
-                        user.IsCameraScanSuccessful = false;
-                        user.IsWithin10m = false;
+                        user.IsCameraScanSuccessful = true;
+                        user.IsWithin10m = true;
 
                         // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
                         if (user.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
                         {
                             user.AccessGrantedToFacility = true;
+                            ViewBag.AccessGrantedToFacility = true;
                         }
                         // if camera scan is not successful
                         else if (!user.IsCameraScanSuccessful && !user.IsWithin10m)
@@ -172,10 +182,14 @@ namespace GymPass.Controllers
                         _facilityContext.Update(facility);
                         await _facilityContext.SaveChangesAsync();
 
-                        // Now jQuery will show the icon unlocked image, which only changes view to show unlocked icon not submit value, jquery will also be used to set the checkbox value based on click
 
-                        // await statement 5 second timer before closing only if door is open, if the door is closed, it automatically closes
-                        if (facility.DoorOpened && user.AccessGrantedToFacility) System.Threading.Thread.Sleep(8000);
+                        // if door has been opened and user is authorised
+                        if (facility.DoorOpened && user.AccessGrantedToFacility)
+                        {
+                            // log the time granted, and wait 8 seconds.
+                            user.TimeAccessGranted = DateTime.Now;
+                            System.Threading.Thread.Sleep(8000);
+                        }
                         else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
 
                         // When 5 second timer finishes, we close the door again automatically

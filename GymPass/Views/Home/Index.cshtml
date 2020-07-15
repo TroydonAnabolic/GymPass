@@ -74,10 +74,10 @@
 
     <div class="access">
 
-        <!-- Button trigger modal TO DO: Once i finish animation for access denied appearing only for 3 seconds, and scanning followed by success --> 
+        <!-- Button trigger modal TO DO: Once i finish animation for access denied appearing only for 3 seconds, and scanning followed by success -->
         @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-            Launch demo modal
-        </button>*@
+                Launch demo modal
+            </button>*@
 
         <div class="access-container">
             @{
@@ -86,57 +86,57 @@
                 {
                     // Hide these form inputs and automatically post set values on click
 
-                        <form asp-action="Index">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="hidden" asp-for="FacilityID" />
+                    <form asp-action="Index">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="FacilityID" />
 
-                            <div class="form-group form-check hidden" style="height:0px;">
-                                <label class="form-check-label">
-                                    <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
-                                </label>
-                            </div>
+                        <div class="form-group form-check hidden" style="height:0px;">
+                            <label class="form-check-label">
+                                <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                            </label>
+                        </div>
 
-                            @*// TODO:
+                        @*// TODO:
                             // there will be an option to skip for those who wish to skip it
                             // within the modal, have the form submit button to complete the modal post and set the ViewBad.CompletedGymEntries = true,
                             // inside the control use an await statement to ensure, redirect to page is not
                             // executed until the modal is posted, and the value of ViewBag.CompletedGymEntries is done.*@
-                            @if (@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility)
-                            {
-                                // open a modal with further form groups asking for training duration and equipment to use with a continue button to close modal.
-                                @* Start Modal for training intentions *@
-                                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ...
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Save changes</button>
-                                            </div>
+                        @if (@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility)
+                        {
+                            // open a modal with further form groups asking for training duration and equipment to use with a continue button to close modal.
+                            @* Start Modal for training intentions *@
+                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ...
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary">Save changes</button>
                                         </div>
                                     </div>
                                 </div>
-                                @* End Modal for training intentions *@
-                            }
-
-                            <div class="form-group">
-                                <button type="submit" class="locked nav-link btn">
-                                    <i class="fa fa-lock"></i>
-                                </button>
                             </div>
-                        </form>
+                        }
+                        @* End Modal for training intentions *@
+
+
+                        <div class="form-group">
+                            <button type="submit" class="locked nav-link btn">
+                                <i class="fa fa-lock"></i>
+                            </button>
+                        </div>
+                    </form>
 
                 }
-
-                // if the door is opened show the unlocked symbol
+                // if the door is opened show the unlocked symbol and also present the modal
                 else if (ViewBag.DoorOpened)
                 {
                     <form asp-action="Index">
@@ -163,7 +163,7 @@
 
             @{
                 // Only when the user is not inside the gym do we trigger the status messages (given it is pressed, this ensures it is not trigerred when trying to leave)
-                if ( !@UserManager.GetUserAsync(User).Result.IsInsideGym)
+                if (!@UserManager.GetUserAsync(User).Result.IsInsideGym)
                 {
                     // using jQuery we remove hidden attribute on button push, when user is not inside gym, and show for 2 seconds always
                     <div class="door-status temp-scan hidden">
