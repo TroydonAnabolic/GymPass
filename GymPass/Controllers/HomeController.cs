@@ -71,7 +71,7 @@ namespace GymPass.Controllers
 
             //// if the time since access is granted, we redirect the user that only displays a page to submit data for the training intentions
             /// it will have the option to skip, which will just navigate the user back to home page
-            /// possibly will have the page look like a replica of the dashboard, but without server side code, only have it with a reduced opacity, by making the modal load on page load.
+            /// possibly will have the page look like a replica of the dashboard(or just a random gym image), but without server side code, only have it with a reduced opacity, by making the modal load on page load.
             /// The modal will have server side code just for posting data for intended training durations and equipment to train with.
             /// TODO: Create a controller action, in facility controller, that allows this above mentioned functionality.
             if (DateTime.Now <= (user.TimeAccessGranted.AddSeconds(15)))
