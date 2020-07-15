@@ -25,7 +25,6 @@ namespace GymPass.Models
         public bool IsUsingStretchRoom { get; set; }
         public bool OpenDoorRequest { get; set; }
         public bool ExitGymRequest { get; set; }
-
-
+        public DateTime TimeAccessDenied { get; set; } 
     }
 }

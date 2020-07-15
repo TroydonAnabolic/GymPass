@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
 using static GymPass.Areas.Identity.Pages.Account.Manage.IndexModel;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace GymPass.Controllers
 {
@@ -44,7 +45,6 @@ namespace GymPass.Controllers
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
             // initiall set the access view bag to false, as this will prevent null exception
-            ViewBag.AccessGrantedToFacility = false;
 
             if (user.Id == null)
             {
@@ -64,7 +64,14 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
+            // door open status depends on database value
             ViewBag.DoorOpened = facility.DoorOpened;
+            // access denied message is normally true
+            ViewBag.AccessDeniedMsgRecieved = true;
+
+            // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
+            if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
+            ViewBag.AccessDeniedMsgRecieved = false;
 
             return View(facility);
         }
@@ -107,16 +114,13 @@ namespace GymPass.Controllers
                         // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
                         // TODO: Add facial recognition scan and geo location detection
 
-
-
-                        user.IsCameraScanSuccessful = true;
-                        user.IsWithin10m = true;
+                        user.IsCameraScanSuccessful = false;
+                        user.IsWithin10m = false;
 
                         // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
                         if (user.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
                         {
                             user.AccessGrantedToFacility = true;
-                            ViewBag.AccessGrantedToFacility = true;
                         }
                         // if camera scan is not successful
                         else if (!user.IsCameraScanSuccessful && !user.IsWithin10m)
@@ -150,17 +154,21 @@ namespace GymPass.Controllers
                             }
 
                         } // end access granted
-
+                        else if (!user.AccessGrantedToFacility)
+                        {
+                            ViewBag.AccessDeniedMsgRecieved = false;
+                            user.TimeAccessDenied = DateTime.Now;
+                        }
                         // make sure door open is no longer requested
 
-                        //// TODO: when we reach midnight and, set everyones as out of the gym
-                        //if (!facility.is24SevenGym user.IsInsideGym && DateTime.Today)
-                        //{
-                        //    facility.NumberOfClientsInGym = 0;
-                        //    user.IsInsideGym = false;
-                        //}
+                            //// TODO: when we reach midnight and, set everyones as out of the gym
+                            //if (!facility.is24SevenGym user.IsInsideGym && DateTime.Today)
+                            //{
+                            //    facility.NumberOfClientsInGym = 0;
+                            //    user.IsInsideGym = false;
+                            //}
 
-                        // save the opened door and user
+                            // save the opened door and user
                         _facilityContext.Update(facility);
                         await _facilityContext.SaveChangesAsync();
 
