@@ -1,23 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GymPass.Data.Migrations
 {
-    public partial class ImplementCameraScan : Migration
+    public partial class AccessGrantedTimeLog : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "AccessGrantedToFacility",
+            migrationBuilder.AddColumn<DateTime>(
+                name: "TimeAccessGranted",
                 schema: "Identity",
                 table: "User",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "AccessGrantedToFacility",
+                name: "TimeAccessGranted",
                 schema: "Identity",
                 table: "User");
         }

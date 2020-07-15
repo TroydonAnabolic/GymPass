@@ -76,7 +76,7 @@ namespace GymPass.Controllers
             /// TODO: Create a controller action, in facility controller, that allows this above mentioned functionality.
             if (DateTime.Now <= (user.TimeAccessGranted.AddSeconds(15)))
             {
-                return RedirectToAction("ViewWithModal");
+                //return RedirectToAction("ViewWithModal");
             }
 
             // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
@@ -147,6 +147,7 @@ namespace GymPass.Controllers
                             {
                                 facility.NumberOfClientsInGym++;
                                 user.IsInsideGym = true;
+                                user.TimeAccessGranted = DateTime.Now;
                                 // TODO: await modal being filled, possibly use view bag to pass data, this will prevent the door from closing
                                 _facilityContext.Update(facility);
                                 await _facilityContext.SaveChangesAsync();
@@ -188,8 +189,7 @@ namespace GymPass.Controllers
                         if (facility.DoorOpened && user.AccessGrantedToFacility)
                         {
                             // log the time granted, and wait 8 seconds.
-                            user.TimeAccessGranted = DateTime.Now;
-                            System.Threading.Thread.Sleep(8000);
+                            System.Threading.Thread.Sleep(facility.DoorCloseTimer);
                         }
                         else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
 

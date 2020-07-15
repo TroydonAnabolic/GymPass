@@ -107,6 +107,9 @@ namespace GymPass.Data.Migrations
                     b.Property<DateTime>("TimeAccessDenied")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("TimeAccessGranted")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 

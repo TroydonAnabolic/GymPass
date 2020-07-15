@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymPass.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200712073511_Implement Camera Scan")]
-    partial class ImplementCameraScan
+    [Migration("20200715093359_Access Granted Time Log")]
+    partial class AccessGrantedTimeLog
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -53,6 +53,9 @@ namespace GymPass.Data.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsCameraScanSuccessful")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsInsideGym")
                         .HasColumnType("bit");
 
@@ -63,6 +66,9 @@ namespace GymPass.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsUsingWeightsRoom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsWithin10m")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
@@ -99,6 +105,12 @@ namespace GymPass.Data.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TimeAccessDenied")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeAccessGranted")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
