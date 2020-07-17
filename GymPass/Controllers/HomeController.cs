@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,29 +9,24 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
-using static GymPass.Areas.Identity.Pages.Account.Manage.IndexModel;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace GymPass.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly FacilityContext _facilityContext;
 
 
         public HomeController(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
             ILogger<HomeController> logger,
             FacilityContext facilityContext
 
             )
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _logger = logger;
             _facilityContext = facilityContext;
         }
@@ -64,6 +58,8 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
+            // default to false for access
+            ViewBag.AccessGrantedToFacility = false;
             // door open status depends on database value
             ViewBag.DoorOpened = facility.DoorOpened;
             // access denied message is normally true
@@ -121,9 +117,10 @@ namespace GymPass.Controllers
                     // if door open is requested from the view by clicking the button, then run the below logic to test if user is authorized and also apply crowdsensing functions
                     if (facilityView.IsOpenDoorRequested == true)
                     {
+                        ViewBag.IsExerciseLogComplete = false;
+
                         // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
                         // TODO: Add facial recognition scan and geo location detection
-
                         user.IsCameraScanSuccessful = true;
                         user.IsWithin10m = true;
 
@@ -148,7 +145,18 @@ namespace GymPass.Controllers
                                 facility.NumberOfClientsInGym++;
                                 user.IsInsideGym = true;
                                 user.TimeAccessGranted = DateTime.Now;
-                                // TODO: await modal being filled, possibly use view bag to pass data, this will prevent the door from closing
+
+                                // TODO: Use AJAX to async send to and from the client at the same time
+                                //while (!ViewBag.IsExerciseLogComplete)
+                                //{
+                                //    // if the amount of time passed since user was asked to fill log 
+                                //    if (DateTime.Now >= (user.TimeAccessGranted.AddSeconds(15))) // todo: change this to 
+                                //    {
+                                //        ViewBag.IsExerciseLogComplete = true;
+                                //    }
+                                //    else if (ViewBag.IsExerciseLogComplete) break;
+                                //}
+
                                 _facilityContext.Update(facility);
                                 await _facilityContext.SaveChangesAsync();
                             }
@@ -180,7 +188,7 @@ namespace GymPass.Controllers
                             //    user.IsInsideGym = false;
                             //}
 
-                            // save the opened door and user
+                            // save the opened door and user. TODO: try changing these to facility view for privacy if possible
                         _facilityContext.Update(facility);
                         await _facilityContext.SaveChangesAsync();
 
@@ -188,7 +196,7 @@ namespace GymPass.Controllers
                         // if door has been opened and user is authorised
                         if (facility.DoorOpened && user.AccessGrantedToFacility)
                         {
-                            // log the time granted, and wait 8 seconds.
+                            // log the time granted, and wait 5 seconds.
                             System.Threading.Thread.Sleep(facility.DoorCloseTimer);
                         }
                         else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
@@ -212,8 +220,8 @@ namespace GymPass.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
-
+                // if the user has logged in successfully, then send to questionnaire for now, later will use AJAX to post questionaire here, and have option to later log in workout
+                return (user.AccessGrantedToFacility) ? RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym }) : RedirectToAction(nameof(Index));
             }
             return View(facility);
         }

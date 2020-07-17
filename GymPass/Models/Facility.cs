@@ -16,7 +16,8 @@ namespace GymPass.Models
         public bool IsOpenDoorRequested { get; set; } 
         public bool DoorOpened { get; set; } 
         public TimeSpan DoorCloseTimer { get; set; } = TimeSpan.FromSeconds(5);
-
+        public TimeSpan UserTrainingDuration { get; set; }
+        public TimeSpan TotalTrainingDuration { get; set; }
         //public bool IsDeepLensRequested { get; set; } = false;
         //public bool IsWithin10m { get; set; } = false;
         //public bool IsAlexaRequested { get; set; } = false;

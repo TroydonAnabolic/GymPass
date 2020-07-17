@@ -7,24 +7,29 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GymPass.Data;
 using GymPass.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace GymPass.Controllers
 {
     public class FacilitiesController : Controller
     {
-        private readonly FacilityContext _context;
+        private readonly FacilityContext _facilityContext;
+        private readonly UserManager<ApplicationUser> _userManager;
+
 
         public FacilitiesController(
-            FacilityContext context
+            FacilityContext facilityContext,
+            UserManager<ApplicationUser> userManager
             )
         {
-            _context = context;
+            _facilityContext = facilityContext;
+
         }
 
         // GET: Facilities
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Facilities.ToListAsync());
+            return View(await _facilityContext.Facilities.ToListAsync());
         }
 
         // GET: Facilities/Details/5
@@ -35,7 +40,7 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
-            var facility = await _context.Facilities
+            var facility = await _facilityContext.Facilities
                 .FirstOrDefaultAsync(m => m.FacilityID == id);
             if (facility == null)
             {
@@ -60,12 +65,85 @@ namespace GymPass.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(facility);
-                await _context.SaveChangesAsync();
+                _facilityContext.Add(facility);
+                await _facilityContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(facility);
         }
+
+        // EDIT Workoutlog
+        public async Task<IActionResult> EditWorkoutLog(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var facility = await _facilityContext.Facilities.FindAsync(id);
+
+
+            if (facility == null)
+            {
+                return NotFound();
+            }
+
+            return View(facility);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditWorkoutLog(int id, [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facilityView)
+        {
+            var facility = await _facilityContext.Facilities.FindAsync(id);
+
+
+            if (id != facility.FacilityID && id != facilityView.FacilityID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var user = await _userManager.GetUserAsync(User);
+
+                    if (user.Id == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // if the user chooses to skip then we go to the home page TODO: Change viewbag for skipworkout in the view if possible otherwise use facility
+                    if (ViewBag.SkipWorkoutLog) return RedirectToAction(nameof(Index), "Home");
+
+                    // If the user is inside gym, ad does not skip, then save the data and go to the home page
+                    else if (user.IsInsideGym)
+                    {
+                        // TODO: create logic for working out avg training time and inputted expected time find out expected amount of ppl
+                        facility.TotalTrainingDuration += facilityView.UserTrainingDuration;
+
+                        _facilityContext.Update(facilityView); // check if updaing facilityview instead of facility will work
+                        await _facilityContext.SaveChangesAsync();
+                    }
+
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FacilityExists(facilityView.FacilityID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index), "Home");
+            }
+            return View(facilityView);
+        }
+
 
         // GET: Facilities/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -75,7 +153,7 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
-            var facility = await _context.Facilities.FindAsync(id);
+            var facility = await _facilityContext.Facilities.FindAsync(id);
             if (facility == null)
             {
                 return NotFound();
@@ -99,8 +177,8 @@ namespace GymPass.Controllers
             {
                 try
                 {
-                    _context.Update(facility);
-                    await _context.SaveChangesAsync();
+                    _facilityContext.Update(facility);
+                    await _facilityContext.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -126,7 +204,7 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
-            var facility = await _context.Facilities
+            var facility = await _facilityContext.Facilities
                 .FirstOrDefaultAsync(m => m.FacilityID == id);
             if (facility == null)
             {
@@ -141,15 +219,15 @@ namespace GymPass.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var facility = await _context.Facilities.FindAsync(id);
-            _context.Facilities.Remove(facility);
-            await _context.SaveChangesAsync();
+            var facility = await _facilityContext.Facilities.FindAsync(id);
+            _facilityContext.Facilities.Remove(facility);
+            await _facilityContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool FacilityExists(int id)
         {
-            return _context.Facilities.Any(e => e.FacilityID == id);
+            return _facilityContext.Facilities.Any(e => e.FacilityID == id);
         }
     }
 }

@@ -1,17 +1,17 @@
 ﻿@model GymPass.Models.Facility
 
 @{
-    ViewData["Title"] = "AddWorkoutLog";
+    ViewData["Title"] = "EditWorkoutLog";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>AddWorkoutLog</h1>
+<h1>EditWorkoutLog</h1>
 
 <h4>Facility</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="AddWorkoutLog">
+        <form asp-action="EditWorkoutLog">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="FacilityID" />
             <div class="form-group">
@@ -53,6 +53,11 @@
                 <label asp-for="DoorCloseTimer" class="control-label"></label>
                 <input asp-for="DoorCloseTimer" class="form-control" />
                 <span asp-validation-for="DoorCloseTimer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserTrainingDuration" class="control-label"></label>
+                <input asp-for="UserTrainingDuration" class="form-control" />
+                <span asp-validation-for="UserTrainingDuration" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

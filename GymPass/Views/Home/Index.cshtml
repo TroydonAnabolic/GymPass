@@ -41,7 +41,19 @@
             <div class="title-name">
                 GYM PASS
             </div>
-
+            @{
+                if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
+                {
+                    @*if user is in gym then we can go here*@
+                    <div class="log-workout-home">
+                        <a asp-action="EditWorkoutLog" asp-controller="Facilities" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym"> Log Workout</a>
+                    </div>
+                }
+            }
+            @*if user is in gym then we can go here*@
+            <div class="log-workout-home">
+                <a asp-action="EditWorkoutLog" asp-controller="Facilities" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym"> Log Workout</a>
+            </div>
 
             <div class="main-pop-cont">
                 <div class="realtime-indicator">
@@ -73,6 +85,9 @@
     </div>
 
     <div class="access">
+        <!-- Trigger/Open The Modal -->
+        @*<button id="myBtn">Open Modal</button>*@
+
 
         <!-- Button trigger modal TO DO: Once i finish animation for access denied appearing only for 3 seconds, and scanning followed by success -->
         @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
@@ -101,29 +116,9 @@
                             // within the modal, have the form submit button to complete the modal post and set the ViewBad.CompletedGymEntries = true,
                             // inside the control use an await statement to ensure, redirect to page is not
                             // executed until the modal is posted, and the value of ViewBag.CompletedGymEntries is done.*@
-                        @if (@UserManager.GetUserAsync(User).Result.AccessGrantedToFacility)
+                        @if (ViewBag.AccessGrantedToFacility)
                         {
-                            // open a modal with further form groups asking for training duration and equipment to use with a continue button to close modal.
-                            @* Start Modal for training intentions *@
-                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            ...
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            <button type="button" class="btn btn-primary">Save changes</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view
                         }
                         @* End Modal for training intentions *@
 
@@ -200,11 +195,41 @@
 
         // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
         // after 5 seconds it will remove scanning
-        $("body > main > div.access > div > form > div:nth-child(3) > button > svg").click(function () {
+        var btn = $("body > main > div.access > div > form > div:nth-child(3) > button > svg");
+
+        btn.click(function () {
             var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
             setTimeout(function () {
                 scan.addClass('hidden');
             }, 5000);
+            modal.style.display = "block";
         });
+
+        // modal
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        //   var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.click = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     });
 </script>
