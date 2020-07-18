@@ -367,7 +367,7 @@ header {
     font-size: 2rem;
 }
 
-.main-pop-cont {
+.main-pop-cont, .occupancy-title {
     display: inline-block; /* TODO: Remove if not needed later, this ensures background used for testing*/
     position: absolute;
     bottom: 1rem;
@@ -375,6 +375,7 @@ header {
     width: 14rem;
     height: 4rem;
     font-size: 0; /* This will make the inline blocks touch*/
+    text-align: center;
     border: 1px solid #fff;
 }
 
@@ -401,16 +402,33 @@ header {
         max-width: 100%;
     }
 
+.occupancy-title  {
+    bottom: 5rem;
+    right: 1rem;
+    width: 14rem;
+    height: 1.3rem;
+    font-size: 0.7rem; /* This will make the inline blocks touch*/
+    color: #fff;
+    border: 1px solid #fff;
+}
+
 /* Log workout on main page */
 .log-workout-home {
     display: inline-block; /* TODO: Remove if not needed later, this ensures background used for testing*/
     position: absolute;
     bottom: 1rem;
-    left: 1rem;
-    width: 5rem;
-    height: 3rem;
-    font-size: 0.5rem; /* This will make the inline blocks touch*/
+    left: 1.2rem;
+    width: 4.5rem;
+    height: 1rem;
+    font-size: 0.7rem; /* This will make the inline blocks touch*/
     border: 1px solid #fff;
+    text-align: center;
+    color: #fff;
+}
+
+body > main > div.main-gym > div > div.log-workout-home > a {
+    text-decoration: none;
+    color: #fff;
 }
 
 .access {

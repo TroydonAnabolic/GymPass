@@ -17,7 +17,7 @@
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <div class="nav-other">
-            <a class="border-nav" href="#">Unlock Door</a>
+            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="border-nav">MY GYM</a>
             <a class="border-nav" href="#">Select Facility</a>
             <a class="border-nav" href="#">Dashboard</a>
         </div>
@@ -41,51 +41,53 @@
             <div class="title-name">
                 GYM PASS
             </div>
-      
-                    @*if user is in gym then we can go here*@
-                    <div class="@(@UserManager.GetUserAsync(User).Result.IsInsideGym ? "log-workout-home" : "hidden")">
-                            <a asp-action="LogWorkout" asp-controller="Facilities" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym"> Log Workout</a>
-                        </div>
-               
 
-                        <div class="main-pop-cont">
-                            <div class="realtime-indicator">
-                                <div class="realtime-icons">
-                                    <img src="~/images/dumbbell.png" />
-                                </div>
-                                @Model.NumberOfClientsUsingWeightRoom
-                            </div>
-                            <div class="realtime-indicator">
-                                <div class="realtime-icons">
-                                    <img src="~/images/icons8-treadmill-100.png" />
-                                </div>
-                                @Model.NumberOfClientsUsingCardioRoom
-                            </div>
-                            <div class="realtime-indicator">
-                                <div class="realtime-icons">
-                                    <img src="~/images/icons8-warm-up-100.png" />
-                                </div>
-                                @Model.NumberOfClientsUsingStretchRoom
-                            </div>
-                            <div class="realtime-indicator">
-                                <div class="realtime-icons">
-                                    <img src="~/images/Capacity/capacity-80.png" />
-                                </div>
-                                @Model.NumberOfClientsInGym
-                            </div>
-                        </div>
+            @*if user is in gym then we can go here*@
+            <div class="@(@UserManager.GetUserAsync(User).Result.IsInsideGym ? "log-workout-home" : "hidden") ">
+                <a asp-action="LogWorkout" asp-controller="Facilities" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym"> Log Workout</a>
+            </div>
+
+            <div class="occupancy-title">
+                Gym Occupany
+            </div>
+            <div class="main-pop-cont">
+
+                <div class="realtime-indicator">
+                    <div class="realtime-icons">
+                        <img src="~/images/dumbbell.png" />
                     </div>
+                    Weights: @Model.NumberOfClientsUsingWeightRoom
                 </div>
+                <div class="realtime-indicator">
+                    <div class="realtime-icons">
+                        <img src="~/images/icons8-treadmill-100.png" />
+                    </div>
+                    Cardio: @Model.NumberOfClientsUsingCardioRoom
+                </div>
+                <div class="realtime-indicator">
+                    <div class="realtime-icons">
+                        <img src="~/images/icons8-warm-up-100.png" />
+                    </div>
+                    Stretch: @Model.NumberOfClientsUsingStretchRoom
+                </div>
+                <div class="realtime-indicator">
+                    <div class="realtime-icons">
+                        <img src="~/images/Capacity/capacity-80.png" />
+                    </div>
+                    Total: @Model.NumberOfClientsInGym
+                </div>
+                @*TODO: Use JavaScript to interchange/toggle display between established number of clients, with actual amount, using hidden, using click/automatic trigger
+                    <div class="realtime-indicator">
+                        <div class="realtime-icons">
+                            <img src="~/images/Capacity/capacity-80.png" />
+                        </div>
+                        Total: @Model.NumberOfClientsInGym
+                    </div>*@
+            </div>
+        </div>
+    </div>
 
     <div class="access">
-        <!-- Trigger/Open The Modal -->
-        @*<button id="myBtn">Open Modal</button>*@
-
-
-        <!-- Button trigger modal TO DO: Once i finish animation for access denied appearing only for 3 seconds, and scanning followed by success -->
-        @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-                Launch demo modal
-            </button>*@
 
         <div class="access-container">
             @{
