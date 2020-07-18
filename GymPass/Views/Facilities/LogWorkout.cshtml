@@ -30,22 +30,19 @@
                     <span asp-validation-for="UserTrainingDuration" class="text-danger"></span>
                 </div>
 
-                <h4>What will you train?</h4>
+                <h4>What facilities will you use?</h4>
 
                 <div class="form-group form-check">
-                    <h6>Weights room</h6>
                     <label class="form-check-label">
                         <input class="form-check-input" asp-for="WillUseWeightsRoom" /> @Html.DisplayNameFor(model => model.WillUseWeightsRoom)
                     </label>
                 </div>
                 <div class="form-group form-check">
-                    <h6>Cardio room</h6>
                     <label class="form-check-label">
                         <input class="form-check-input" asp-for="WillUseCardioRoom" /> @Html.DisplayNameFor(model => model.WillUseCardioRoom)
                     </label>
                 </div>
                 <div class="form-group form-check">
-                    <h6>Stretch room</h6>
                     <label class="form-check-label">
                         <input class="form-check-input" asp-for="WillUseStretchRoom" /> @Html.DisplayNameFor(model => model.WillUseStretchRoom)
                     </label>
@@ -55,10 +52,12 @@
                     <input type="submit" value="Save" class="btn btn-primary" />
                 </div>
             </form>
+            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="btn btn-primary">Skip Log</a>
+
         }
         else if (@UserManager.GetUserAsync(User).Result.HasLoggedWorkoutToday)
         {
-            <h2> You have already worked your workout today, you can log your next workout tomorrow!</h2>
+            <h2> You have already logged your workout today, you can log your next workout tomorrow!</h2>
 
             <!-- The Modal -->
             <div id="myModal" class="modal">
@@ -77,19 +76,12 @@
                         <h3>Modal Footer</h3>
                     </div>
                 </div>
-
             </div>
-
+            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="btn btn-primary">Return to Gym</a>
         }
-
-
     </div>
-
 </div>
 
-<div>
-    <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym">Skip Workout Log</a>
-</div>
 
 <script>
     $(document).ready(function () {

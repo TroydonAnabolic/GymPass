@@ -89,7 +89,23 @@ namespace GymPass.Controllers
             {
                 return NotFound();
             }
-            
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user.Id == null)
+            {
+                return NotFound();
+            }
+
+            if (user.TimeLoggedWorkout.Date < DateTime.Today.Date) // checks midnight date time
+            {
+                user.HasLoggedWorkoutToday = false;
+            }
+            else if (user.TimeLoggedWorkout.Date >= DateTime.Today.Date)
+            {
+                user.HasLoggedWorkoutToday = true;
+            }
+
             return View(facility);
         }
 
@@ -125,8 +141,8 @@ namespace GymPass.Controllers
                     // If the user is inside gym, ad does not skip, then save the data and go to the home page
                     else if (user.IsInsideGym)
                     {
-                        // if the time access was granted is not today's date, then we can say we have not yet logged today's workout
-                        if (!(user.TimeLoggedWorkout.Date == DateTime.Today.Date))
+                        // if the user logged workout before today, then we can log it
+                        if (user.TimeLoggedWorkout.Date <= DateTime.Today.Date)
                         {
                             user.HasLoggedWorkoutToday = false;
                         }

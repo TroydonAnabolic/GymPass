@@ -19,13 +19,16 @@ namespace GymPass.Models
         public bool DoorOpened { get; set; } 
 
         public TimeSpan DoorCloseTimer { get; set; } = TimeSpan.FromSeconds(5);
-        [Display(Name = "Workout Duration ")]
+        [Display(Name = "Workout Duration")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:hh\\:mm}")]
         [RegularExpression(@"((([0-1][0-9])|(2[0-3]))(:[0-5][0-9])(:[0-5][0-9])?)", ErrorMessage = "Time must be between 00:00 to 23:59")]
         public TimeSpan? UserTrainingDuration { get; set; }
         public TimeSpan? TotalTrainingDuration { get; set; }
+        [Display(Name = "Weights Room")]
         public bool WillUseWeightsRoom { get; set; }
+        [Display(Name = "Cardio Room")]
         public bool WillUseCardioRoom { get; set; }
+        [Display(Name = "Stretch Room")]
         public bool WillUseStretchRoom { get; set; }
 
         //public bool IsDeepLensRequested { get; set; } = false;
