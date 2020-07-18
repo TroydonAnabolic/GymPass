@@ -433,7 +433,7 @@ header {
 }
 
 body > main > div.access > div > div.progress {
-/*    margin-top: 1rem;*/
+    /*    margin-top: 1rem;*/
 }
 
 .door-status {
@@ -443,7 +443,7 @@ body > main > div.access > div > div.progress {
 /* Login style */
 .banner {
     display: block;
-        position: relative;
+    position: relative;
     /*background-image: url('../images/gympass-banner.png');
     background-repeat: no-repeat;
     background-size: contain;*/
@@ -457,12 +457,13 @@ body > main > div.access > div > div.progress {
         max-height: 100%;
     }
 
-    .banner h1{
+    .banner h1 {
         position: absolute;
         top: 65%;
         left: 50%;
         transform: translate(-50%, -65%); /* Center absolute position items like this */
     }
+
     .banner .logo {
         position: absolute;
         top: 60%;
@@ -470,9 +471,9 @@ body > main > div.access > div > div.progress {
         transform: translate(-50%, -60%); /* Center absolute position items like this */
     }
 
-        .logo {
-            max-width: 5rem;
-        }
+.logo {
+    max-width: 5rem;
+}
 
 .fingerprint {
     margin: auto;
@@ -570,8 +571,26 @@ body > main > div.access > div > div.progress {
     color: white;
 }
 
+/* Log workout styling */
 
-    /* Extra small devices (phones, 600px and down) */
+.workout-log-bg {
+    position: absolute;
+    background-image: url('../images/log-workout-bg.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    top: 5rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    height: 100%;
+    width: 100%;
+}
+
+/* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     .main-gym-icon {
     }

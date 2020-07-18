@@ -89,19 +89,7 @@ namespace GymPass.Controllers
             {
                 return NotFound();
             }
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user.Id == null)
-            {
-                return NotFound();
-            }
-
-            if (user.HasLoggedWorkoutToday)
-            {
-                System.Threading.Thread.Sleep(300);
-                return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
-            }
-
+            
             return View(facility);
         }
 
@@ -134,13 +122,9 @@ namespace GymPass.Controllers
                         return NotFound();
                     }
 
-                    //// if the user chooses to skip then we go to the home page TODO: Change viewbag for skipworkout in the view if possible otherwise use facility
-                    //if (facilityView.SkipWorkoutLog) return RedirectToAction(nameof(Index), "Home");
-
                     // If the user is inside gym, ad does not skip, then save the data and go to the home page
                     else if (user.IsInsideGym)
                     {
-                        // TODO: create logic for working out avg training time, so the database updates average number of people that visit per hr everyday.(currently manual task)
                         // if the time access was granted is not today's date, then we can say we have not yet logged today's workout
                         if (!(user.TimeLoggedWorkout.Date == DateTime.Today.Date))
                         {
@@ -170,6 +154,14 @@ namespace GymPass.Controllers
                                 user.WillUseStretchRoom = true;
                             }
                         }
+
+                        // redirect to home page after 3 seconds if user tries to submit form
+                        else if (user.HasLoggedWorkoutToday)
+                        {
+                            System.Threading.Thread.Sleep(500);
+                            return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
+                        }
+
 
                         _facilityContext.Update(facility); // check if updaing facilityview instead of facility will work
                         await _facilityContext.SaveChangesAsync();
