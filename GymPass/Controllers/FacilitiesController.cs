@@ -23,7 +23,7 @@ namespace GymPass.Controllers
             )
         {
             _facilityContext = facilityContext;
-
+            _userManager = userManager;
         }
 
         // GET: Facilities
@@ -61,7 +61,9 @@ namespace GymPass.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facility)
+        public async Task<IActionResult> Create(
+            [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom," +
+            "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facility)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +75,7 @@ namespace GymPass.Controllers
         }
 
         // EDIT Workoutlog
-        public async Task<IActionResult> EditWorkoutLog(int? id)
+        public async Task<IActionResult> LogWorkout(int? id)
         {
             if (id == null)
             {
@@ -87,13 +89,29 @@ namespace GymPass.Controllers
             {
                 return NotFound();
             }
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user.Id == null)
+            {
+                return NotFound();
+            }
+
+            if (user.HasLoggedWorkoutToday)
+            {
+                System.Threading.Thread.Sleep(300);
+                return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
+            }
 
             return View(facility);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditWorkoutLog(int id, [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facilityView)
+        public async Task<IActionResult> LogWorkout(int id,
+            [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom," +
+            "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer," +
+            "UserTrainingDuration, TotalTrainingDuration, WillUseWeightsRoom, WillUseCardioRoom, WillUseStretchRoom," +
+            "HasLoggedWorkoutToday")] Facility facilityView)
         {
             var facility = await _facilityContext.Facilities.FindAsync(id);
 
@@ -103,31 +121,62 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
+            var user = await _userManager.GetUserAsync(User);
+
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var user = await _userManager.GetUserAsync(User);
 
                     if (user.Id == null)
                     {
                         return NotFound();
                     }
 
-                    // if the user chooses to skip then we go to the home page TODO: Change viewbag for skipworkout in the view if possible otherwise use facility
-                    if (ViewBag.SkipWorkoutLog) return RedirectToAction(nameof(Index), "Home");
+                    //// if the user chooses to skip then we go to the home page TODO: Change viewbag for skipworkout in the view if possible otherwise use facility
+                    //if (facilityView.SkipWorkoutLog) return RedirectToAction(nameof(Index), "Home");
 
                     // If the user is inside gym, ad does not skip, then save the data and go to the home page
                     else if (user.IsInsideGym)
                     {
-                        // TODO: create logic for working out avg training time and inputted expected time find out expected amount of ppl
-                        facility.TotalTrainingDuration += facilityView.UserTrainingDuration;
+                        // TODO: create logic for working out avg training time, so the database updates average number of people that visit per hr everyday.(currently manual task)
+                        // if the time access was granted is not today's date, then we can say we have not yet logged today's workout
+                        if (!(user.TimeLoggedWorkout.Date == DateTime.Today.Date))
+                        {
+                            user.HasLoggedWorkoutToday = false;
+                        }
 
-                        _facilityContext.Update(facilityView); // check if updaing facilityview instead of facility will work
+                        // if the user has not logged workout today, then add the estimated training duration
+                        if (!user.HasLoggedWorkoutToday)
+                        {
+                            facility.TotalTrainingDuration += facilityView.UserTrainingDuration;
+                            user.HasLoggedWorkoutToday = true;
+                            user.TimeLoggedWorkout = DateTime.Now;
+                            // if the user will use any of these facilities of the gym, it will increase that counter
+                            if (facilityView.WillUseWeightsRoom)
+                            {
+                                facility.NumberOfClientsUsingWeightRoom++;
+                                user.WillUseWeightsRoom = true;
+                            }
+                            if (facilityView.WillUseCardioRoom)
+                            {
+                                facility.NumberOfClientsUsingCardioRoom++;
+                                user.WillUseCardioRoom = true;
+                            }
+                            if (facilityView.WillUseStretchRoom)
+                            {
+                                facility.NumberOfClientsUsingStretchRoom++;
+                                user.WillUseStretchRoom = true;
+                            }
+                        }
+
+                        _facilityContext.Update(facility); // check if updaing facilityview instead of facility will work
                         await _facilityContext.SaveChangesAsync();
+                        await _userManager.UpdateAsync(user);
                     }
-
                 }
+
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!FacilityExists(facilityView.FacilityID))
@@ -139,7 +188,7 @@ namespace GymPass.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index), "Home");
+                return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
             }
             return View(facilityView);
         }

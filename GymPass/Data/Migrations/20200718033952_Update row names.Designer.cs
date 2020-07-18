@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymPass.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200715083928_Access denied Option")]
-    partial class AccessdeniedOption
+    [Migration("20200718033952_Update row names")]
+    partial class Updaterownames
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -53,19 +53,16 @@ namespace GymPass.Data.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasLoggedWorkoutToday")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeSpan>("IntendedTrainingDuration")
+                        .HasColumnType("time");
+
                     b.Property<bool>("IsCameraScanSuccessful")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsInsideGym")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUsingCardioRoom")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUsingStretchRoom")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUsingWeightsRoom")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsWithin10m")
@@ -109,6 +106,9 @@ namespace GymPass.Data.Migrations
                     b.Property<DateTime>("TimeAccessDenied")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("TimeAccessGranted")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -118,6 +118,15 @@ namespace GymPass.Data.Migrations
 
                     b.Property<int>("UsernameChangeLimit")
                         .HasColumnType("int");
+
+                    b.Property<bool>("WillUseCardioRoom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("WillUseStretchRoom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("WillUseWeightsRoom")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

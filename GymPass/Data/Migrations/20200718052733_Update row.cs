@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GymPass.Data.Migrations
 {
-    public partial class AccessdeniedOption : Migration
+    public partial class Updaterow : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
-                name: "TimeAccessDenied",
+                name: "TimeLoggedWorkout",
                 schema: "Identity",
                 table: "User",
                 nullable: false,
@@ -18,7 +18,7 @@ namespace GymPass.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "TimeAccessDenied",
+                name: "TimeLoggedWorkout",
                 schema: "Identity",
                 table: "User");
         }

@@ -20,13 +20,15 @@ namespace GymPass.Models
         public bool IsCameraScanSuccessful { get; set; }
         public bool IsWithin10m { get; set; }
         public bool IsInsideGym { get; set; }
-        public bool IsUsingWeightsRoom { get; set; }
-        public bool IsUsingCardioRoom{ get; set; }
-        public bool IsUsingStretchRoom { get; set; }
         public bool OpenDoorRequest { get; set; }
         public bool ExitGymRequest { get; set; }
         public DateTime TimeAccessDenied { get; set; }
         public DateTime TimeAccessGranted { get; set; }
-
+        public TimeSpan IntendedTrainingDuration { get; set; }
+        public bool WillUseWeightsRoom { get; set; } 
+        public bool WillUseCardioRoom { get; set; }
+        public bool WillUseStretchRoom { get; set; } 
+        public bool HasLoggedWorkoutToday { get; set; }
+        public DateTime TimeLoggedWorkout { get; internal set; }
     }
 }

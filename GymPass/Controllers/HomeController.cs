@@ -145,7 +145,6 @@ namespace GymPass.Controllers
                                 facility.NumberOfClientsInGym++;
                                 user.IsInsideGym = true;
                                 user.TimeAccessGranted = DateTime.Now;
-
                                 // TODO: Use AJAX to async send to and from the client at the same time
                                 //while (!ViewBag.IsExerciseLogComplete)
                                 //{
@@ -165,12 +164,27 @@ namespace GymPass.Controllers
                             {
                                 user.IsInsideGym = false;
                                 facility.NumberOfClientsInGym--;
+
+                                if (user.WillUseWeightsRoom)
+                                {
+                                    facility.NumberOfClientsUsingWeightRoom--;
+                                    user.WillUseWeightsRoom = false;
+                                }
+                                if (user.WillUseCardioRoom)
+                                {
+                                    facility.NumberOfClientsUsingCardioRoom--;
+                                    user.WillUseCardioRoom = false;
+                                }
+                                if (user.WillUseStretchRoom)
+                                {
+                                    facility.NumberOfClientsUsingStretchRoom--;
+                                    user.WillUseWeightsRoom = false;
+                                }
                                 user.IsCameraScanSuccessful = false;
                                 user.IsWithin10m = false;
                                 user.AccessGrantedToFacility = false;
                                 _facilityContext.Update(facility);
                                 await _facilityContext.SaveChangesAsync();
-                                // TODO: if statements, if viewbag, user selected if they are using cardio equip, then increment cardio etc.
                             }
 
                         } // end access granted

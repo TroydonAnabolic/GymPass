@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymPass.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200711033821_Added Custom Properties")]
-    partial class AddedCustomProperties
+    [Migration("20200718035221_Update row name")]
+    partial class Updaterowname
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,9 +30,15 @@ namespace GymPass.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<bool>("AccessGrantedToFacility")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DefaultGym")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
@@ -41,10 +47,25 @@ namespace GymPass.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("ExitGymRequest")
+                        .HasColumnType("bit");
+
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasLoggedWorkoutToday")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeSpan>("IntendedTrainingDuration")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsCameraScanSuccessful")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsInsideGym")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsWithin10m")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
@@ -82,6 +103,12 @@ namespace GymPass.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("TimeAccessDenied")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeAccessGranted")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -91,6 +118,15 @@ namespace GymPass.Data.Migrations
 
                     b.Property<int>("UsernameChangeLimit")
                         .HasColumnType("int");
+
+                    b.Property<bool>("WillUseCardioRoom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("WillUseStretchRoom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("WillUseWeightsRoom")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

@@ -41,48 +41,41 @@
             <div class="title-name">
                 GYM PASS
             </div>
-            @{
-                if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
-                {
+      
                     @*if user is in gym then we can go here*@
-                    <div class="log-workout-home">
-                        <a asp-action="EditWorkoutLog" asp-controller="Facilities" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym"> Log Workout</a>
-                    </div>
-                }
-            }
-            @*if user is in gym then we can go here*@
-            <div class="log-workout-home">
-                <a asp-action="EditWorkoutLog" asp-controller="Facilities" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym"> Log Workout</a>
-            </div>
+                    <div class="@(@UserManager.GetUserAsync(User).Result.IsInsideGym ? "log-workout-home" : "hidden")">
+                            <a asp-action="LogWorkout" asp-controller="Facilities" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym"> Log Workout</a>
+                        </div>
+               
 
-            <div class="main-pop-cont">
-                <div class="realtime-indicator">
-                    <div class="realtime-icons">
-                        <img src="~/images/dumbbell.png" />
+                        <div class="main-pop-cont">
+                            <div class="realtime-indicator">
+                                <div class="realtime-icons">
+                                    <img src="~/images/dumbbell.png" />
+                                </div>
+                                @Model.NumberOfClientsUsingWeightRoom
+                            </div>
+                            <div class="realtime-indicator">
+                                <div class="realtime-icons">
+                                    <img src="~/images/icons8-treadmill-100.png" />
+                                </div>
+                                @Model.NumberOfClientsUsingCardioRoom
+                            </div>
+                            <div class="realtime-indicator">
+                                <div class="realtime-icons">
+                                    <img src="~/images/icons8-warm-up-100.png" />
+                                </div>
+                                @Model.NumberOfClientsUsingStretchRoom
+                            </div>
+                            <div class="realtime-indicator">
+                                <div class="realtime-icons">
+                                    <img src="~/images/Capacity/capacity-80.png" />
+                                </div>
+                                @Model.NumberOfClientsInGym
+                            </div>
+                        </div>
                     </div>
-                    15
                 </div>
-                <div class="realtime-indicator">
-                    <div class="realtime-icons">
-                        <img src="~/images/icons8-treadmill-100.png" />
-                    </div>
-                    20
-                </div>
-                <div class="realtime-indicator">
-                    <div class="realtime-icons">
-                        <img src="~/images/icons8-warm-up-100.png" />
-                    </div>
-                    5
-                </div>
-                <div class="realtime-indicator">
-                    <div class="realtime-icons">
-                        <img src="~/images/Capacity/capacity-80.png" />
-                    </div>
-                    @Model.NumberOfClientsInGym
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="access">
         <!-- Trigger/Open The Modal -->
@@ -193,43 +186,6 @@
     $(document).ready(function () {
         $("header").hide();
 
-        // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
-        // after 5 seconds it will remove scanning
-        var btn = $("body > main > div.access > div > form > div:nth-child(3) > button > svg");
 
-        btn.click(function () {
-            var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
-            setTimeout(function () {
-                scan.addClass('hidden');
-            }, 5000);
-            modal.style.display = "block";
-        });
-
-        // modal
-        // Get the modal
-        var modal = document.getElementById("myModal");
-
-        // Get the button that opens the modal
-        //   var btn = document.getElementById("myBtn");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks the button, open the modal
-        btn.click = function () {
-            modal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function () {
-            modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
     });
 </script>

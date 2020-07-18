@@ -46,6 +46,18 @@ $(document).ready(function () {
         }
     });
 
+    // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
+    // after 5 seconds it will remove scanning
+    var btn = $("body > main > div.access > div > form > div:nth-child(3) > button > svg");
+
+    btn.click(function () {
+        var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
+        setTimeout(function () {
+            scan.addClass('hidden');
+        }, 5000);
+        modal.style.display = "block";
+    });
+
     // TODO: Progress Bar Depelete each time the open door button is pressed.
     //$(function () {
     //    var current_progress = 100;

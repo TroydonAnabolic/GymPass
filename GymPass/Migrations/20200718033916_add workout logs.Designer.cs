@@ -4,14 +4,16 @@ using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GymPass.Migrations
 {
     [DbContext(typeof(FacilityContext))]
-    partial class FacilityContextModelSnapshot : ModelSnapshot
+    [Migration("20200718033916_add workout logs")]
+    partial class addworkoutlogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,20 +52,11 @@ namespace GymPass.Migrations
                     b.Property<int?>("NumberOfClientsUsingWeightRoom")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("TotalTrainingDuration")
+                    b.Property<TimeSpan>("TotalTrainingDuration")
                         .HasColumnType("time");
 
-                    b.Property<TimeSpan?>("UserTrainingDuration")
+                    b.Property<TimeSpan>("UserTrainingDuration")
                         .HasColumnType("time");
-
-                    b.Property<bool>("WillUseCardioRoom")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("WillUseStretchRoom")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("WillUseWeightsRoom")
-                        .HasColumnType("bit");
 
                     b.HasKey("FacilityID");
 

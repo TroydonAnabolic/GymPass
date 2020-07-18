@@ -1,0 +1,72 @@
+﻿@model GymPass.Models.Facility
+@inject UserManager<ApplicationUser> UserManager
+@using GymPass.Helpers;
+@{
+    ViewData["Title"] = "LogWorkout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Log Today's Workout</h1>
+
+<hr />
+<div class="row container">
+
+    <div class="col-md-4">
+
+        @if (!@UserManager.GetUserAsync(User).Result.HasLoggedWorkoutToday)
+        {
+
+            <form asp-action="LogWorkout">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="FacilityID" />
+
+                <h4>How long will you train?</h4>
+
+                <div class="form-group">
+                    <label asp-for="UserTrainingDuration" class="control-label"></label>
+                    @Html.DropDownListFor(x => x.UserTrainingDuration, SelectListHelper.GetTrainingTimes())
+                    <span asp-validation-for="UserTrainingDuration" class="text-danger"></span>
+                </div>
+
+                <h4>What will you train?</h4>
+
+                <div class="form-group form-check">
+                    <h6>Weights room</h6>
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="WillUseWeightsRoom" /> @Html.DisplayNameFor(model => model.WillUseWeightsRoom)
+                    </label>
+                </div>
+                <div class="form-group form-check">
+                    <h6>Cardio room</h6>
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="WillUseCardioRoom" /> @Html.DisplayNameFor(model => model.WillUseCardioRoom)
+                    </label>
+                </div>
+                <div class="form-group form-check">
+                    <h6>Stretch room</h6>
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="WillUseStretchRoom" /> @Html.DisplayNameFor(model => model.WillUseStretchRoom)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        }
+        else if (@UserManager.GetUserAsync(User).Result.HasLoggedWorkoutToday)
+        {
+            <h2> You have already worked your workout today, you can log your next workout tomorrow!</h2>
+        }
+
+        @* Background image *@
+        <div class="workout-log-bg">
+        </div>
+    </div>
+
+</div>
+
+<div>
+    <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym">Skip Workout Log</a>
+</div>
+

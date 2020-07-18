@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymPass.Migrations
 {
     [DbContext(typeof(FacilityContext))]
-    [Migration("20200717140412_Add gym training options")]
-    partial class Addgymtrainingoptions
+    [Migration("20200718053846_an update")]
+    partial class anupdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,11 +52,20 @@ namespace GymPass.Migrations
                     b.Property<int?>("NumberOfClientsUsingWeightRoom")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("TotalTrainingDuration")
+                    b.Property<TimeSpan?>("TotalTrainingDuration")
                         .HasColumnType("time");
 
-                    b.Property<TimeSpan>("UserTrainingDuration")
+                    b.Property<TimeSpan?>("UserTrainingDuration")
                         .HasColumnType("time");
+
+                    b.Property<bool>("WillUseCardioRoom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("WillUseStretchRoom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("WillUseWeightsRoom")
+                        .HasColumnType("bit");
 
                     b.HasKey("FacilityID");
 
