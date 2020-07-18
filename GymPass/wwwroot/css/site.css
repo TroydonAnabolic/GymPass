@@ -608,6 +608,31 @@ body > main > div.access > div > div.progress {
     width: 100%;
 }
 
+.containerz {
+    position: absolute;
+    border: 0.5rem solid #007bff;
+    text-align: center;
+    width: 90%;
+    max-width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+}
+
+.message-box {
+    line-height: 1.5;
+    display: inline-block;
+    vertical-align: middle;
+    margin: auto;
+    padding: 1rem;
+}
+
+body > main > div.containerz > div > div > a
+{
+
+}
+
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     .main-gym-icon {

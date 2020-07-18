@@ -9,79 +9,79 @@
 @* Background image *@
 <div class="workout-log-bg">
 </div>
+<div class="containerz">
+    <div class="row message-box">
 
-<div class="row container">
-
-    <div class="col-md-4">
+        <div class="col-md-4">
 
 
-        @if (!@UserManager.GetUserAsync(User).Result.HasLoggedWorkoutToday)
-        {
+            @if (!@UserManager.GetUserAsync(User).Result.HasLoggedWorkoutToday)
+            {
 
-            <form asp-action="LogWorkout">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="FacilityID" />
+                <form asp-action="LogWorkout">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="FacilityID" />
 
-                <h4>How long will you train?</h4>
+                    <h4>How long will you train?</h4>
 
-                <div class="form-group">
-                    <label asp-for="UserTrainingDuration" class="control-label"></label>
-                    @Html.DropDownListFor(x => x.UserTrainingDuration, SelectListHelper.GetTrainingTimes())
-                    <span asp-validation-for="UserTrainingDuration" class="text-danger"></span>
-                </div>
-
-                <h4>What facilities will you use?</h4>
-
-                <div class="form-group form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" asp-for="WillUseWeightsRoom" /> @Html.DisplayNameFor(model => model.WillUseWeightsRoom)
-                    </label>
-                </div>
-                <div class="form-group form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" asp-for="WillUseCardioRoom" /> @Html.DisplayNameFor(model => model.WillUseCardioRoom)
-                    </label>
-                </div>
-                <div class="form-group form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" asp-for="WillUseStretchRoom" /> @Html.DisplayNameFor(model => model.WillUseStretchRoom)
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="Save" class="btn btn-primary" />
-                </div>
-            </form>
-            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="btn btn-primary">Skip Log</a>
-
-        }
-        else if (@UserManager.GetUserAsync(User).Result.HasLoggedWorkoutToday)
-        {
-            <h2> You have already logged your workout today, you can log your next workout tomorrow!</h2>
-
-            <!-- The Modal -->
-            <div id="myModal" class="modal">
-
-                <!-- Modal content -->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <span class="close">&times;</span>
-                        <h2>Modal Header</h2>
+                    <div class="form-group">
+                        <label asp-for="UserTrainingDuration" class="control-label"></label>
+                        @Html.DropDownListFor(x => x.UserTrainingDuration, SelectListHelper.GetTrainingTimes())
+                        <span asp-validation-for="UserTrainingDuration" class="text-danger"></span>
                     </div>
-                    <div class="modal-body">
-                        <p>Some text in the Modal Body</p>
-                        <p>Some other text...</p>
+
+                    <h4>What facilities will you use?</h4>
+
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="WillUseWeightsRoom" /> @Html.DisplayNameFor(model => model.WillUseWeightsRoom)
+                        </label>
                     </div>
-                    <div class="modal-footer">
-                        <h3>Modal Footer</h3>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="WillUseCardioRoom" /> @Html.DisplayNameFor(model => model.WillUseCardioRoom)
+                        </label>
+                    </div>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="WillUseStretchRoom" /> @Html.DisplayNameFor(model => model.WillUseStretchRoom)
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+                <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="btn btn-primary">Skip Log</a>
+
+            }
+            else if (@UserManager.GetUserAsync(User).Result.HasLoggedWorkoutToday)
+            {
+                <h3> You have already logged your workout today, you can log your next workout tomorrow!</h3>
+
+                <!-- The Modal -->
+                <div id="myModal" class="modal">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="close">&times;</span>
+                            <h>Modal Header</h>
+                        </div>
+                        <div class="modal-body">
+                            <p>Some text in the Modal Body</p>
+                            <p>Some other text...</p>
+                        </div>
+                        <div class="modal-footer">
+                            <h3>Modal Footer</h3>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="btn btn-primary">Return to Gym</a>
-        }
+                <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="btn btn-primary">Return to Gym</a>
+            }
+        </div>
     </div>
 </div>
-
 
 <script>
     $(document).ready(function () {
