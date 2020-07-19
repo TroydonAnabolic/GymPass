@@ -38,6 +38,7 @@ namespace GymPass.Controllers
         {
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
+            ViewBag.EstimatedNumberInGym = 0;
             // initiall set the access view bag to false, as this will prevent null exception
 
             if (user.Id == null)
@@ -53,6 +54,10 @@ namespace GymPass.Controllers
             }
 
             var facility = await _facilityContext.Facilities.FindAsync(id);
+            var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
+            var currentFacilityDetailEntry = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+            DateTime estimatedExitTime = DateTime.Now;
+
             if (facility == null)
             {
                 return NotFound();
@@ -65,14 +70,24 @@ namespace GymPass.Controllers
             // access denied message is normally true
             ViewBag.AccessDeniedMsgRecieved = true;
 
-            //// if the time since access is granted, we redirect the user that only displays a page to submit data for the training intentions
-            /// it will have the option to skip, which will just navigate the user back to home page
-            /// possibly will have the page look like a replica of the dashboard(or just a random gym image), but without server side code, only have it with a reduced opacity, by making the modal load on page load.
-            /// The modal will have server side code just for posting data for intended training durations and equipment to train with.
-            /// TODO: Create a controller action, in facility controller, that allows this above mentioned functionality.
-            if (DateTime.Now <= (user.TimeAccessGranted.AddSeconds(15)))
+            // Decide to increase or decrease the estimated numbers in gym
+            // if there are entries get the estimated exit time
+            if (facilityDetails.Count > 0)
             {
-                //return RedirectToAction("ViewWithModal");
+                estimatedExitTime = currentFacilityDetailEntry.TimeAccessGranted.Add(currentFacilityDetailEntry.EstimatedTrainingTime);
+
+                // for each user logged into the gym, increment or decrement based on time entered
+                foreach (var userInGym in facilityDetails)
+                {
+                    // if current time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
+                    if (DateTime.Now < estimatedExitTime)
+                    {
+                        // if the current user is still within his estimated training time, then add estimated number of gym users list
+                        ViewBag.EstimatedNumberInGym++;
+                    }
+                    else if (DateTime.Now > estimatedExitTime)
+                        ViewBag.EstimatedNumberInGym--;
+                }
             }
 
             // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
@@ -190,11 +205,6 @@ namespace GymPass.Controllers
                                 if (facilityDetails.Count() > 0 )
                                 {
                                      _facilityContext.UsersInGymDetails.Remove(currentFacilityDetailDb);
-                                    //var gymDetailToRemove = new UsersInGymDetail();
-                                    //gymDetailToRemove.FacilityID = currentFacilityDetailId;
-                                    ////_facilityContext.UsersInGymDetails.Remove(gymDetailToRemove);
-                                    //_facilityContext.Entry(gymDetailToRemove).State = EntityState.Deleted;
-
                                 }
 
                                 user.IsCameraScanSuccessful = false;
@@ -242,8 +252,8 @@ namespace GymPass.Controllers
                         throw;
                     }
                 }
-                // if the user has logged in successfully, then send to questionnaire for now, later will use AJAX to post questionaire here, and have option to later log in workout
-                return (user.AccessGrantedToFacility) ? RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym }) : RedirectToAction(nameof(Index));
+                // if the user has logged in successfully and not logged workout, then send to questionnaire for now, later will use AJAX to post questionaire here, and have option to later log in workout
+                return (user.AccessGrantedToFacility) && (!user.HasLoggedWorkoutToday) ? RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym }) : RedirectToAction(nameof(Index));
             }
             return View(facility);
         }

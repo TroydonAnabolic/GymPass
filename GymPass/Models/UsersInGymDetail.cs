@@ -14,7 +14,7 @@ namespace GymPass.Models
         public Facility Facility { get; set; }
         public string FirstName { get; set; }
         public DateTime TimeAccessGranted { get; set; }
-        public TimeSpan? EstimatedTrainingTime { get; set; } = TimeSpan.FromMinutes(45); // default training time is 45 mins, incase user skips
+        public TimeSpan EstimatedTrainingTime { get; set; } = TimeSpan.FromMinutes(45); // default training time is 45 mins, incase user skips
         public string UniqueEntryID { get; set; } // used to identify which entry to remove when the user leaves
     }
 }

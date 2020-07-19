@@ -70,19 +70,19 @@
                     </div>
                     Stretch: @Model.NumberOfClientsUsingStretchRoom
                 </div>
+                @* The actual number shows by default, js will interchange between the two on click ( *@
                 <div class="realtime-indicator">
                     <div class="realtime-icons">
                         <img src="~/images/Capacity/capacity-80.png" />
                     </div>
-                    Total: @Model.NumberOfClientsInGym
+                    Total:  @Model.NumberOfClientsInGym
                 </div>
-                @*TODO: Use JavaScript to interchange/toggle display between established number of clients, with actual amount, using hidden, using click/automatic trigger
-                    <div class="realtime-indicator">
+                    <div class="realtime-indicator hidden">
                         <div class="realtime-icons">
                             <img src="~/images/Capacity/capacity-80.png" />
                         </div>
-                        Total: @Model.NumberOfClientsInGym
-                    </div>*@
+                        Est Total: @ViewBag.EstimatedNumberInGym
+                    </div>
             </div>
         </div>
     </div>
