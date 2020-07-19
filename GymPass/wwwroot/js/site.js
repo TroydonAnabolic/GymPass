@@ -12,7 +12,6 @@ function closeNav() {
 }
 
 $(document).ready(function () {
-
     /*
     *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
     */
@@ -48,7 +47,7 @@ $(document).ready(function () {
 
     // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
     // after 5 seconds it will remove scanning
-    var btn = $("body > main > div.access > div > form > div:nth-child(3) > button > svg");
+    var btn = $("#submit-icon");
 
     btn.click(function () {
         var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
@@ -57,6 +56,11 @@ $(document).ready(function () {
         }, 5000);
         modal.style.display = "block";
     });
+
+    // Option to fill in location services and pass users current location data to the server
+    var userLocation = "Anytime Fitness";
+    $("#user-location").val(gymName);
+
 
     // TODO: Progress Bar Depelete each time the open door button is pressed.
     //$(function () {
