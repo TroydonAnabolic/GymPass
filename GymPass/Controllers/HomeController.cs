@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace GymPass.Controllers
 {
@@ -118,12 +119,7 @@ namespace GymPass.Controllers
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
             UsersInGymDetail currentFacilityDetail = new UsersInGymDetail();
             var currentFacilityDetailDb = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
-
             bool enteredGym = false;
-            // currentFacilityDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
-            // foreach facility details count, check for user id match, then remove
-            //currentFacilityDetail = await _facilityContext.UsersInGymDetails.FirstOrDefaultAsync();
-
 
             if (id != facility.FacilityID ||  id != facilityView.FacilityID)
             {
@@ -139,106 +135,8 @@ namespace GymPass.Controllers
             {
                 try
                 { // maybe make is open door requested a user property
-                    // if door open is requested from the view by clicking the button, then run the below logic to test if user is authorized and also apply crowdsensing functions
-                    if (facilityView.IsOpenDoorRequested == true)
-                    {
-                        ViewBag.IsExerciseLogComplete = false;
-
-                        // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
-                        // TODO: Add facial recognition scan and geo location detection
-                        user.IsCameraScanSuccessful = true;
-                        user.IsWithin10m = true;
-
-                        // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
-                        if (user.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
-                        {
-                            user.AccessGrantedToFacility = true;
-                            ViewBag.AccessGrantedToFacility = true;
-                        }
-                        // if camera scan is not successful
-                        else if (!user.IsCameraScanSuccessful && !user.IsWithin10m)
-                        {
-                            user.AccessGrantedToFacility = false;
-                        }
-
-                        if (user.AccessGrantedToFacility)
-                        {
-                            facility.DoorOpened = true;
-                            // if the user is not in the gym, then say this user is not in the gym, and increase the number of ppl in the gym by 1
-                            if (!user.IsInsideGym)
-                            {
-                                facility.NumberOfClientsInGym++;
-                                user.IsInsideGym = true;
-                                user.TimeAccessGranted = DateTime.Now;
-                                // fill in facility details table, TODO: Exchange user time access with facility list
-                                currentFacilityDetail.TimeAccessGranted = DateTime.Now;
-                                currentFacilityDetail.FirstName = user.FirstName;
-                                currentFacilityDetail.UniqueEntryID = user.Id;
-                                currentFacilityDetail.FacilityID = facility.FacilityID;
-                                enteredGym = true;
-                                // TODO: Use AJAX to async send to and from the client at the same time
-                            }
-                            // if the user is already in the gym, when button is pushed then make reset all access to false, and decrement the number of ppl in the gym by 1
-                            else if (user.IsInsideGym)
-                            {
-                                user.IsInsideGym = false;
-                                facility.NumberOfClientsInGym--;
-
-                                if (user.WillUseWeightsRoom)
-                                {
-                                    facility.NumberOfClientsUsingWeightRoom--;
-                                    user.WillUseWeightsRoom = false;
-                                }
-                                if (user.WillUseCardioRoom)
-                                {
-                                    facility.NumberOfClientsUsingCardioRoom--;
-                                    user.WillUseCardioRoom = false;
-                                }
-                                if (user.WillUseStretchRoom)
-                                {
-                                    facility.NumberOfClientsUsingStretchRoom--;
-                                    user.WillUseWeightsRoom = false;
-                                }
-
-                                // if there are entries for facilities, loop through all the facilities, remove the entry which is stamped with the current user entry
-                                if (facilityDetails.Count() > 0 )
-                                {
-                                     _facilityContext.UsersInGymDetails.Remove(currentFacilityDetailDb);
-                                }
-
-                                user.IsCameraScanSuccessful = false;
-                                user.IsWithin10m = false;
-                                user.AccessGrantedToFacility = false;
-                            }
-
-                        } // end access granted
-                        else if (!user.AccessGrantedToFacility)
-                        {
-                            ViewBag.AccessDeniedMsgRecieved = false;
-                            user.TimeAccessDenied = DateTime.Now;
-                        }
-
-                        // if door has been opened and user is authorised
-                        if (facility.DoorOpened && user.AccessGrantedToFacility)
-                        {
-                            // log the time granted, and wait 5 seconds.
-                            System.Threading.Thread.Sleep(facility.DoorCloseTimer);
-                        }
-                        else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
-
-                        // When 5 second timer finishes, we close the door again automatically
-                        // facility.IsOpenDoorRequested = false;
-                        facility.DoorOpened = false;
-                        _facilityContext.Update(facility);
-
-                        // if we are entering gym, use the new facility object, if we are leaving, use the facility detail using Db values.
-                        if (enteredGym) _facilityContext.Update(currentFacilityDetail);
-                       // else if (leftGym) _facilityContext.Update(currentFacilityDetailDb);
-
-                        // after a facility exist, then we can update facility to avoid foreign key constraint?
-                        await _facilityContext.SaveChangesAsync();
-                        await _userManager.UpdateAsync(user);
-                    }
+                  // if door open is requested from the view by clicking the button, then run the below logic to test if user is authorized and also apply crowdsensing functions
+                    enteredGym = await DetermineEnterOrExitGym(facilityView, user, facility, facilityDetails, currentFacilityDetail, currentFacilityDetailDb, enteredGym);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -255,6 +153,112 @@ namespace GymPass.Controllers
                 return (user.AccessGrantedToFacility) && (!user.HasLoggedWorkoutToday) ? RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym }) : RedirectToAction(nameof(Index));
             }
             return View(facility);
+        }
+
+        private async Task<bool> DetermineEnterOrExitGym(Facility facilityView, ApplicationUser user, Facility facility, List<UsersInGymDetail> facilityDetails, UsersInGymDetail currentFacilityDetail,
+            UsersInGymDetail currentFacilityDetailDb, bool enteredGym)
+        {
+            if (facilityView.IsOpenDoorRequested == true)
+            {
+                ViewBag.IsExerciseLogComplete = false;
+
+                // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
+                // TODO: Add facial recognition scan and geo location detection
+                user.IsCameraScanSuccessful = true;
+                user.IsWithin10m = true;
+
+                // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
+                if (user.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
+                {
+                    user.AccessGrantedToFacility = true;
+                    ViewBag.AccessGrantedToFacility = true;
+                }
+                // if camera scan is not successful
+                else if (!user.IsCameraScanSuccessful && !user.IsWithin10m)
+                {
+                    user.AccessGrantedToFacility = false;
+                }
+
+                if (user.AccessGrantedToFacility)
+                {
+                    facility.DoorOpened = true;
+                    // if the user is not in the gym, then say this user is not in the gym, and increase the number of ppl in the gym by 1
+                    if (!user.IsInsideGym)
+                    {
+                        facility.NumberOfClientsInGym++;
+                        user.IsInsideGym = true;
+                        user.TimeAccessGranted = DateTime.Now;
+                        // fill in facility details table, TODO: Exchange user time access with facility list
+                        currentFacilityDetail.TimeAccessGranted = DateTime.Now;
+                        currentFacilityDetail.FirstName = user.FirstName;
+                        currentFacilityDetail.UniqueEntryID = user.Id;
+                        currentFacilityDetail.FacilityID = facility.FacilityID;
+                        enteredGym = true;
+                        // TODO: Use AJAX to async send to and from the client at the same time
+                    }
+                    // if the user is already in the gym, when button is pushed then make reset all access to false, and decrement the number of ppl in the gym by 1
+                    else if (user.IsInsideGym)
+                    {
+                        user.IsInsideGym = false;
+                        facility.NumberOfClientsInGym--;
+
+                        if (user.WillUseWeightsRoom)
+                        {
+                            facility.NumberOfClientsUsingWeightRoom--;
+                            user.WillUseWeightsRoom = false;
+                        }
+                        if (user.WillUseCardioRoom)
+                        {
+                            facility.NumberOfClientsUsingCardioRoom--;
+                            user.WillUseCardioRoom = false;
+                        }
+                        if (user.WillUseStretchRoom)
+                        {
+                            facility.NumberOfClientsUsingStretchRoom--;
+                            user.WillUseWeightsRoom = false;
+                        }
+
+                        // if there are entries for facilities, loop through all the facilities, remove the entry which is stamped with the current user entry
+                        if (facilityDetails.Count() > 0)
+                        {
+                            _facilityContext.UsersInGymDetails.Remove(currentFacilityDetailDb);
+                        }
+
+                        user.IsCameraScanSuccessful = false;
+                        user.IsWithin10m = false;
+                        user.AccessGrantedToFacility = false;
+                    }
+
+                } // end access granted
+                else if (!user.AccessGrantedToFacility)
+                {
+                    ViewBag.AccessDeniedMsgRecieved = false;
+                    user.TimeAccessDenied = DateTime.Now;
+                }
+
+                // if door has been opened and user is authorised
+                if (facility.DoorOpened && user.AccessGrantedToFacility)
+                {
+                    // log the time granted, and wait 5 seconds.
+                    System.Threading.Thread.Sleep(facility.DoorCloseTimer);
+                }
+                else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
+
+                // When 5 second timer finishes, we close the door again automatically
+                // facility.IsOpenDoorRequested = false;
+                facility.DoorOpened = false;
+                _facilityContext.Update(facility);
+
+                // if we are entering gym, use the new facility object, if we are leaving, use the facility detail using Db values.
+                if (enteredGym) _facilityContext.Update(currentFacilityDetail);
+                // else if (leftGym) _facilityContext.Update(currentFacilityDetailDb);
+
+                // after a facility exist, then we can update facility to avoid foreign key constraint?
+                await _facilityContext.SaveChangesAsync();
+                await _userManager.UpdateAsync(user);
+            }
+
+            return enteredGym;
         }
 
         public IActionResult Privacy()

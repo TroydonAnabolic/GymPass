@@ -107,7 +107,7 @@
                             </div>
 
                             @* Location Entry *@
-                            <div class="form-group hidden">
+                            <div class="form-group">
                                 <label asp-for="FacilityName" class="control-label"></label>
                                 <input id="user-location"  asp-for="FacilityName" class="form-control" />
                                 <span asp-validation-for="FacilityName" class="text-danger"></span>
@@ -121,7 +121,7 @@
 
 
                             <div class="form-group">
-                                <button type="submit" class="locked nav-link btn">
+                                <button onclick="getLocation()" type="submit" class="locked nav-link btn">
                                     <i id="submit-icon" class="fa fa-lock"></i>
                                 </button>
                             </div>
