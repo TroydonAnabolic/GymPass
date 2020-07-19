@@ -84,7 +84,9 @@ namespace GymPass.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(int id, [Bind("FacilityID,FacilityName,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facilityView) // 
+        public async Task<IActionResult> Index(int id, [Bind("FacilityID,FacilityName,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom," +
+            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facilityView,
+            [Bind("FirstName,TimeAccessGranted,EstimatedTrainingTime,UniqueEntryID")] UsersInGymDetail usersInGymDetailView) // 
         {
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
@@ -98,9 +100,17 @@ namespace GymPass.Controllers
 
             // note that variable facility is the database values, facilityView, binds data from the view
             var facility = await _facilityContext.Facilities.FindAsync(id);
+            var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
+            UsersInGymDetail currentFacilityDetail = new UsersInGymDetail();
+            var currentFacilityDetailDb = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+
+            bool enteredGym = false, leftGym = false;
+            // currentFacilityDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+            // foreach facility details count, check for user id match, then remove
+            //currentFacilityDetail = await _facilityContext.UsersInGymDetails.FirstOrDefaultAsync();
 
 
-            if (id != facility.FacilityID && id != facilityView.FacilityID)
+            if (id != facility.FacilityID ||  id != facilityView.FacilityID)
             {
                 return NotFound();
             }
@@ -145,23 +155,18 @@ namespace GymPass.Controllers
                                 facility.NumberOfClientsInGym++;
                                 user.IsInsideGym = true;
                                 user.TimeAccessGranted = DateTime.Now;
+                                // fill in facility details table, TODO: Exchange user time access with facility list
+                                currentFacilityDetail.TimeAccessGranted = DateTime.Now;
+                                currentFacilityDetail.FirstName = user.FirstName;
+                                currentFacilityDetail.UniqueEntryID = user.Id;
+                                currentFacilityDetail.FacilityID = facility.FacilityID;
+                                enteredGym = true;
                                 // TODO: Use AJAX to async send to and from the client at the same time
-                                //while (!ViewBag.IsExerciseLogComplete)
-                                //{
-                                //    // if the amount of time passed since user was asked to fill log 
-                                //    if (DateTime.Now >= (user.TimeAccessGranted.AddSeconds(15))) // todo: change this to 
-                                //    {
-                                //        ViewBag.IsExerciseLogComplete = true;
-                                //    }
-                                //    else if (ViewBag.IsExerciseLogComplete) break;
-                                //}
-
-                                _facilityContext.Update(facility);
-                                await _facilityContext.SaveChangesAsync();
                             }
                             // if the user is already in the gym, when button is pushed then make reset all access to false, and decrement the number of ppl in the gym by 1
                             else if (user.IsInsideGym)
                             {
+                                leftGym = true;
                                 user.IsInsideGym = false;
                                 facility.NumberOfClientsInGym--;
 
@@ -180,11 +185,21 @@ namespace GymPass.Controllers
                                     facility.NumberOfClientsUsingStretchRoom--;
                                     user.WillUseWeightsRoom = false;
                                 }
+
+                                // if there are entries for facilities, loop through all the facilities, remove the entry which is stamped with the current user entry
+                                if (facilityDetails.Count() > 0 )
+                                {
+                                     _facilityContext.UsersInGymDetails.Remove(currentFacilityDetailDb);
+                                    //var gymDetailToRemove = new UsersInGymDetail();
+                                    //gymDetailToRemove.FacilityID = currentFacilityDetailId;
+                                    ////_facilityContext.UsersInGymDetails.Remove(gymDetailToRemove);
+                                    //_facilityContext.Entry(gymDetailToRemove).State = EntityState.Deleted;
+
+                                }
+
                                 user.IsCameraScanSuccessful = false;
                                 user.IsWithin10m = false;
                                 user.AccessGrantedToFacility = false;
-                                _facilityContext.Update(facility);
-                                await _facilityContext.SaveChangesAsync();
                             }
 
                         } // end access granted
@@ -193,19 +208,6 @@ namespace GymPass.Controllers
                             ViewBag.AccessDeniedMsgRecieved = false;
                             user.TimeAccessDenied = DateTime.Now;
                         }
-                        // make sure door open is no longer requested
-
-                            //// TODO: when we reach midnight and, set everyones as out of the gym
-                            //if (!facility.is24SevenGym user.IsInsideGym && DateTime.Today)
-                            //{
-                            //    facility.NumberOfClientsInGym = 0;
-                            //    user.IsInsideGym = false;
-                            //}
-
-                            // save the opened door and user. TODO: try changing these to facility view for privacy if possible
-                        _facilityContext.Update(facility);
-                        await _facilityContext.SaveChangesAsync();
-
 
                         // if door has been opened and user is authorised
                         if (facility.DoorOpened && user.AccessGrantedToFacility)
@@ -219,6 +221,12 @@ namespace GymPass.Controllers
                         // facility.IsOpenDoorRequested = false;
                         facility.DoorOpened = false;
                         _facilityContext.Update(facility);
+
+                        // if we are entering gym, use the new facility object, if we are leaving, use the facility detail using Db values.
+                        if (enteredGym) _facilityContext.Update(currentFacilityDetail);
+                       // else if (leftGym) _facilityContext.Update(currentFacilityDetailDb);
+
+                        // after a facility exist, then we can update facility to avoid foreign key constraint?
                         await _facilityContext.SaveChangesAsync();
                         await _userManager.UpdateAsync(user);
                     }

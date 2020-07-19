@@ -10,6 +10,7 @@ namespace GymPass.Models
     public class Facility
     {
         public int FacilityID { get; set; }
+        public ICollection<UsersInGymDetail> UsersInGymDetails { get; set; }
         public string FacilityName { get; set; }
         public int? NumberOfClientsInGym { get; set; }
         public int? NumberOfClientsUsingWeightRoom { get; set; }

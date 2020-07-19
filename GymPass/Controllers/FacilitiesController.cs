@@ -126,6 +126,7 @@ namespace GymPass.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
+            var currentFacilityDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
 
 
             if (ModelState.IsValid)
@@ -153,6 +154,7 @@ namespace GymPass.Controllers
                             facility.TotalTrainingDuration += facilityView.UserTrainingDuration;
                             user.HasLoggedWorkoutToday = true;
                             user.TimeLoggedWorkout = DateTime.Now;
+                            currentFacilityDetail.EstimatedTrainingTime = facilityView.UserTrainingDuration;
                             // if the user will use any of these facilities of the gym, it will increase that counter
                             if (facilityView.WillUseWeightsRoom)
                             {
@@ -178,8 +180,8 @@ namespace GymPass.Controllers
                             return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
                         }
 
-
                         _facilityContext.Update(facility); // check if updaing facilityview instead of facility will work
+                        _facilityContext.Update(currentFacilityDetail); // check if updaing facilityview instead of facility will work
                         await _facilityContext.SaveChangesAsync();
                         await _userManager.UpdateAsync(user);
                     }

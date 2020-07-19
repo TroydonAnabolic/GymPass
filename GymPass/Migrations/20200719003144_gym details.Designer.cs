@@ -4,14 +4,16 @@ using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GymPass.Migrations
 {
     [DbContext(typeof(FacilityContext))]
-    partial class FacilityContextModelSnapshot : ModelSnapshot
+    [Migration("20200719003144_gym details")]
+    partial class gymdetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,7 +79,7 @@ namespace GymPass.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<TimeSpan?>("EstimatedTrainingTime")
+                    b.Property<TimeSpan>("EstimatedTrainingTime")
                         .HasColumnType("time");
 
                     b.Property<int>("FacilityID")
@@ -89,8 +91,8 @@ namespace GymPass.Migrations
                     b.Property<DateTime>("TimeAccessGranted")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UniqueEntryID")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("UniqueEntryID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UsersInGymDetailID");
 
