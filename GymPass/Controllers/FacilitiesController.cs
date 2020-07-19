@@ -279,6 +279,7 @@ namespace GymPass.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var facility = await _facilityContext.Facilities.FindAsync(id);
+
             _facilityContext.Facilities.Remove(facility);
             await _facilityContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

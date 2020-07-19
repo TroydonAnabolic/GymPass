@@ -71,17 +71,17 @@
                     Stretch: @Model.NumberOfClientsUsingStretchRoom
                 </div>
                 @* The actual number shows by default, js will interchange between the two on click ( *@
-                <div class="realtime-indicator">
+                <div id="total-in-gym-icon" class="realtime-indicator">
                     <div class="realtime-icons">
                         <img src="~/images/Capacity/capacity-80.png" />
                     </div>
                     Total:  @Model.NumberOfClientsInGym
                 </div>
-                    <div class="realtime-indicator hidden">
+                    <div id="est-total-in-gym-icon" class="realtime-indicator">
                         <div class="realtime-icons">
                             <img src="~/images/Capacity/capacity-80.png" />
                         </div>
-                        Est Total: @ViewBag.EstimatedNumberInGym
+                        E Total: @ViewBag.EstimatedNumberInGym
                     </div>
             </div>
         </div>
@@ -183,6 +183,19 @@
     $(document).ready(function () {
         $("header").hide();
 
+        // Change between estimated total and actual total
+        // When we click user total, show est total
+        $("#total-in-gym-icon").click(function () {
+            $(this).css("display", "none");
+            $("#est-total-in-gym-icon")
+                .css("display", "block");
+        });
+        // other way around
+        $("#est-total-in-gym-icon").click(function () {
+            $(this).css("display", "none");
+            $("#total-in-gym-icon")
+                .css("display", "block");
+        });
 
     });
 </script>

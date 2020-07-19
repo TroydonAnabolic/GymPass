@@ -402,7 +402,11 @@ header {
         max-width: 100%;
     }
 
-.occupancy-title  {
+#est-total-in-gym-icon {
+    display: none;
+}
+
+.occupancy-title {
     bottom: 5rem;
     right: 1rem;
     width: 14rem;

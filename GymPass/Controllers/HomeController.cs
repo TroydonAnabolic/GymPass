@@ -50,7 +50,7 @@ namespace GymPass.Controllers
 
             if (id == null)
             {
-                return RedirectToAction("Index", "Facilities");
+                return RedirectToPage("/Identity/Account/Login");
             }
 
             var facility = await _facilityContext.Facilities.FindAsync(id);
@@ -119,7 +119,7 @@ namespace GymPass.Controllers
             UsersInGymDetail currentFacilityDetail = new UsersInGymDetail();
             var currentFacilityDetailDb = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
 
-            bool enteredGym = false, leftGym = false;
+            bool enteredGym = false;
             // currentFacilityDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
             // foreach facility details count, check for user id match, then remove
             //currentFacilityDetail = await _facilityContext.UsersInGymDetails.FirstOrDefaultAsync();
@@ -181,7 +181,6 @@ namespace GymPass.Controllers
                             // if the user is already in the gym, when button is pushed then make reset all access to false, and decrement the number of ppl in the gym by 1
                             else if (user.IsInsideGym)
                             {
-                                leftGym = true;
                                 user.IsInsideGym = false;
                                 facility.NumberOfClientsInGym--;
 
