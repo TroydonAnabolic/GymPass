@@ -120,7 +120,7 @@ $(document).ready(function () {
     // Trial HERE Maps
     // Instantiate a map and platform object:
     var platform = new H.service.Platform({
-        'apikey': 'USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8'
+        apikey: `USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8`
     });
 
     // Get an instance of the geocoding service:
@@ -131,14 +131,14 @@ $(document).ready(function () {
     // the callback and an error callback function (called if a
     // communication error occurs):
     service.geocode({
-        q: '200 S Mathilda Ave, Sunnyvale, CA'
+        q: '44 Brenda Street'
     }, (result) => {
         // Add a marker for each location found
-        result.items.forEach((item) => {
-           alert(item.position);
+            result.items.forEach((item) => {
+                alert(item.position.coords.latitude);
+            map.addObject(new H.map.Marker(item.position));
         });
     }, alert);
-
 
 
 
