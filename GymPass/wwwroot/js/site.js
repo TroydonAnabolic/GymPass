@@ -57,23 +57,21 @@ $(document).ready(function () {
         //modal.style.display = "block";
     });
 
-/*
-*  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
-*/
+    /*
+    *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
+    */
 
     // Option to fill in location services and pass users current location data to the server
-    var userLocation = "Anytime Fitness";
-    $("#user-location").val(userLocation);
 
     var x = document.getElementById("user-location");
     var lat = "";
     var long = "";
 
-    // get the lat1 and lon1 for the current user and the gym
+    // get the lat1 and lon1 for the current user 
     function getLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(showPosition);
-            console.log("worked");
+            console.log(long);
         } else {
             alert("Geolocation is not supported by this browser.");
         }
@@ -84,34 +82,64 @@ $(document).ready(function () {
             "<br>Longitude: " + position.coords.longitude;
         lat = position.coords.latitude;
         long = position.coords.longitude;
-        alert(long);
+        // Calculate the difference between the gym location
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371000; // Radius of the earth in m
+            var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+                ;
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180)
+        }
+
+        // sets the default gym to values on hidden fields
+        var defaultGymLat = $('#dlat').html();
+        var defaultGymLong = $('#dlong').html();
+
+        var differenceBetweenUser = getDistanceFromLatLonInKm(lat, long, defaultGymLat, defaultGymLong).toFixed(1);
+
+        if (differenceBetweenUser < 40) {
+            $('#user-location').prop('checked', true);
+        }
+        else {
+            console.log("false");
+            $('#user-location').prop('checked', false);
+        }
     }
+        getLocation();
 
-    getLocation();
+    // Trial HERE Maps
+    // Instantiate a map and platform object:
+    var platform = new H.service.Platform({
+        'apikey': 'USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8'
+    });
 
-    // Calculate the difference between the gym location
-    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-        var R = 6371000; // Radius of the earth in m
-        var dLat = deg2rad(lat2 - lat1);  // deg2rad below
-        var dLon = deg2rad(lon2 - lon1);
-        var a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2)
-            ;
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        var d = R * c; // Distance in km
-        return d;
-    }
+    // Get an instance of the geocoding service:
+    var service = platform.getSearchService();
 
-    function deg2rad(deg) {
-        return deg * (Math.PI / 180)
-    }
 
-    var defaultGymLat = -34.006269;
-    var defaultGymLong = 150.859077;
+    // Call the geocode method with the geocoding parameters,
+    // the callback and an error callback function (called if a
+    // communication error occurs):
+    service.geocode({
+        q: '200 S Mathilda Ave, Sunnyvale, CA'
+    }, (result) => {
+        // Add a marker for each location found
+        result.items.forEach((item) => {
+           alert(item.position);
+        });
+    }, alert);
 
-    var differenceBetweenUser = getDistanceFromLatLonInKm(59.3293371, 13.4877472, defaultGymLat, defaultGymLong).toFixed(1);
+
 
 
 

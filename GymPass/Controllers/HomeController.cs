@@ -101,7 +101,7 @@ namespace GymPass.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(int id, [Bind("FacilityID,FacilityName,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom," +
-            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facilityView,
+            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful")] Facility facilityView,
             [Bind("FirstName,TimeAccessGranted,EstimatedTrainingTime,UniqueEntryID")] UsersInGymDetail usersInGymDetailView) // 
         {
             // Get the default gym for a user and set it to be the Id for the gym being edited
@@ -158,23 +158,24 @@ namespace GymPass.Controllers
         private async Task<bool> DetermineEnterOrExitGym(Facility facilityView, ApplicationUser user, Facility facility, List<UsersInGymDetail> facilityDetails, UsersInGymDetail currentFacilityDetail,
             UsersInGymDetail currentFacilityDetailDb, bool enteredGym)
         {
-            if (facilityView.IsOpenDoorRequested == true)
+            if (facilityView.IsOpenDoorRequested)
             {
                 ViewBag.IsExerciseLogComplete = false;
 
                 // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
-                // TODO: Add facial recognition scan and geo location detection
-                user.IsCameraScanSuccessful = true;
+                // TODO: Add facial recognition scan and for now use facilityView geolocation, later
+
+                if (facilityView.IsCameraScanSuccessful) user.IsCameraScanSuccessful = true;
                 user.IsWithin10m = true;
 
                 // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
-                if (user.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
+                if (facilityView.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
                 {
                     user.AccessGrantedToFacility = true;
                     ViewBag.AccessGrantedToFacility = true;
                 }
                 // if camera scan is not successful
-                else if (!user.IsCameraScanSuccessful && !user.IsWithin10m)
+                else if (!facilityView.IsCameraScanSuccessful && !user.IsWithin10m)
                 {
                     user.AccessGrantedToFacility = false;
                 }
@@ -224,7 +225,7 @@ namespace GymPass.Controllers
                             _facilityContext.UsersInGymDetails.Remove(currentFacilityDetailDb);
                         }
 
-                        user.IsCameraScanSuccessful = false;
+                        facilityView.IsCameraScanSuccessful = false;
                         user.IsWithin10m = false;
                         user.AccessGrantedToFacility = false;
                     }
@@ -240,9 +241,9 @@ namespace GymPass.Controllers
                 if (facility.DoorOpened && user.AccessGrantedToFacility)
                 {
                     // log the time granted, and wait 5 seconds.
-                    System.Threading.Thread.Sleep(facility.DoorCloseTimer);
+                    System.Threading.Thread.Sleep(200);
                 }
-                else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(facility.DoorCloseTimer);
+                else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(200);
 
                 // When 5 second timer finishes, we close the door again automatically
                 // facility.IsOpenDoorRequested = false;

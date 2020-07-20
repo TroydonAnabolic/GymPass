@@ -106,22 +106,24 @@
                                 </label>
                             </div>
 
+                            <div id="dlat" class="hidden">-34.006362</div><div id="dlong" class="hidden">150.858607</div>
+
                             @* Location Entry *@
-                            <div class="form-group">
-                                <label asp-for="FacilityName" class="control-label"></label>
-                                <input id="user-location"  asp-for="FacilityName" class="form-control" />
-                                <span asp-validation-for="FacilityName" class="text-danger"></span>
+                            <div class="form-group form-check hidden" style="height:0px;">
+                                <label class="form-check-label">
+                                    <input id="user-location" class="form-check-input" asp-for="IsCameraScanSuccessful" /> @Html.DisplayNameFor(model => model.IsCameraScanSuccessful)
+                                </label>
                             </div>
 
                             @if (ViewBag.AccessGrantedToFacility)
                             {
-                                // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view
+                                // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view to enter exercise log on the same page?
                             }
                             @* End Modal for training intentions *@
 
 
                             <div class="form-group">
-                                <button onclick="getLocation()" type="submit" class="locked nav-link btn">
+                                <button type="submit" class="locked nav-link btn">
                                     <i id="submit-icon" class="fa fa-lock"></i>
                                 </button>
                             </div>

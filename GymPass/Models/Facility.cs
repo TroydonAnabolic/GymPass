@@ -31,6 +31,8 @@ namespace GymPass.Models
         public bool WillUseCardioRoom { get; set; }
         [Display(Name = "Stretch Room")]
         public bool WillUseStretchRoom { get; set; }
+        public bool IsCameraScanSuccessful { get; set; } = true;
+
 
         //public bool IsDeepLensRequested { get; set; } = false;
         //public bool IsWithin10m { get; set; } = false;

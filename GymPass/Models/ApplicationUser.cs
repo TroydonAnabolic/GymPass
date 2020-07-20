@@ -29,6 +29,6 @@ namespace GymPass.Models
         public bool WillUseCardioRoom { get; set; }
         public bool WillUseStretchRoom { get; set; } 
         public bool HasLoggedWorkoutToday { get; set; }
-        public DateTime TimeLoggedWorkout { get; internal set; }
+        public DateTime TimeLoggedWorkout { get;  set; }
     }
 }
