@@ -90,17 +90,31 @@
     @* Popup modal for camera and maps*@
 
     <!-- The Modal -->
-    <div id="myModal" class="modal">
-
+    <div id="map" class="modalz">
         <!-- Modal content -->
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Some text in the Modal..</p>
+        <div class="modalz-content">
+            <div class="modalz-header">
+                <span class="close">&times;</span>
+                <h4>@Model.FacilityName Location</h4>
+            </div>
+            <div class="modal-body">
+                <p>Image of Map goes here, with a gym icon as marker, and your icon will be different</p>
+            </div>
         </div>
     </div>
 
-    <div id="camera">
-
+    <!-- The Modal -->
+    <div id="camera" class="modalz">
+        <!-- Modal content -->
+        <div class="modalz-content">
+            <div class="modalz-header">
+                <span class="close">&times;</span>
+                <h4>@Model.FacilityName</h4>
+            </div>
+            <div class="modalz-body">
+                <p>Selfie camera content goes here if possible</p>
+            </div>
+        </div>
     </div>
 
     <div class="access">

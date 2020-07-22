@@ -59,6 +59,47 @@ $(document).ready(function () {
     *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
     */
 
+    // Modal animation for map and camera
+    // Get the modal
+    var mapModal = document.getElementById("map");
+    var camModal = document.getElementById("camera");
+
+    // Get the button that opens the modal
+    var mapBtn = document.getElementById("map-button");
+    var camBtn = document.getElementById("camera-button");
+
+    // Get the <span> element that closes the modal (TODO: may need to modify due to being two)
+    var span = document.getElementsByClassName("close")[0];
+    var span2 = document.getElementsByClassName("close")[1];
+
+    // When the user clicks the button, open the modal 
+    mapBtn.onclick = function () {
+        mapModal.style.display = "block";
+    }
+    camBtn.onclick = function () {
+        camModal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        mapModal.style.display = "none";
+    }
+    // When the user clicks on <span> (x), close the modal
+    span2.onclick = function () {
+        camModal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == mapModal) {
+            mapModal.style.display = "none";
+        }
+        if (event.target == camModal) {
+            mapModal.style.display = "none";
+            camModal.style.display = "none";
+        }
+    }
+
     // Option to fill in location services and pass users current location data to the server
     var x = document.getElementById("user-location");
     var lat = "";

@@ -457,21 +457,6 @@ body > main > div.main-gym > div > div.log-workout-home > a {
 .door-status {
     padding-top: 2rem;
 }
-
-#map-button, #camera-button {
-    position: absolute;
-    height: 2rem;
-    width: 2rem;
-    margin: 0.6rem 1rem;
-}
-    #camera-button {
-        right: 0;
-    }
-
-#map-button > svg, #camera-button > svg {
-    height: 100%;
-    width: 100%;
-}
 /* Login style */
 .banner {
     display: block;
@@ -517,7 +502,24 @@ body > main > div.main-gym > div > div.log-workout-home > a {
         max-width: 100%;
     }
 
-/* Log workout modal */
+/* Map and camera modal */
+
+#map-button, #camera-button {
+    position: absolute;
+    height: 2rem;
+    width: 2rem;
+    margin: 0.6rem 1rem;
+}
+
+#camera-button {
+    right: 0;
+}
+
+    #map-button > svg, #camera-button > svg {
+        height: 100%;
+        width: 100%;
+    }
+
 .modalz {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -589,7 +591,7 @@ body > main > div.main-gym > div > div.log-workout-home > a {
 
 .modalz-header {
     padding: 2px 16px;
-    background-color: #5cb85c;
+    background-color: #007bff;
     color: white;
 }
 
@@ -602,6 +604,8 @@ body > main > div.main-gym > div > div.log-workout-home > a {
     background-color: #5cb85c;
     color: white;
 }
+
+
 
 /* Log workout styling */
 
