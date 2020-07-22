@@ -38,7 +38,6 @@ $(document).ready(function () {
             // we remove the class and add the other class to this button
             $('body > main > div.access > div > form > div:nth-child(3) > button > svg').remove();
             $(this)
-                // .remove("<i class='fa fa-lock'></i>")
                 .append("<i class='fas fa-lock-open'></i>")
                 .addClass("unlocked")
                 .removeClass("locked");
@@ -54,7 +53,6 @@ $(document).ready(function () {
         setTimeout(function () {
             scan.addClass('hidden');
         }, 5000);
-        //modal.style.display = "block";
     });
 
     /*
@@ -62,7 +60,6 @@ $(document).ready(function () {
     */
 
     // Option to fill in location services and pass users current location data to the server
-
     var x = document.getElementById("user-location");
     var lat = "";
     var long = "";

@@ -4,16 +4,14 @@ using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GymPass.Migrations
+namespace GymPass.Migrations.Facility
 {
     [DbContext(typeof(FacilityContext))]
-    [Migration("20200719013320_gym detailed")]
-    partial class gymdetailed
+    partial class FacilityContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,6 +35,9 @@ namespace GymPass.Migrations
                     b.Property<string>("FacilityName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsCameraScanSuccessful")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsOpenDoorRequested")
                         .HasColumnType("bit");
 
@@ -52,10 +53,10 @@ namespace GymPass.Migrations
                     b.Property<int?>("NumberOfClientsUsingWeightRoom")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("TotalTrainingDuration")
+                    b.Property<TimeSpan>("TotalTrainingDuration")
                         .HasColumnType("time");
 
-                    b.Property<TimeSpan?>("UserTrainingDuration")
+                    b.Property<TimeSpan>("UserTrainingDuration")
                         .HasColumnType("time");
 
                     b.Property<bool>("WillUseCardioRoom")
@@ -79,7 +80,7 @@ namespace GymPass.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<TimeSpan?>("EstimatedTrainingTime")
+                    b.Property<TimeSpan>("EstimatedTrainingTime")
                         .HasColumnType("time");
 
                     b.Property<int>("FacilityID")

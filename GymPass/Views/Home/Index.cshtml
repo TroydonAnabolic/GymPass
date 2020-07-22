@@ -87,7 +87,32 @@
         </div>
     </div>
 
+    @* Popup modal for camera and maps*@
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Some text in the Modal..</p>
+        </div>
+    </div>
+
+    <div id="camera">
+
+    </div>
+
     <div class="access">
+
+        @* Map and button trigger to reveal what is currently happening after clicking button for each context
+            e.g camera will show a search icon on click with current geo cords, security camera will show the phones facial recognition (if that can work)*@
+        <div id="map-button">
+            <i class="fas fa-map-marked-alt"></i>
+        </div>
+        <div id="camera-button">
+            <i class="fas fa-video"></i>
+        </div>
 
         <div class="access-container">
             @{
@@ -96,38 +121,38 @@
                 {
                     // Hide these form inputs and automatically post set values on click
 
-                        <form asp-action="Index">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="hidden" asp-for="FacilityID" />
+                    <form asp-action="Index">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="FacilityID" />
 
-                            <div class="form-group form-check hidden" style="height:0px;">
-                                <label class="form-check-label">
-                                    <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
-                                </label>
-                            </div>
+                        <div class="form-group form-check hidden" style="height:0px;">
+                            <label class="form-check-label">
+                                <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                            </label>
+                        </div>
 
-                            <div id="dlat" class="hidden">-34.006362</div><div id="dlong" class="hidden">150.858607</div>
+                        <div id="dlat" class="hidden">-34.006362</div><div id="dlong" class="hidden">150.858607</div>
 
-                            @* Location Entry *@
-                            <div class="form-group form-check hidden" style="height:0px;">
-                                <label class="form-check-label">
-                                    <input id="user-location" class="form-check-input" asp-for="IsCameraScanSuccessful" /> @Html.DisplayNameFor(model => model.IsCameraScanSuccessful)
-                                </label>
-                            </div>
+                        @* Location Entry *@
+                        <div class="form-group form-check hidden" style="height:0px;">
+                            <label class="form-check-label">
+                                <input id="user-location" class="form-check-input" asp-for="IsCameraScanSuccessful" /> @Html.DisplayNameFor(model => model.IsCameraScanSuccessful)
+                            </label>
+                        </div>
 
-                            @if (ViewBag.AccessGrantedToFacility)
-                            {
-                                // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view to enter exercise log on the same page?
-                            }
-                            @* End Modal for training intentions *@
+                        @if (ViewBag.AccessGrantedToFacility)
+                        {
+                            // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view to enter exercise log on the same page?
+                        }
+                        @* End Modal for training intentions *@
 
 
-                            <div class="form-group">
-                                <button type="submit" class="locked nav-link btn">
-                                    <i id="submit-icon" class="fa fa-lock"></i>
-                                </button>
-                            </div>
-                        </form>
+                        <div class="form-group">
+                            <button type="submit" class="locked nav-link btn">
+                                <i id="submit-icon" class="fa fa-lock"></i>
+                            </button>
+                        </div>
+                    </form>
 
                 }
                 // if the door is opened show the unlocked symbol and also present the modal

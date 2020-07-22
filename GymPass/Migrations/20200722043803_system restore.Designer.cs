@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GymPass.Data.Migrations
+namespace GymPass.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200718035221_Update row name")]
-    partial class Updaterowname
+    [Migration("20200722043803_system restore")]
+    partial class systemrestore
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -107,6 +107,9 @@ namespace GymPass.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("TimeAccessGranted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeLoggedWorkout")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("TwoFactorEnabled")

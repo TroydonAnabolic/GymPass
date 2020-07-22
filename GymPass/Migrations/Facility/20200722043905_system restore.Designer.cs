@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GymPass.Migrations
+namespace GymPass.Migrations.Facility
 {
     [DbContext(typeof(FacilityContext))]
-    [Migration("20200719003144_gym details")]
-    partial class gymdetails
+    [Migration("20200722043905_system restore")]
+    partial class systemrestore
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,6 +37,9 @@ namespace GymPass.Migrations
                     b.Property<string>("FacilityName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsCameraScanSuccessful")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsOpenDoorRequested")
                         .HasColumnType("bit");
 
@@ -52,10 +55,10 @@ namespace GymPass.Migrations
                     b.Property<int?>("NumberOfClientsUsingWeightRoom")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("TotalTrainingDuration")
+                    b.Property<TimeSpan>("TotalTrainingDuration")
                         .HasColumnType("time");
 
-                    b.Property<TimeSpan?>("UserTrainingDuration")
+                    b.Property<TimeSpan>("UserTrainingDuration")
                         .HasColumnType("time");
 
                     b.Property<bool>("WillUseCardioRoom")
@@ -91,8 +94,8 @@ namespace GymPass.Migrations
                     b.Property<DateTime>("TimeAccessGranted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UniqueEntryID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UniqueEntryID")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UsersInGymDetailID");
 

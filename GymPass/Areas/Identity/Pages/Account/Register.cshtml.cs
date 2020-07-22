@@ -91,7 +91,7 @@ namespace GymPass.Areas.Identity.Pages.Account
                     UserName = Input.Email,
                     Email = Input.Email,
                     FirstName = Input.FirstName,
-                    DefaultGym = 1 // hard code to be default gym for now
+                    DefaultGym = 10 // hard code to be default gym for now
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)

@@ -6,18 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\Migrations\20200711085813_Updated Custom Properties2.cs" />
-    <Compile Remove="Data\Migrations\20200711085813_Updated Custom Properties2.Designer.cs" />
-    <Compile Remove="Data\Migrations\20200711122750_Update Logic.cs" />
-    <Compile Remove="Data\Migrations\20200711122750_Update Logic.Designer.cs" />
-    <Compile Remove="Migrations\20200711111157_Update Logic.cs" />
-    <Compile Remove="Migrations\20200711111157_Update Logic.Designer.cs" />
-    <Compile Remove="Migrations\20200711122649_Update Logic.cs" />
-    <Compile Remove="Migrations\20200711122649_Update Logic.Designer.cs" />
-    <Compile Remove="Migrations\20200711122727_Update Logic.cs" />
-    <Compile Remove="Migrations\20200711122727_Update Logic.Designer.cs" />
-    <Compile Remove="Migrations\20200712060943_Add Nullable Avoid Defaults.cs" />
-    <Compile Remove="Migrations\20200712060943_Add Nullable Avoid Defaults.Designer.cs" />
+    <Compile Remove="Migrations\20200722043606_system restore.cs" />
+    <Compile Remove="Migrations\20200722043606_system restore.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

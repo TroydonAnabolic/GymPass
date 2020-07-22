@@ -454,14 +454,24 @@ body > main > div.main-gym > div > div.log-workout-home > a {
     margin-top: 1rem;
 }
 
-body > main > div.access > div > div.progress {
-    /*    margin-top: 1rem;*/
-}
-
 .door-status {
     padding-top: 2rem;
 }
 
+#map-button, #camera-button {
+    position: absolute;
+    height: 2rem;
+    width: 2rem;
+    margin: 0.6rem 1rem;
+}
+    #camera-button {
+        right: 0;
+    }
+
+#map-button > svg, #camera-button > svg {
+    height: 100%;
+    width: 100%;
+}
 /* Login style */
 .banner {
     display: block;
