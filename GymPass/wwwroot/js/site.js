@@ -107,6 +107,7 @@ $(document).ready(function () {
     var x = document.getElementById("user-location");
     var lat = "";
     var long = "";
+    // sets the default gym to values on hidden elements
     var defaultGymLat = $('#dlat').html();
     var defaultGymLong = $('#dlong').html();
 
@@ -144,8 +145,7 @@ $(document).ready(function () {
             return deg * (Math.PI / 180)
         }
 
-        // sets the default gym to values on hidden fields
-       
+
 
         var differenceBetweenUser = getDistanceFromLatLonInKm(lat, long, defaultGymLat, defaultGymLong).toFixed(1);
 
@@ -157,7 +157,11 @@ $(document).ready(function () {
             $('#user-location').prop('checked', false);
         }
     }
-        getLocation();
+    getLocation();
+
+    var test;
+
+
 
     // Trial HERE Maps
     //Step 1: initializeMap communication with the platform
@@ -185,19 +189,34 @@ $(document).ready(function () {
         // Create the default UI components
         var ui = H.ui.UI.createDefault(map, defaultLayers);
 
-        var LocationOfMarker = { lat: defaultGymLat, lng: defaultGymLong };
-        // Create a marker icon from an image URL: 
+        var LocationOfGym = { lat: defaultGymLat, lng: defaultGymLong };
+        //// Create a marker icon from an image URL: 
         var pngIcon = new H.map.Icon('/images/gym-map.png', { size: { w: 56, h: 56 } });
-
-        // Create a marker using the previously instantiated icon:
-        var marker = new H.map.Marker(LocationOfMarker, { icon: pngIcon  });
-
-        // Add the marker to the map:
+        //// Create a marker using the previously instantiated icon:
+        var marker = new H.map.Marker(LocationOfGym, { icon: pngIcon });
+        //// Add the marker to the map:
         map.addObject(marker);
 
+        // show your location
+        // Try HTML5 geolocation.
+        
+            navigator.geolocation.watchPosition(function (position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                var LocationOfYou = { lat: pos.lat, lng: pos.lng };
+
+                var myIcon = new H.map.Icon('/images/your-location.png', { size: { w: 56, h: 56 } });
+                var myMarker = new H.map.Marker(LocationOfYou, { icon: myIcon });
+                map.addObject(myMarker);
+            });
+         
+
         // Optionally, 
-        //Show the marker in the center of the map
-        map.setCenter(LocationOfMarker);
+        //Show the gym in the center of the map
+        map.setCenter(LocationOfGym);
 
         //Zooming so that the marker can be clearly visible
         map.setZoom(15);
