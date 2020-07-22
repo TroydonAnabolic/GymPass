@@ -107,6 +107,8 @@ $(document).ready(function () {
     var x = document.getElementById("user-location");
     var lat = "";
     var long = "";
+    var defaultGymLat = $('#dlat').html();
+    var defaultGymLong = $('#dlong').html();
 
     // get the lat1 and lon1 for the current user 
     function getLocation() {
@@ -143,8 +145,7 @@ $(document).ready(function () {
         }
 
         // sets the default gym to values on hidden fields
-        var defaultGymLat = $('#dlat').html();
-        var defaultGymLong = $('#dlong').html();
+       
 
         var differenceBetweenUser = getDistanceFromLatLonInKm(lat, long, defaultGymLat, defaultGymLong).toFixed(1);
 
@@ -169,8 +170,8 @@ $(document).ready(function () {
         var map = new H.Map(document.getElementById('mapContainer'),
             defaultLayers.vector.normal.map,
             {
-                center: { lat: 50, lng: 5 },
-                zoom: 4,
+                center: { lat: defaultGymLat, lng: defaultGymLong },
+                zoom: 15,
                 pixelRatio: window.devicePixelRatio || 1
             }
         );
@@ -183,6 +184,23 @@ $(document).ready(function () {
 
         // Create the default UI components
         var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+        var LocationOfMarker = { lat: defaultGymLat, lng: defaultGymLong };
+        // Create a marker icon from an image URL: 
+        var pngIcon = new H.map.Icon('/images/gym-map.png', { size: { w: 56, h: 56 } });
+
+        // Create a marker using the previously instantiated icon:
+        var marker = new H.map.Marker(LocationOfMarker, { icon: pngIcon  });
+
+        // Add the marker to the map:
+        map.addObject(marker);
+
+        // Optionally, 
+        //Show the marker in the center of the map
+        map.setCenter(LocationOfMarker);
+
+        //Zooming so that the marker can be clearly visible
+        map.setZoom(15);
     }
 
     // function to remove all elements inside a map to avoid duplicate map showing.

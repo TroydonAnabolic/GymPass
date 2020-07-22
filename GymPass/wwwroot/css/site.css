@@ -503,6 +503,9 @@ body > main > div.main-gym > div > div.log-workout-home > a {
     }
 
 /* Map and camera modal */
+#map {
+    text-align: center;
+}
 
 #map-button, #camera-button {
     position: absolute;
@@ -522,7 +525,11 @@ body > main > div.main-gym > div > div.log-workout-home > a {
 
 #mapContainer {
     width: 100%;
-    height: 15rem;
+    height: 25rem;
+}
+
+#map > div > div.modalz-header > h4 {
+    padding: 0.2rem;
 }
 
 .modalz {
