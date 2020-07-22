@@ -75,6 +75,7 @@ $(document).ready(function () {
     // When the user clicks the button, open the modal 
     mapBtn.onclick = function () {
         mapModal.style.display = "block";
+        initializeMap()
     }
     camBtn.onclick = function () {
         camModal.style.display = "block";
@@ -83,6 +84,7 @@ $(document).ready(function () {
     // When the user clicks on <span> (x), close the modal
     span.onclick = function () {
         mapModal.style.display = "none";
+        terminateMap();
     }
     // When the user clicks on <span> (x), close the modal
     span2.onclick = function () {
@@ -93,6 +95,7 @@ $(document).ready(function () {
     window.onclick = function (event) {
         if (event.target == mapModal) {
             mapModal.style.display = "none";
+            terminateMap();
         }
         if (event.target == camModal) {
             mapModal.style.display = "none";
@@ -156,30 +159,36 @@ $(document).ready(function () {
         getLocation();
 
     // Trial HERE Maps
-    // Instantiate a map and platform object:
-    var platform = new H.service.Platform({
-        apikey: `USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8`
-    });
-
-    // Get an instance of the geocoding service:
-    var service = platform.getSearchService();
-
-
-    // Call the geocode method with the geocoding parameters,
-    // the callback and an error callback function (called if a
-    // communication error occurs):
-    service.geocode({
-        q: '44 Brenda Street'
-    }, (result) => {
-        // Add a marker for each location found
-            result.items.forEach((item) => {
-                alert(item.position.coords.latitude);
-            map.addObject(new H.map.Marker(item.position));
+    //Step 1: initializeMap communication with the platform
+    function initializeMap() {
+        var platform = new H.service.Platform({
+            apikey: 'USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8'
         });
-    }, alert);
+        var defaultLayers = platform.createDefaultLayers();
+        //Step 2: initializeMap a map - this map is centered over Europe
+        var map = new H.Map(document.getElementById('mapContainer'),
+            defaultLayers.vector.normal.map,
+            {
+                center: { lat: 50, lng: 5 },
+                zoom: 4,
+                pixelRatio: window.devicePixelRatio || 1
+            }
+        );
+        // This adds a resize listener to make sure that the map occupies the whole container
+        window.addEventListener('resize', () => map.getViewPort().resize());
+        //Step 3: make the map interactive
+        // MapEvents enables the event system
+        // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
 
+        // Create the default UI components
+        var ui = H.ui.UI.createDefault(map, defaultLayers);
+    }
 
-
+    // function to remove all elements inside a map to avoid duplicate map showing.
+    function terminateMap() {
+        $('#mapContainer > div').remove();
+    }
 
     // TODO: Progress Bar Depelete each time the open door button is pressed.
     //$(function () {

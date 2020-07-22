@@ -520,6 +520,11 @@ body > main > div.main-gym > div > div.log-workout-home > a {
         width: 100%;
     }
 
+#mapContainer {
+    width: 100%;
+    height: 15rem;
+}
+
 .modalz {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
