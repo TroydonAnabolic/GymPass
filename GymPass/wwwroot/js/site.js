@@ -12,123 +12,108 @@ function closeNav() {
 }
 
 $(document).ready(function () {
+        /*
+        *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
+        */
+        $('.border-nav').mouseenter(function () {
+            $(this).css("border", "1px solid blue");
+        });
+        $('.border-nav').mouseleave(function () {
+            $(this).css("border", "1px solid grey");
+        });
 
+        /*
+         *  ------------------------------------------------ Landing Page Scripts ----------------------------------------------------------------
+         */
+
+        // on page load we pre-select the checbox depending on if its opened or closed
+        $('#open-door').prop('checked', true);
+        $('#close-door').prop('checked', false);
+
+        // Lock Icon changer
+        // allows the changed icon to show unlocked icon change before the server applies the change from the delayed refresh
+        $("body > main > div.access > div > form > div:nth-child(3) > button").click(function () {
+            // only when it shows locked class
+            if ($(this).hasClass("locked")) {
+                // we remove the class and add the other class to this button
+                $('body > main > div.access > div > form > div:nth-child(3) > button > svg').remove();
+                $(this)
+                    .append("<i class='fas fa-lock-open'></i>")
+                    .addClass("unlocked")
+                    .removeClass("locked");
+            }
+        });
+
+        // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
+        // after 5 seconds it will remove scanning
+        var btn = $("#submit-icon");
+
+        btn.click(function () {
+            var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
+            setTimeout(function () {
+                scan.addClass('hidden');
+            }, 5000);
+        });
+
+        /*
+        *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
+        */
+    // allows lat and long to be globally accessible within anything requiring it to be accessed.
     navigator.geolocation.watchPosition(function (position) {
         var pos = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
         };
 
-    /*
-    *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
-    */
-    $('.border-nav').mouseenter(function () {
-        $(this).css("border", "1px solid blue");
-    });
-    $('.border-nav').mouseleave(function () {
-        $(this).css("border", "1px solid grey");
-    });
+        // Modal animation for map and camera
+        // Get the modal
+        var mapModal = document.getElementById("map");
+        var camModal = document.getElementById("camera");
 
-    /*
-     *  ------------------------------------------------ Landing Page Scripts ----------------------------------------------------------------
-     */
+        // Get the button that opens the modal
+        var mapBtn = document.getElementById("map-button");
+        var camBtn = document.getElementById("camera-button");
 
-    // on page load we pre-select the checbox depending on if its opened or closed
-    $('#open-door').prop('checked', true);
-    $('#close-door').prop('checked', false);
+        // Get the <span> element that closes the modal (TODO: may need to modify due to being two)
+        var span = document.getElementsByClassName("close")[0];
+        var span2 = document.getElementsByClassName("close")[1];
 
-    // Lock Icon changer
-    // allows the changed icon to show unlocked icon change before the server applies the change from the delayed refresh
-    $("body > main > div.access > div > form > div:nth-child(3) > button").click(function () {
-        // only when it shows locked class
-        if ($(this).hasClass("locked")) {
-            // we remove the class and add the other class to this button
-            $('body > main > div.access > div > form > div:nth-child(3) > button > svg').remove();
-            $(this)
-                .append("<i class='fas fa-lock-open'></i>")
-                .addClass("unlocked")
-                .removeClass("locked");
+        // When the user clicks the button, open the modal 
+        mapBtn.onclick = function () {
+            mapModal.style.display = "block";
+            initializeMap()
         }
-    });
+        camBtn.onclick = function () {
+            camModal.style.display = "block";
+        }
 
-    // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
-    // after 5 seconds it will remove scanning
-    var btn = $("#submit-icon");
-
-    btn.click(function () {
-        var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
-        setTimeout(function () {
-            scan.addClass('hidden');
-        }, 5000);
-    });
-
-    /*
-    *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
-    */
-
-    // Modal animation for map and camera
-    // Get the modal
-    var mapModal = document.getElementById("map");
-    var camModal = document.getElementById("camera");
-
-    // Get the button that opens the modal
-    var mapBtn = document.getElementById("map-button");
-    var camBtn = document.getElementById("camera-button");
-
-    // Get the <span> element that closes the modal (TODO: may need to modify due to being two)
-    var span = document.getElementsByClassName("close")[0];
-    var span2 = document.getElementsByClassName("close")[1];
-
-    // When the user clicks the button, open the modal 
-    mapBtn.onclick = function () {
-        mapModal.style.display = "block";
-        initializeMap()
-    }
-    camBtn.onclick = function () {
-        camModal.style.display = "block";
-    }
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function () {
-        mapModal.style.display = "none";
-        terminateMap();
-    }
-    // When the user clicks on <span> (x), close the modal
-    span2.onclick = function () {
-        camModal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event) {
-        if (event.target == mapModal) {
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
             mapModal.style.display = "none";
             terminateMap();
         }
-        if (event.target == camModal) {
-            mapModal.style.display = "none";
+        // When the user clicks on <span> (x), close the modal
+        span2.onclick = function () {
             camModal.style.display = "none";
         }
-    }
 
-    // Option to fill in location services and pass users current location data to the server
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == mapModal) {
+                mapModal.style.display = "none";
+                terminateMap();
+            }
+            if (event.target == camModal) {
+                mapModal.style.display = "none";
+                camModal.style.display = "none";
+            }
+        }
 
-    // sets the default gym to values on hidden elements
-    var defaultGymLat = $('#dlat').html();
-    var defaultGymLong = $('#dlong').html();
+        // sets the default gym to values on hidden elements
+        var defaultGymLat = $('#dlat').html();
+        var defaultGymLong = $('#dlong').html();
 
-    // get the lat1 and lon1 for the current user 
-    //function getLocation() {
-    //    if (navigator.geolocation) {
-    //        navigator.geolocation.watchPosition(showPosition);
-    //        console.log(long);
-    //    } else {
-    //        alert("Geolocation is not supported by this browser.");
-    //    }
-    //}
-
-   // function showPosition(position) {
-
-        // Calculate the difference between the gym location
+        // Calculate the difference between the gym location in metres
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371000; // Radius of the earth in m
             var dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -141,13 +126,10 @@ $(document).ready(function () {
             var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             var d = R * c; // Distance in km
             return d;
-
         }
-
         function deg2rad(deg) {
             return deg * (Math.PI / 180)
         }
-
 
         var differenceBetweenUser = getDistanceFromLatLonInKm(pos.lat, pos.lng, defaultGymLat, defaultGymLong).toFixed(1);
 
@@ -159,69 +141,55 @@ $(document).ready(function () {
             $('#user-location').prop('checked', false);
         }
 
-    
-    //getLocation();
+        //Step 1: initializeMap communication with the platform
+        async function initializeMap() {
+            var platform = new H.service.Platform({
+                apikey: 'USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8'
+            });
+            var defaultLayers = platform.createDefaultLayers();
+            //Step 2: initializeMap a map - this map is centered over Europe
+            var map = new H.Map(document.getElementById('mapContainer'),
+                defaultLayers.vector.normal.map,
+                {
+                    center: { lat: defaultGymLat, lng: defaultGymLong },
+                    zoom: 15,
+                    pixelRatio: window.devicePixelRatio || 1
+                }
+            );
+            // This adds a resize listener to make sure that the map occupies the whole container
+            window.addEventListener('resize', () => map.getViewPort().resize());
+            //Step 3: make the map interactive
+            // MapEvents enables the event system
+            // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+            var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
 
+            // Create the default UI components
+            var ui = H.ui.UI.createDefault(map, defaultLayers);
 
-    // Trial HERE Maps
-    //Step 1: initializeMap communication with the platform
-    async function initializeMap() {
-        var platform = new H.service.Platform({
-            apikey: 'USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8'
-        });
-        var defaultLayers = platform.createDefaultLayers();
-        //Step 2: initializeMap a map - this map is centered over Europe
-        var map = new H.Map(document.getElementById('mapContainer'),
-            defaultLayers.vector.normal.map,
-            {
-                center: { lat: defaultGymLat, lng: defaultGymLong },
-                zoom: 15,
-                pixelRatio: window.devicePixelRatio || 1
-            }
-        );
-        // This adds a resize listener to make sure that the map occupies the whole container
-        window.addEventListener('resize', () => map.getViewPort().resize());
-        //Step 3: make the map interactive
-        // MapEvents enables the event system
-        // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
-        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+            var LocationOfGym = { lat: defaultGymLat, lng: defaultGymLong };
+            //// Create a marker icon from an image URL: 
+            var pngIcon = new H.map.Icon('/images/gym-map.png', { size: { w: 56, h: 56 } });
+            var myIcon = new H.map.Icon('/images/your-location.png', { size: { w: 56, h: 56 } });
+            //// Create a marker using the previously instantiated icon:
+            var marker = new H.map.Marker(LocationOfGym, { icon: pngIcon });
+            // show your location
+            // Try HTML5 geolocation.
+            var LocationOfYou = { lat: pos.lat, lng: pos.lng };
+            var myMarker = new H.map.Marker(LocationOfYou, { icon: myIcon });
+            //// Add the marker to the map:
+            map.addObject(myMarker);
+            map.addObject(marker);
+            // Optionally, 
+            //Show the gym in the center of the map
+            map.setCenter(LocationOfGym);
+            //Zooming so that the marker can be clearly visible
+            map.setZoom(15);
+        }
 
-        // Create the default UI components
-        var ui = H.ui.UI.createDefault(map, defaultLayers);
-
-        var LocationOfGym = { lat: defaultGymLat, lng: defaultGymLong };
-        //// Create a marker icon from an image URL: 
-        var pngIcon = new H.map.Icon('/images/gym-map.png', { size: { w: 56, h: 56 } });
-        var myIcon = new H.map.Icon('/images/your-location.png', { size: { w: 56, h: 56 } });
-        //// Create a marker using the previously instantiated icon:
-        var marker = new H.map.Marker(LocationOfGym, { icon: pngIcon });
-        //// Add the marker to the map:
-
-        // show your location
-        // Try HTML5 geolocation.
-     
-
-                var LocationOfYou = { lat: pos.lat, lng: pos.lng };
-
-                var myMarker = new H.map.Marker(LocationOfYou, { icon: myIcon });
-        map.addObject(myMarker);
-        map.addObject(marker);
-
-         
-
-        // Optionally, 
-        //Show the gym in the center of the map
-        map.setCenter(LocationOfGym);
-
-        //Zooming so that the marker can be clearly visible
-        map.setZoom(15);
-    }
-
-    // function to remove all elements inside a map to avoid duplicate map showing.
-    function terminateMap() {
-        $('#mapContainer > div').remove();
-    }
-
+        // function to remove all elements inside a map to avoid duplicate map showing.
+        function terminateMap() {
+            $('#mapContainer > div').remove();
+        }
     });
 
     // TODO: Progress Bar Depelete each time the open door button is pressed.
