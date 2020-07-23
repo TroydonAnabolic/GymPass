@@ -12,6 +12,13 @@ function closeNav() {
 }
 
 $(document).ready(function () {
+
+    navigator.geolocation.watchPosition(function (position) {
+        var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+
     /*
     *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
     */
@@ -104,28 +111,23 @@ $(document).ready(function () {
     }
 
     // Option to fill in location services and pass users current location data to the server
-    var x = document.getElementById("user-location");
-    var lat = "";
-    var long = "";
+
     // sets the default gym to values on hidden elements
     var defaultGymLat = $('#dlat').html();
     var defaultGymLong = $('#dlong').html();
 
     // get the lat1 and lon1 for the current user 
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(showPosition);
-            console.log(long);
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
-    }
+    //function getLocation() {
+    //    if (navigator.geolocation) {
+    //        navigator.geolocation.watchPosition(showPosition);
+    //        console.log(long);
+    //    } else {
+    //        alert("Geolocation is not supported by this browser.");
+    //    }
+    //}
 
-    function showPosition(position) {
-        x.innerHTML = "Latitude: " + position.coords.latitude +
-            "<br>Longitude: " + position.coords.longitude;
-        lat = position.coords.latitude;
-        long = position.coords.longitude;
+   // function showPosition(position) {
+
         // Calculate the difference between the gym location
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371000; // Radius of the earth in m
@@ -139,6 +141,7 @@ $(document).ready(function () {
             var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             var d = R * c; // Distance in km
             return d;
+
         }
 
         function deg2rad(deg) {
@@ -146,8 +149,7 @@ $(document).ready(function () {
         }
 
 
-
-        var differenceBetweenUser = getDistanceFromLatLonInKm(lat, long, defaultGymLat, defaultGymLong).toFixed(1);
+        var differenceBetweenUser = getDistanceFromLatLonInKm(pos.lat, pos.lng, defaultGymLat, defaultGymLong).toFixed(1);
 
         if (differenceBetweenUser < 40) {
             $('#user-location').prop('checked', true);
@@ -156,11 +158,9 @@ $(document).ready(function () {
             console.log("false");
             $('#user-location').prop('checked', false);
         }
-    }
-    getLocation();
 
-    var test;
-
+    
+    //getLocation();
 
 
     // Trial HERE Maps
@@ -196,22 +196,17 @@ $(document).ready(function () {
         //// Create a marker using the previously instantiated icon:
         var marker = new H.map.Marker(LocationOfGym, { icon: pngIcon });
         //// Add the marker to the map:
-        map.addObject(marker);
 
         // show your location
         // Try HTML5 geolocation.
-        
-          navigator.geolocation.watchPosition(function (position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
+     
 
                 var LocationOfYou = { lat: pos.lat, lng: pos.lng };
 
                 var myMarker = new H.map.Marker(LocationOfYou, { icon: myIcon });
-                map.addObject(myMarker);
-            });
+        map.addObject(myMarker);
+        map.addObject(marker);
+
          
 
         // Optionally, 
@@ -226,6 +221,8 @@ $(document).ready(function () {
     function terminateMap() {
         $('#mapContainer > div').remove();
     }
+
+    });
 
     // TODO: Progress Bar Depelete each time the open door button is pressed.
     //$(function () {
