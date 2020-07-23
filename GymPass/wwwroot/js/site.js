@@ -165,7 +165,7 @@ $(document).ready(function () {
 
     // Trial HERE Maps
     //Step 1: initializeMap communication with the platform
-    function initializeMap() {
+    async function initializeMap() {
         var platform = new H.service.Platform({
             apikey: 'USVLHLFNdt2wR2V9WyYvCy4fwsof7enWCDq-xQn2rK8'
         });
@@ -192,6 +192,7 @@ $(document).ready(function () {
         var LocationOfGym = { lat: defaultGymLat, lng: defaultGymLong };
         //// Create a marker icon from an image URL: 
         var pngIcon = new H.map.Icon('/images/gym-map.png', { size: { w: 56, h: 56 } });
+        var myIcon = new H.map.Icon('/images/your-location.png', { size: { w: 56, h: 56 } });
         //// Create a marker using the previously instantiated icon:
         var marker = new H.map.Marker(LocationOfGym, { icon: pngIcon });
         //// Add the marker to the map:
@@ -200,7 +201,7 @@ $(document).ready(function () {
         // show your location
         // Try HTML5 geolocation.
         
-            navigator.geolocation.watchPosition(function (position) {
+          navigator.geolocation.watchPosition(function (position) {
                 var pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
@@ -208,7 +209,6 @@ $(document).ready(function () {
 
                 var LocationOfYou = { lat: pos.lat, lng: pos.lng };
 
-                var myIcon = new H.map.Icon('/images/your-location.png', { size: { w: 56, h: 56 } });
                 var myMarker = new H.map.Marker(LocationOfYou, { icon: myIcon });
                 map.addObject(myMarker);
             });
