@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using GymPass.Models;
+using Amazon.S3;
+using Amazon.Rekognition;
 
 namespace GymPass
 {
@@ -28,6 +30,18 @@ namespace GymPass
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // configure AWS services
+            var options = Configuration.GetAWSOptions("AWSService");
+
+            IAmazonS3 client = options.CreateServiceClient<IAmazonS3>();
+
+          //  services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+
+
+            services.AddAWSService<IAmazonS3>();
+            services.AddAWSService<IAmazonRekognition>();
+
+            // add controller service
             services.AddControllersWithViews();
             services.AddRazorPages();
 

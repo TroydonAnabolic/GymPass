@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Authorization;
 using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.IO;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
-
+using Amazon.S3;
 
 namespace GymPass.Controllers
 {
@@ -21,18 +22,22 @@ namespace GymPass.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly FacilityContext _facilityContext;
-
+        IAmazonS3 S3Client { get; set; }
+        IAmazonRekognition AmazonRekognition { get; set; } // access amazon rekognition API ref
 
         public HomeController(
             UserManager<ApplicationUser> userManager,
             ILogger<HomeController> logger,
-            FacilityContext facilityContext
-
+            FacilityContext facilityContext,
+            IAmazonS3 s3Client,
+            IAmazonRekognition amazonRekognition
             )
         {
             _userManager = userManager;
             _logger = logger;
             _facilityContext = facilityContext;
+            S3Client = s3Client;
+            AmazonRekognition = amazonRekognition;
         }
 
         // GET: Home/Index/1
@@ -165,9 +170,50 @@ namespace GymPass.Controllers
             {
                 ViewBag.IsExerciseLogComplete = false;
 
-                // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
+                // ----------------- Begin Facial recognition----------------------
+                String photo = "business-atire.jpg";
+                String bucket = "gym-user-bucket-i";
 
-                user.IsCameraScanSuccessful = true;
+
+                DetectFacesRequest detectFacesRequest = new DetectFacesRequest()
+                {
+                    Image = new Image()
+                    {
+                        S3Object = new S3Object()
+                        {
+                            Name = photo,
+                            Bucket = bucket
+                        },
+                    },
+                    // Attributes can be "ALL" or "DEFAULT". 
+                    // "DEFAULT": BoundingBox, Confidence, Landmarks, Pose, and Quality.
+                    // "ALL": See https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/Rekognition/TFaceDetail.html
+                    Attributes = new List<String>() { "ALL" }
+                };
+
+                try
+                {
+                    DetectFacesResponse detectFacesResponse = await AmazonRekognition.DetectFacesAsync(detectFacesRequest);
+                    bool hasAll = detectFacesRequest.Attributes.Contains("ALL");
+                    foreach (FaceDetail face in detectFacesResponse.FaceDetails)
+                    {
+                        Console.WriteLine("BoundingBox: top={0} left={1} width={2} height={3}", face.BoundingBox.Left,
+                            face.BoundingBox.Top, face.BoundingBox.Width, face.BoundingBox.Height);
+                        Console.WriteLine("Confidence: {0}\nLandmarks: {1}\nPose: pitch={2} roll={3} yaw={4}\nQuality: {5}",
+                            face.Confidence, face.Landmarks.Count, face.Pose.Pitch,
+                            face.Pose.Roll, face.Pose.Yaw, face.Quality);
+                        if (hasAll)
+                            Console.WriteLine("The detected face is estimated to be between " +
+                                face.AgeRange.Low + " and " + face.AgeRange.High + " years old.");
+                        Console.WriteLine(face.Gender.Value);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                // user.IsCameraScanSuccessful = true; --------------------------------end facial recognition
 
                 // gathers location scan results
                 if (facilityView.IsWithin10m) 
@@ -232,6 +278,7 @@ namespace GymPass.Controllers
 
                         facilityView.IsCameraScanSuccessful = false;
                         user.IsWithin10m = false;
+                        user.IsCameraScanSuccessful = false;
                         user.AccessGrantedToFacility = false;
                     }
 
