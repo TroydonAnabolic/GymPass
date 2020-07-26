@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Amazon.Rekognition;
+using Amazon.Rekognition.Model;
+
 
 namespace GymPass.Controllers
 {
@@ -101,7 +104,7 @@ namespace GymPass.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(int id, [Bind("FacilityID,FacilityName,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom," +
-            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful")] Facility facilityView,
+            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful, IsWithin10m")] Facility facilityView,
             [Bind("FirstName,TimeAccessGranted,EstimatedTrainingTime,UniqueEntryID")] UsersInGymDetail usersInGymDetailView) // 
         {
             // Get the default gym for a user and set it to be the Id for the gym being edited
@@ -163,10 +166,11 @@ namespace GymPass.Controllers
                 ViewBag.IsExerciseLogComplete = false;
 
                 // temp viewBag data showing true - to be used for testing, unless I can get real data using webcam with facial recognition
-                // TODO: Add facial recognition scan and for now use facilityView geolocation, later
 
-                if (facilityView.IsCameraScanSuccessful) user.IsCameraScanSuccessful = true;
-                user.IsWithin10m = true;
+                user.IsCameraScanSuccessful = true;
+
+                // gathers location scan results
+                if (facilityView.IsWithin10m) user.IsWithin10m = true;
 
                 // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
                 if (facilityView.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)

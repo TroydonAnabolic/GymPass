@@ -30,5 +30,6 @@ namespace GymPass.Models
         public bool WillUseStretchRoom { get; set; } 
         public bool HasLoggedWorkoutToday { get; set; }
         public DateTime TimeLoggedWorkout { get;  set; }
+        public byte[] UserImage { get; set; }
     }
 }
