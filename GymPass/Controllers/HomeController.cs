@@ -170,10 +170,11 @@ namespace GymPass.Controllers
                 user.IsCameraScanSuccessful = true;
 
                 // gathers location scan results
-                if (facilityView.IsWithin10m) user.IsWithin10m = true;
+                if (facilityView.IsWithin10m) 
+                    user.IsWithin10m = true;
 
                 // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
-                if (facilityView.IsCameraScanSuccessful && user.IsWithin10m && !user.IsInsideGym)
+                if (user.IsWithin10m && user.IsCameraScanSuccessful && !user.IsInsideGym)
                 {
                     user.AccessGrantedToFacility = true;
                     ViewBag.AccessGrantedToFacility = true;
