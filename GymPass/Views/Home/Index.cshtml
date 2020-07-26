@@ -17,9 +17,9 @@
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <div class="nav-other">
-            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="border-nav">MY GYM</a>
+            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="border-nav">MY GYM</a> 
             <a class="border-nav" href="#">Select Facility</a>
-            <a class="border-nav" href="#">Dashboard</a>
+            <a class="border-nav"  asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Dashboard</a>
         </div>
         @*<div >
                 <a href="#">Contact</a>

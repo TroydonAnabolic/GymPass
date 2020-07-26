@@ -115,7 +115,7 @@ namespace GymPass.Controllers
             [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom," +
             "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer," +
             "UserTrainingDuration, TotalTrainingDuration, WillUseWeightsRoom, WillUseCardioRoom, WillUseStretchRoom," +
-            "HasLoggedWorkoutToday")] Facility facilityView)
+            "HasLoggedWorkoutToday, IsCameraScanSuccessful, IsWithin10m")] Facility facilityView)
         {
             var facility = await _facilityContext.Facilities.FindAsync(id);
 
@@ -225,8 +225,12 @@ namespace GymPass.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer")] Facility facility)
-        {
+        public async Task<IActionResult> Edit(int id,
+           [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom," +
+            "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer," +
+            "UserTrainingDuration, TotalTrainingDuration, WillUseWeightsRoom, WillUseCardioRoom, WillUseStretchRoom," +
+            "HasLoggedWorkoutToday, IsCameraScanSuccessful, IsWithin10m")] Facility facility)
+        { 
             if (id != facility.FacilityID)
             {
                 return NotFound();
