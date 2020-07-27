@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Amazon.Rekognition;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace GymPass.Models
 {
@@ -16,5 +14,9 @@ namespace GymPass.Models
         public DateTime TimeAccessGranted { get; set; }
         public TimeSpan EstimatedTrainingTime { get; set; } = TimeSpan.FromMinutes(45); // default training time is 45 mins, incase user skips
         public string UniqueEntryID { get; set; } // used to identify which entry to remove when the user leaves
+        public bool IsSmiling { get; set; }
+        public string Gender { get; internal set; }
+        public int AgeRangeLow { get; internal set; }
+        public int AgeRangeHigh { get; internal set; }
     }
 }

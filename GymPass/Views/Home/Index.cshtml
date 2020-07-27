@@ -17,9 +17,9 @@
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <div class="nav-other">
-            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="border-nav">MY GYM</a> 
+            <a asp-action="Index" asp-controller="Home" asp-route-id="@UserManager.GetUserAsync(User).Result.DefaultGym" class="border-nav">MY GYM</a>
             <a class="border-nav" href="#">Select Facility</a>
-            <a class="border-nav"  asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Dashboard</a>
+            <a class="border-nav" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Dashboard</a>
         </div>
         @*<div >
                 <a href="#">Contact</a>
@@ -111,7 +111,27 @@
                 <h4>@Model.FacilityName</h4>
             </div>
             <div class="modalz-body">
-                <p>Selfie camera content goes here if possible</p>
+                @* When we click open door we trigger this logic *@
+
+                <div id="camera-img">
+                    <h5> CAMERA IMAGE HERE</h5>
+                </div>
+                @* Show scan results, if successful display face details, if not smiling, say smile, if smiling say looks like your ready to smash the gym, have *@
+                @if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
+                {
+                    <h4>Facial Match success!</h4>
+                    @if (ViewBag.IsSmiling)
+                    {
+                        <h6>Great! Looks like your ready to smash the gym</h6>
+                    }
+                    else
+                    {
+                        <h6>You are not smiling, dont forget to smash it!</h6>
+                    }
+                    <h6>Gender: @ViewBag.Gender</h6>
+                    <h6>Yoru age range low: @ViewBag.AgeRangeLow</h6>
+                    <h6>Your age range high: @ViewBag.AgeRangeHigh</h6>
+                }
             </div>
         </div>
     </div>
@@ -158,7 +178,6 @@
                             // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view to enter exercise log on the same page?
                         }
                         @* End Modal for training intentions *@
-
 
                         <div class="form-group">
                             <button type="submit" class="locked nav-link btn">

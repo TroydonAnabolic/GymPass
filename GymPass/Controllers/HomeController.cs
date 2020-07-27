@@ -40,6 +40,9 @@ namespace GymPass.Controllers
             AmazonRekognition = amazonRekognition;
         }
 
+        [BindProperty]
+        UsersInGymDetail UsersInGymDetail { get; set; }
+       
         // GET: Home/Index/1
         // TODO: We begin using id = 1 for now, later will implement dynamically changing this ID number, if it is null then redirect to action choose gym
         [Authorize]
@@ -48,6 +51,8 @@ namespace GymPass.Controllers
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
             ViewBag.EstimatedNumberInGym = 0;
+            ViewBag.IsOpenDoorRequested = false;
+
             // initiall set the access view bag to false, as this will prevent null exception
 
             if (user.Id == null)
@@ -64,7 +69,16 @@ namespace GymPass.Controllers
 
             var facility = await _facilityContext.Facilities.FindAsync(id);
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
-            var currentFacilityDetailEntry = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+            UsersInGymDetail = await _facilityContext.UsersInGymDetails
+                .Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+
+            // get facial recognition details to show
+            ViewBag.IsSmiling = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().IsSmiling;
+            ViewBag.Gender = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().Gender;
+            ViewBag.AgeRangeLow = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeLow;
+            ViewBag.AgeRangeHigh = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeHigh;
+
+
             DateTime estimatedExitTime = DateTime.Now;
 
             if (facility == null)
@@ -83,7 +97,7 @@ namespace GymPass.Controllers
             // if there are entries get the estimated exit time
             if (facilityDetails.Count > 0)
             {
-                estimatedExitTime = currentFacilityDetailEntry.TimeAccessGranted.Add(currentFacilityDetailEntry.EstimatedTrainingTime);
+                estimatedExitTime = UsersInGymDetail.TimeAccessGranted.Add(UsersInGymDetail.EstimatedTrainingTime);
 
                 // for each user logged into the gym, increment or decrement based on time entered
                 foreach (var userInGym in facilityDetails)
@@ -101,7 +115,7 @@ namespace GymPass.Controllers
 
             // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
             if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
-            ViewBag.AccessDeniedMsgRecieved = false;
+                ViewBag.AccessDeniedMsgRecieved = false;
 
             return View(facility);
         }
@@ -129,7 +143,7 @@ namespace GymPass.Controllers
             var currentFacilityDetailDb = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
             bool enteredGym = false;
 
-            if (id != facility.FacilityID ||  id != facilityView.FacilityID)
+            if (id != facility.FacilityID || id != facilityView.FacilityID)
             {
                 return NotFound();
             }
@@ -168,20 +182,89 @@ namespace GymPass.Controllers
         {
             if (facilityView.IsOpenDoorRequested)
             {
-                ViewBag.IsExerciseLogComplete = false;
-
                 // ----------------- Begin Facial recognition----------------------
+                float similarityThreshold = 70F;
                 String photo = "business-atire.jpg";
+                String targetImage = "fbPic.jpg";
+                // String targetImage = "pris-face.jpg"; TODO: Try using this as a test if I cannot get user input
                 String bucket = "gym-user-bucket-i";
 
+                // ------------------------------ Recognition from image
+                try
+                {
 
+                    Image imageSource = new Image()
+                    {
+                        S3Object = new S3Object()
+                        {
+                            Name = photo,
+                            Bucket = bucket
+                        },
+                    };
+
+                    Image imageTarget = new Image()
+                    {
+                        S3Object = new S3Object()
+                        {
+                            Name = targetImage,
+                            Bucket = bucket
+                        },
+                    };
+
+                    // TODO: Set the target to be user upload
+                    //using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
+                    //{
+                    //    byte[] data = new byte[fs.Length];
+                    //    data = new byte[fs.Length];
+                    //    fs.Read(data, 0, (int)fs.Length);
+                    //    imageTarget.Bytes = new MemoryStream(data);
+                    //}
+
+                    CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
+                    {
+                        SourceImage = imageSource,
+                        TargetImage = imageTarget,
+                        SimilarityThreshold = similarityThreshold
+                    };
+
+                    // detect face features of img scanned
+                    //  DetectFacesResponse detectFacesResponse = await AmazonRekognition.DetectFacesAsync(detectFacesRequest);
+
+                    // Call operation
+                    CompareFacesResponse compareFacesResponse = await AmazonRekognition.CompareFacesAsync(compareFacesRequest);
+
+                    // Display results
+                    foreach (CompareFacesMatch match in compareFacesResponse.FaceMatches)
+                    {
+                        ComparedFace face = match.Face;
+                        // if confidence for similarity is over 90 then grant access
+                        if (match.Similarity > 90)
+                        {
+                            // if there is a match set scan success and display to the view the match
+                            user.IsCameraScanSuccessful = true;
+                        }
+                        else
+                        {
+                            ViewBag.MatchResult = "Facial Match Failed!";
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogInformation(e.Message);
+                }
+
+                // ------------------------------ Now add detect from video
+
+
+                // ------------------------------ Now add get facial details to display in the view.
                 DetectFacesRequest detectFacesRequest = new DetectFacesRequest()
                 {
                     Image = new Image()
                     {
                         S3Object = new S3Object()
                         {
-                            Name = photo,
+                            Name = targetImage,
                             Bucket = bucket
                         },
                     },
@@ -197,26 +280,24 @@ namespace GymPass.Controllers
                     bool hasAll = detectFacesRequest.Attributes.Contains("ALL");
                     foreach (FaceDetail face in detectFacesResponse.FaceDetails)
                     {
-                        Console.WriteLine("BoundingBox: top={0} left={1} width={2} height={3}", face.BoundingBox.Left,
-                            face.BoundingBox.Top, face.BoundingBox.Width, face.BoundingBox.Height);
-                        Console.WriteLine("Confidence: {0}\nLandmarks: {1}\nPose: pitch={2} roll={3} yaw={4}\nQuality: {5}",
-                            face.Confidence, face.Landmarks.Count, face.Pose.Pitch,
-                            face.Pose.Roll, face.Pose.Yaw, face.Quality);
-                        if (hasAll)
-                            Console.WriteLine("The detected face is estimated to be between " +
-                                face.AgeRange.Low + " and " + face.AgeRange.High + " years old.");
-                        Console.WriteLine(face.Gender.Value);
+                        if (hasAll) // consider removing of only certain features can be detected.
+                        {
+                            currentFacilityDetail.IsSmiling = face.Smile.Value;
+                            currentFacilityDetail.Gender = face.Gender.Value.ToString();
+                            currentFacilityDetail.AgeRangeLow = face.AgeRange.Low;
+                            currentFacilityDetail.AgeRangeHigh = face.AgeRange.High;
+                        }
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    _logger.LogInformation(e.Message);
                 }
 
-                // user.IsCameraScanSuccessful = true; --------------------------------end facial recognition
+                // --------------------------------------------------------end facial recognition-------------------------------------------------------------
 
                 // gathers location scan results
-                if (facilityView.IsWithin10m) 
+                if (facilityView.IsWithin10m)
                     user.IsWithin10m = true;
 
                 // if camera scan and location check is true, and user is not in the gym, then we open the door, and access granted is true
@@ -295,10 +376,12 @@ namespace GymPass.Controllers
                     // log the time granted, and wait 5 seconds.
                     System.Threading.Thread.Sleep(200);
                 }
-                else if (!user.AccessGrantedToFacility) System.Threading.Thread.Sleep(200);
+                // delay 10s when entering
+              if (!user.IsInsideGym) System.Threading.Thread.Sleep(200);
 
                 // When 5 second timer finishes, we close the door again automatically
-                // facility.IsOpenDoorRequested = false;
+                 facility.IsOpenDoorRequested = false;
+                ViewBag.IsOpenDoorRequested = false;
                 facility.DoorOpened = false;
                 _facilityContext.Update(facility);
 
