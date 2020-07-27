@@ -171,7 +171,7 @@ namespace GymPass.Controllers
                         throw;
                     }
                 }
-                // if the user has logged in successfully and not logged workout, then send to questionnaire for now, later will use AJAX to post questionaire here, and have option to later log in workout
+                // if the user has logged in successfully and not logged workout, then send to questionnaire TODO: for now, later will use AJAX to post questionaire here, and have option to later log in workout
                 return (user.AccessGrantedToFacility) && (!user.HasLoggedWorkoutToday) ? RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym }) : RedirectToAction(nameof(Index));
             }
             return View(facility);
@@ -182,11 +182,12 @@ namespace GymPass.Controllers
         {
             if (facilityView.IsOpenDoorRequested)
             {
-                // ----------------- Begin Facial recognition----------------------
+                // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
                 float similarityThreshold = 70F;
                 String photo = "business-atire.jpg";
-                String targetImage = "fbPic.jpg";
-                // String targetImage = "pris-face.jpg"; TODO: Try using this as a test if I cannot get user input
+                // String targetImage = "fbPic.jpg"; // S3 bucket img match
+                String targetImage = "C:\\fbPic.jpg"; // local img match
+                // String targetImage = "pris-face.jpg"; // S3 bucket mismatch
                 String bucket = "gym-user-bucket-i";
 
                 // ------------------------------ Recognition from image
@@ -201,24 +202,25 @@ namespace GymPass.Controllers
                             Bucket = bucket
                         },
                     };
-
-                    Image imageTarget = new Image()
-                    {
-                        S3Object = new S3Object()
-                        {
-                            Name = targetImage,
-                            Bucket = bucket
-                        },
-                    };
-
-                    // TODO: Set the target to be user upload
-                    //using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
+                    //  S3 bucket img matching
+                    //Image imageTarget = new Image()
                     //{
-                    //    byte[] data = new byte[fs.Length];
-                    //    data = new byte[fs.Length];
-                    //    fs.Read(data, 0, (int)fs.Length);
-                    //    imageTarget.Bytes = new MemoryStream(data);
-                    //}
+                    //    S3Object = new S3Object()
+                    //    {
+                    //        Name = targetImage,
+                    //        Bucket = bucket
+                    //    },
+                    //};
+
+                    //  Local Image matching
+                    Amazon.Rekognition.Model.Image imageTarget = new Image();
+                    using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
+                    {
+                        byte[] data = new byte[fs.Length];
+                        data = new byte[fs.Length];
+                        fs.Read(data, 0, (int)fs.Length);
+                        imageTarget.Bytes = new MemoryStream(data);
+                    }
 
                     CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
                     {
@@ -228,9 +230,6 @@ namespace GymPass.Controllers
                     };
 
                     // detect face features of img scanned
-                    //  DetectFacesResponse detectFacesResponse = await AmazonRekognition.DetectFacesAsync(detectFacesRequest);
-
-                    // Call operation
                     CompareFacesResponse compareFacesResponse = await AmazonRekognition.CompareFacesAsync(compareFacesRequest);
 
                     // Display results
@@ -254,7 +253,7 @@ namespace GymPass.Controllers
                     _logger.LogInformation(e.Message);
                 }
 
-                // ------------------------------ Now add detect from video
+                // ------------------------------ TODO: Now add detect from video/live streaming
 
 
                 // ------------------------------ Now add get facial details to display in the view.

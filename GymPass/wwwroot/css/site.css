@@ -406,6 +406,30 @@ header {
     display: none;
 }
 
+.contain-est{
+    position: relative;
+}
+
+.expand-select-duration-arrow {
+    position: absolute;
+    border: solid #fff;
+    border-width: 0 3px 3px 0;
+    padding: 3px;
+    width: 15%;
+    right: 0;
+    top: 0;
+    margin: 2px;
+}
+
+.right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+.est-data{
+    width: 80%;
+}
+
 .occupancy-title {
     bottom: 5rem;
     right: 1rem;
