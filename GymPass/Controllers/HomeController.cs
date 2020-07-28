@@ -42,7 +42,7 @@ namespace GymPass.Controllers
 
         [BindProperty]
         UsersInGymDetail UsersInGymDetail { get; set; }
-       
+
         // GET: Home/Index/1
         // TODO: We begin using id = 1 for now, later will implement dynamically changing this ID number, if it is null then redirect to action choose gym
         [Authorize]
@@ -78,7 +78,9 @@ namespace GymPass.Controllers
             ViewBag.AgeRangeLow = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeLow;
             ViewBag.AgeRangeHigh = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeHigh;
 
-
+            // calculations for estimated time
+            // get estimated time to check submitted to the db
+            DateTime estimatedTimeToCheck = _facilityContext.UsersOutofGymDetails.FirstOrDefault().EstimatedTimeToCheck;
             DateTime estimatedExitTime = DateTime.Now;
 
             if (facility == null)
@@ -97,18 +99,20 @@ namespace GymPass.Controllers
             // if there are entries get the estimated exit time
             if (facilityDetails.Count > 0)
             {
+                // estimated exit time is the time user accessed gym + his declared training duration
                 estimatedExitTime = UsersInGymDetail.TimeAccessGranted.Add(UsersInGymDetail.EstimatedTrainingTime);
 
                 // for each user logged into the gym, increment or decrement based on time entered
                 foreach (var userInGym in facilityDetails)
                 {
-                    // if current time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
-                    if (DateTime.Now < estimatedExitTime)
+                    // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
+                    // somehow get the clicked value to replace this datetime.now. possibly use another action method
+                    if (DateTime.Now < estimatedExitTime) // TODO: Change this to (TimeframeToCheck < estimatedExitTime) this is selected
                     {
                         // if the current user is still within his estimated training time, then add estimated number of gym users list
-                        ViewBag.EstimatedNumberInGym++;
+                        ViewBag.EstimatedNumberInGym++; //TODO: instead of viewbag, this will be data extracted fromt the db
                     }
-                    else if (DateTime.Now > estimatedExitTime)
+                    else if (DateTime.Now > estimatedExitTime && ViewBag.EstimatedNumberInGym != 0)
                         ViewBag.EstimatedNumberInGym--;
                 }
             }
@@ -185,8 +189,8 @@ namespace GymPass.Controllers
                 // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
                 float similarityThreshold = 70F;
                 String photo = "business-atire.jpg";
-                // String targetImage = "fbPic.jpg"; // S3 bucket img match
-                String targetImage = "C:\\fbPic.jpg"; // local img match
+                 String targetImage = "fbPic.jpg"; // S3 bucket img match
+                // String targetImage = "C:\\fbPic.jpg"; // local img match TODO: appears to be a delay using local img tht does not allow detect face to proces
                 // String targetImage = "pris-face.jpg"; // S3 bucket mismatch
                 String bucket = "gym-user-bucket-i";
 
@@ -203,24 +207,24 @@ namespace GymPass.Controllers
                         },
                     };
                     //  S3 bucket img matching
-                    //Image imageTarget = new Image()
-                    //{
-                    //    S3Object = new S3Object()
-                    //    {
-                    //        Name = targetImage,
-                    //        Bucket = bucket
-                    //    },
-                    //};
+                    Image imageTarget = new Image()
+                    {
+                        S3Object = new S3Object()
+                        {
+                            Name = targetImage,
+                            Bucket = bucket
+                        },
+                    };
 
                     //  Local Image matching
-                    Amazon.Rekognition.Model.Image imageTarget = new Image();
-                    using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
-                    {
-                        byte[] data = new byte[fs.Length];
-                        data = new byte[fs.Length];
-                        fs.Read(data, 0, (int)fs.Length);
-                        imageTarget.Bytes = new MemoryStream(data);
-                    }
+                   // Amazon.Rekognition.Model.Image imageTarget = new Image();
+                    //using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
+                    //{
+                    //    byte[] data = new byte[fs.Length];
+                    //    data = new byte[fs.Length];
+                    //    fs.Read(data, 0, (int)fs.Length);
+                    //    imageTarget.Bytes = new MemoryStream(data);
+                    //}
 
                     CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
                     {

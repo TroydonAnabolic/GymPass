@@ -17,7 +17,7 @@ namespace GymPass.Data
 
         public DbSet<Facility> Facilities { get; set; }
         public DbSet<UsersInGymDetail> UsersInGymDetails { get; set; }
-
+        public DbSet<UsersOutOfGymDetails> UsersOutofGymDetails { get;  set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

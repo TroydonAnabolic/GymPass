@@ -32,9 +32,9 @@ namespace GymPass.Models
         [Display(Name = "Stretch Room")]
         public bool WillUseStretchRoom { get; set; }
         public bool IsCameraScanSuccessful { get; set; }
-
         public bool IsWithin10m { get; set; }
-       // public bool IsSmiling { get; internal set; }
+
+        // public bool IsSmiling { get; internal set; }
         //public bool IsDeepLensRequested { get; set; } = false;
         //public bool IsWithin10m { get; set; } = false;
         //public bool IsAlexaRequested { get; set; } = false;

@@ -51,7 +51,6 @@
                 Gym Occupany
             </div>
             <div class="main-pop-cont">
-
                 <div class="realtime-indicator">
                     <div class="realtime-icons">
                         <img src="~/images/dumbbell.png" />
@@ -86,19 +85,34 @@
                             ETotal: @ViewBag.EstimatedNumberInGym
                         </div>
                         <div class="expand-select-duration-arrow right">
-                            <div id="est-drop-down">
-                                @Html.DropDownListFor(x => x.UserTrainingDuration, SelectListHelper.GetTrainingTimes())
-                            </div>
+
                         </div>
                     </div>
                 </div>
             </div>
+
+                <div id="est-drop-down">
+                    <form asp-action="SelectTimeToEstimate" asp-controller="Facilities" method="post">
+
+                        <select data-val="true" data-val-regex="Time must be between 00:00 to 23:59"
+                                data-val-regex-pattern="((([0-1][0-9])|(2[0-3]))(:[0-5][0-9])(:[0-5][0-9])?)"
+                                data-val-required="The Workout Duration field is required." id="UserTrainingDuration"
+                                name="UserTrainingDuration">
+                            <option asp-for="@ViewBag.EstimatedTimeToCheck" value="">Select hour to estimate</option>
+                            <option onchange="this.form.submit()" asp-for="@ViewBag.EstimatedTimeToCheck" value="@DateTime.Now">0 minutes</option>
+                            <option onchange="this.form.submit()" asp-for="@ViewBag.EstimatedTimeToCheck" value="@DateTime.Now.AddMinutes(20)">20 minutes</option>
+                            <option onchange="this.form.submit()" asp-for="@ViewBag.EstimatedTimeToCheck" value="@DateTime.Now.AddMinutes(40)">40 minutes</option>
+                            <option onchange="this.form.submit()" asp-for="@ViewBag.EstimatedTimeToCheck" value="@DateTime.Now.AddMinutes(60)">1 hour</option>
+                            <option onchange="this.form.submit()" asp-for="@ViewBag.EstimatedTimeToCheck" value="@DateTime.Now.AddMinutes(90)">1 hour 30 minutes</option>
+                            <option onchange="this.form.submit()" asp-for="@ViewBag.EstimatedTimeToCheck" value="@DateTime.Now.AddMinutes(120)">2 hours</option>
+                        </select>
+                    </form>
+                </div>
+
         </div>
     </div>
 
     @* Popup modal for camera and maps*@
-
-    <!-- The Modal -->
     <div id="map" class="modalz">
         <!-- Modal content -->
         <div class="modalz-content">
@@ -111,7 +125,7 @@
         </div>
     </div>
 
-    <!-- The Modal -->
+    <!-- Camera Modal -->
     <div id="camera" class="modalz">
         <!-- Modal content -->
         <div class="modalz-content">

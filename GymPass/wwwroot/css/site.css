@@ -641,10 +641,25 @@ body > main > div.main-gym > div > div.log-workout-home > a {
     color: white;
 }
 
+#est-drop-down {
+    position: absolute;
+    bottom: 0;
+    right: 1rem;
+    line-height:0;
+}
 
+#UserTrainingDuration {
+    height: 0.95rem;
+    font-size: 0.7rem;
+    color: #fff;
+    background-color: #000;
+    margin-bottom:1px;
+}
 
+select#UserTrainingDuration {
+    border: none;
+}
 /* Log workout styling */
-
 .workout-log-bg {
     position: absolute;
     background-image: url('../images/log-workout-bg.png');

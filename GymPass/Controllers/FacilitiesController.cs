@@ -75,6 +75,7 @@ namespace GymPass.Controllers
         }
 
         // EDIT Workoutlog
+        [HttpGet]
         public async Task<IActionResult> LogWorkout(int? id)
         {
             if (id == null)
@@ -203,9 +204,45 @@ namespace GymPass.Controllers
             return View(facilityView);
         }
 
+        // This post sends selected data from the drop down list to the server
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SelectTimeToEstimate(int id,
+           [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom," +
+            "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer," +
+            "UserTrainingDuration, TotalTrainingDuration, WillUseWeightsRoom, WillUseCardioRoom, WillUseStretchRoom," +
+            "HasLoggedWorkoutToday, IsCameraScanSuccessful, IsWithin10m")] UsersOutOfGymDetails usersOutOfGymDetails)
+        {
+            var user = await _userManager.GetUserAsync(User);
 
-        // GET: Facilities/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+            if (user.Id == null)
+            {
+                return NotFound();
+            }
+
+            // the id will be the ID of the newly created facility ID
+            var facility = await _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault();
+
+
+            if (id != facility.FacilityID && id != usersOutOfGymDetails.FacilityID)
+            {
+                return NotFound();
+            }
+
+
+            var currentFacilityDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+
+            if (facility == null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index), "Home", new { id = user.DefaultGym });
+        }
+
+
+            // GET: Facilities/Edit/5
+            public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
