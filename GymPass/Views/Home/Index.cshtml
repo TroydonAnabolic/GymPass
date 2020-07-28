@@ -1,5 +1,5 @@
 ﻿@model GymPass.Models.Facility
-
+@using GymPass.Helpers;
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
@@ -86,6 +86,9 @@
                             ETotal: @ViewBag.EstimatedNumberInGym
                         </div>
                         <div class="expand-select-duration-arrow right">
+                            <div id="est-drop-down">
+                                @Html.DropDownListFor(x => x.UserTrainingDuration, SelectListHelper.GetTrainingTimes())
+                            </div>
                         </div>
                     </div>
                 </div>
