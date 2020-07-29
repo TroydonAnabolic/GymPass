@@ -8,6 +8,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20200722043606_system restore.cs" />
     <Compile Remove="Migrations\20200722043606_system restore.Designer.cs" />
+    <Compile Remove="Migrations\Facility\20200728101649_improve estimate time2.cs" />
+    <Compile Remove="Migrations\Facility\20200728101649_improve estimate time2.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

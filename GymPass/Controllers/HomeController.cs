@@ -72,16 +72,19 @@ namespace GymPass.Controllers
             UsersInGymDetail = await _facilityContext.UsersInGymDetails
                 .Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
 
-            // get facial recognition details to show
-            ViewBag.IsSmiling = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().IsSmiling;
-            ViewBag.Gender = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().Gender;
-            ViewBag.AgeRangeLow = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeLow;
-            ViewBag.AgeRangeHigh = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeHigh;
+            // if there is a user in gym, get facial recognition details to show
+            if (UsersInGymDetail != null)
+            {
+                ViewBag.IsSmiling = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().IsSmiling;
+                ViewBag.Gender = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().Gender;
+                ViewBag.AgeRangeLow = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeLow;
+                ViewBag.AgeRangeHigh = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeHigh;
+            }
 
             // calculations for estimated time
-            // get estimated time to check submitted to the db
-            DateTime estimatedTimeToCheck = _facilityContext.UsersOutofGymDetails.FirstOrDefault().EstimatedTimeToCheck;
-            DateTime estimatedExitTime = DateTime.Now;
+            // get estimated time to check submitted to the db  
+            DateTime estimatedTimeToCheck = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().EstimatedTimeToCheck; // TODO: add an option to create an entry for each user during sign up
+            DateTime estimatedExitTime;
 
             if (facility == null)
             {
@@ -100,6 +103,7 @@ namespace GymPass.Controllers
             if (facilityDetails.Count > 0)
             {
                 // estimated exit time is the time user accessed gym + his declared training duration
+                if (UsersInGymDetail.EstimatedTrainingTime   != null)
                 estimatedExitTime = UsersInGymDetail.TimeAccessGranted.Add(UsersInGymDetail.EstimatedTrainingTime);
 
                 // for each user logged into the gym, increment or decrement based on time entered
@@ -107,16 +111,17 @@ namespace GymPass.Controllers
                 {
                     // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
                     // somehow get the clicked value to replace this datetime.now. possibly use another action method
-                    if (DateTime.Now < estimatedExitTime) // TODO: Change this to (TimeframeToCheck < estimatedExitTime) this is selected
+                    if (estimatedTimeToCheck < estimatedExitTime) //
                     {
                         // if the current user is still within his estimated training time, then add estimated number of gym users list
                         ViewBag.EstimatedNumberInGym++; //TODO: instead of viewbag, this will be data extracted fromt the db
                     }
-                    else if (DateTime.Now > estimatedExitTime && ViewBag.EstimatedNumberInGym != 0)
+                    // otherwise remove users from the gym, ensure not to go to negative
+                    else if (estimatedTimeToCheck > estimatedExitTime && ViewBag.EstimatedNumberInGym != 0)
                         ViewBag.EstimatedNumberInGym--;
+                    // need to find a way to decrement estimate in gym also when user leaves the gym
                 }
             }
-
             // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
             if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
                 ViewBag.AccessDeniedMsgRecieved = false;
@@ -127,9 +132,11 @@ namespace GymPass.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(int id, [Bind("FacilityID,FacilityName,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom," +
-            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful, IsWithin10m")] Facility facilityView,
-            [Bind("FirstName,TimeAccessGranted,EstimatedTrainingTime,UniqueEntryID")] UsersInGymDetail usersInGymDetailView) // 
+            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful, IsWithin10m")] Facility facilityView
+            ) // 
         {
+            var UserDetails = Request.QueryString.ToString();
+
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
 
@@ -145,6 +152,9 @@ namespace GymPass.Controllers
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
             UsersInGymDetail currentFacilityDetail = new UsersInGymDetail();
             var currentFacilityDetailDb = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+            var allGymUserRecords = await _facilityContext.UsersOutofGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+
+
             bool enteredGym = false;
 
             if (id != facility.FacilityID || id != facilityView.FacilityID)
@@ -162,7 +172,7 @@ namespace GymPass.Controllers
                 try
                 { // maybe make is open door requested a user property
                   // if door open is requested from the view by clicking the button, then run the below logic to test if user is authorized and also apply crowdsensing functions
-                    enteredGym = await DetermineEnterOrExitGym(facilityView, user, facility, facilityDetails, currentFacilityDetail, currentFacilityDetailDb, enteredGym);
+                    enteredGym = await DetermineEnterOrExitGym(facilityView, user, facility, facilityDetails, currentFacilityDetail, currentFacilityDetailDb, enteredGym, allGymUserRecords);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -182,7 +192,7 @@ namespace GymPass.Controllers
         }
 
         private async Task<bool> DetermineEnterOrExitGym(Facility facilityView, ApplicationUser user, Facility facility, List<UsersInGymDetail> facilityDetails, UsersInGymDetail currentFacilityDetail,
-            UsersInGymDetail currentFacilityDetailDb, bool enteredGym)
+            UsersInGymDetail currentFacilityDetailDb, bool enteredGym, UsersOutOfGymDetails allGymUserRecords)
         {
             if (facilityView.IsOpenDoorRequested)
             {

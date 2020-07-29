@@ -74,10 +74,16 @@ namespace GymPass
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+                    name: "userDetails",
+                    pattern: "{controller=Facilities}/{action=SelectTimeToEstimate}/{id?}");
+                endpoints.MapRazorPages();
+
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
         }
     }
 }

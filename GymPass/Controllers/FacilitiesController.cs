@@ -206,13 +206,13 @@ namespace GymPass.Controllers
 
         // This post sends selected data from the drop down list to the server
         [HttpPost]
+        [Route("Home/Index")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SelectTimeToEstimate(int id,
-           [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom," +
-            "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer," +
-            "UserTrainingDuration, TotalTrainingDuration, WillUseWeightsRoom, WillUseCardioRoom, WillUseStretchRoom," +
-            "HasLoggedWorkoutToday, IsCameraScanSuccessful, IsWithin10m")] UsersOutOfGymDetails usersOutOfGymDetails)
+        public async Task<IActionResult> SelectTimeToEstimate(int idForUser, // TODO look into assigning the value for this id on argument
+           [Bind("UserOutOfGymDetailsID, FacilityID, EstimatedTimeToCheck, UniqueEntryID")] UsersOutOfGymDetails usersOutOfGymDetails, [Bind]DateTime userDetails)
         {
+
+            // get the user
             var user = await _userManager.GetUserAsync(User);
 
             if (user.Id == null)
@@ -220,24 +220,40 @@ namespace GymPass.Controllers
                 return NotFound();
             }
 
-            // the id will be the ID of the newly created facility ID
-            var facility = await _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault();
+            // set the PK entry to be the same as the one the usere created
+            idForUser =  _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().UsersOutOfGymDetailsID;
+            // ensure we are only updating for the user that entered the drop down list value
 
 
-            if (id != facility.FacilityID && id != usersOutOfGymDetails.FacilityID)
+            var currentUserDetail = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault();
+
+            if (idForUser != currentUserDetail.UsersOutOfGymDetailsID)
             {
                 return NotFound();
             }
 
-
-            var currentFacilityDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
-
-            if (facility == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
+                try
+                {
+                    currentUserDetail.EstimatedTimeToCheck = userDetails;
 
-            return RedirectToAction(nameof(Index), "Home", new { id = user.DefaultGym });
+                    _facilityContext.Update(currentUserDetail);
+                    await _facilityContext.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FacilityExists(usersOutOfGymDetails.FacilityID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
         }
 
 
