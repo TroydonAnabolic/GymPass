@@ -69,8 +69,7 @@ namespace GymPass.Controllers
 
             var facility = await _facilityContext.Facilities.FindAsync(id);
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
-            UsersInGymDetail = await _facilityContext.UsersInGymDetails
-                .Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
+            UsersInGymDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
 
             // if there is a user in gym, get facial recognition details to show
             if (UsersInGymDetail != null)
@@ -82,9 +81,9 @@ namespace GymPass.Controllers
             }
 
             // calculations for estimated time
-            // get estimated time to check submitted to the db  
+            // get estimated time to check submitted to the db for the user submitting
             DateTime estimatedTimeToCheck = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().EstimatedTimeToCheck; // TODO: add an option to create an entry for each user during sign up
-            DateTime estimatedExitTime;
+            DateTime estimatedExitTime = DateTime.Now;
 
             if (facility == null)
             {
@@ -103,7 +102,7 @@ namespace GymPass.Controllers
             if (facilityDetails.Count > 0)
             {
                 // estimated exit time is the time user accessed gym + his declared training duration
-                if (UsersInGymDetail.EstimatedTrainingTime   != null)
+                if (UsersInGymDetail?.EstimatedTrainingTime != null)
                 estimatedExitTime = UsersInGymDetail.TimeAccessGranted.Add(UsersInGymDetail.EstimatedTrainingTime);
 
                 // for each user logged into the gym, increment or decrement based on time entered
