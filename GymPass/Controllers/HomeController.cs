@@ -83,7 +83,7 @@ namespace GymPass.Controllers
             // calculations for estimated time
             // get estimated time to check submitted to the db for the user submitting
             DateTime estimatedTimeToCheck = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().EstimatedTimeToCheck; // TODO: add an option to create an entry for each user during sign up
-            DateTime estimatedExitTime = DateTime.Now;
+            DateTime estimatedExitTimeCurrentUser = DateTime.Now;
 
             if (facility == null)
             {
@@ -101,25 +101,24 @@ namespace GymPass.Controllers
             // if there are entries get the estimated exit time
             if (facilityDetails.Count > 0)
             {
-                // estimated exit time is the time user accessed gym + his declared training duration
-                if (UsersInGymDetail?.EstimatedTrainingTime != null)
-                estimatedExitTime = UsersInGymDetail.TimeAccessGranted.Add(UsersInGymDetail.EstimatedTrainingTime);
-
-                // for each user logged into the gym, increment or decrement based on time entered
-                foreach (var userInGym in facilityDetails)
-                {
-                    // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
-                    // somehow get the clicked value to replace this datetime.now. possibly use another action method
-                    if (estimatedTimeToCheck < estimatedExitTime) //
+                    int i = 0;
+                    foreach (var userInGym in facilityDetails)
                     {
-                        // if the current user is still within his estimated training time, then add estimated number of gym users list
-                        ViewBag.EstimatedNumberInGym++; //TODO: instead of viewbag, this will be data extracted fromt the db
+                        // get all the logged in users and assign est training time for each one
+                        estimatedExitTimeCurrentUser = facilityDetails[i].TimeAccessGranted.Add(facilityDetails[i].EstimatedTrainingTime); // appears if user is not in the gym he cannot check, need to est exit time for all users
+
+                        // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
+                        // somehow get the clicked value to replace this datetime.now. possibly use another action method
+                        if (estimatedTimeToCheck < estimatedExitTimeCurrentUser) //
+                        {
+                            // if the current user is still within his estimated training time, then add estimated number of gym users list
+                            ViewBag.EstimatedNumberInGym++; //TODO: instead of viewbag, this will be data extracted fromt the db
+                        }
+                        // otherwise remove users from the gym, ensure not to go to negative
+                        else if (estimatedTimeToCheck > estimatedExitTimeCurrentUser && ViewBag.EstimatedNumberInGym != 0)
+                            ViewBag.EstimatedNumberInGym--;
+                        i++;
                     }
-                    // otherwise remove users from the gym, ensure not to go to negative
-                    else if (estimatedTimeToCheck > estimatedExitTime && ViewBag.EstimatedNumberInGym != 0)
-                        ViewBag.EstimatedNumberInGym--;
-                    // need to find a way to decrement estimate in gym also when user leaves the gym
-                }
             }
             // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
             if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
@@ -195,116 +194,7 @@ namespace GymPass.Controllers
         {
             if (facilityView.IsOpenDoorRequested)
             {
-                // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
-                float similarityThreshold = 70F;
-                String photo = "business-atire.jpg";
-                 String targetImage = "fbPic.jpg"; // S3 bucket img match
-                // String targetImage = "C:\\fbPic.jpg"; // local img match TODO: appears to be a delay using local img tht does not allow detect face to proces
-                // String targetImage = "pris-face.jpg"; // S3 bucket mismatch
-                String bucket = "gym-user-bucket-i";
-
-                // ------------------------------ Recognition from image
-                try
-                {
-
-                    Image imageSource = new Image()
-                    {
-                        S3Object = new S3Object()
-                        {
-                            Name = photo,
-                            Bucket = bucket
-                        },
-                    };
-                    //  S3 bucket img matching
-                    Image imageTarget = new Image()
-                    {
-                        S3Object = new S3Object()
-                        {
-                            Name = targetImage,
-                            Bucket = bucket
-                        },
-                    };
-
-                    //  Local Image matching
-                   // Amazon.Rekognition.Model.Image imageTarget = new Image();
-                    //using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
-                    //{
-                    //    byte[] data = new byte[fs.Length];
-                    //    data = new byte[fs.Length];
-                    //    fs.Read(data, 0, (int)fs.Length);
-                    //    imageTarget.Bytes = new MemoryStream(data);
-                    //}
-
-                    CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
-                    {
-                        SourceImage = imageSource,
-                        TargetImage = imageTarget,
-                        SimilarityThreshold = similarityThreshold
-                    };
-
-                    // detect face features of img scanned
-                    CompareFacesResponse compareFacesResponse = await AmazonRekognition.CompareFacesAsync(compareFacesRequest);
-
-                    // Display results
-                    foreach (CompareFacesMatch match in compareFacesResponse.FaceMatches)
-                    {
-                        ComparedFace face = match.Face;
-                        // if confidence for similarity is over 90 then grant access
-                        if (match.Similarity > 90)
-                        {
-                            // if there is a match set scan success and display to the view the match
-                            user.IsCameraScanSuccessful = true;
-                        }
-                        else
-                        {
-                            ViewBag.MatchResult = "Facial Match Failed!";
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    _logger.LogInformation(e.Message);
-                }
-
-                // ------------------------------ TODO: Now add detect from video/live streaming
-
-
-                // ------------------------------ Now add get facial details to display in the view.
-                DetectFacesRequest detectFacesRequest = new DetectFacesRequest()
-                {
-                    Image = new Image()
-                    {
-                        S3Object = new S3Object()
-                        {
-                            Name = targetImage,
-                            Bucket = bucket
-                        },
-                    },
-                    // Attributes can be "ALL" or "DEFAULT". 
-                    // "DEFAULT": BoundingBox, Confidence, Landmarks, Pose, and Quality.
-                    // "ALL": See https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/Rekognition/TFaceDetail.html
-                    Attributes = new List<String>() { "ALL" }
-                };
-
-                try
-                {
-                    DetectFacesResponse detectFacesResponse = await AmazonRekognition.DetectFacesAsync(detectFacesRequest);
-                    bool hasAll = detectFacesRequest.Attributes.Contains("ALL");
-                    foreach (FaceDetail face in detectFacesResponse.FaceDetails)
-                    {
-                        if (hasAll) // consider removing of only certain features can be detected.
-                        {
-                            currentFacilityDetail.IsSmiling = face.Smile.Value;
-                            currentFacilityDetail.Gender = face.Gender.Value.ToString();
-                            currentFacilityDetail.AgeRangeLow = face.AgeRange.Low;
-                            currentFacilityDetail.AgeRangeHigh = face.AgeRange.High;
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    _logger.LogInformation(e.Message);
-                }
+                await FacialRecognitionScan(user, currentFacilityDetail);
 
                 // --------------------------------------------------------end facial recognition-------------------------------------------------------------
 
@@ -345,19 +235,20 @@ namespace GymPass.Controllers
                     else if (user.IsInsideGym)
                     {
                         user.IsInsideGym = false;
-                        facility.NumberOfClientsInGym--;
+                        // if it is not 0 then we can decrement to avoid negatives
+                        if(facility.NumberOfClientsInGym != 0) facility.NumberOfClientsInGym--;
 
                         if (user.WillUseWeightsRoom)
                         {
                             facility.NumberOfClientsUsingWeightRoom--;
                             user.WillUseWeightsRoom = false;
                         }
-                        if (user.WillUseCardioRoom)
+                        if (user.WillUseCardioRoom && facility.NumberOfClientsUsingCardioRoom != 0)
                         {
                             facility.NumberOfClientsUsingCardioRoom--;
                             user.WillUseCardioRoom = false;
                         }
-                        if (user.WillUseStretchRoom)
+                        if (user.WillUseStretchRoom && facility.NumberOfClientsUsingStretchRoom != 0)
                         {
                             facility.NumberOfClientsUsingStretchRoom--;
                             user.WillUseWeightsRoom = false;
@@ -389,10 +280,10 @@ namespace GymPass.Controllers
                     System.Threading.Thread.Sleep(200);
                 }
                 // delay 10s when entering
-              if (!user.IsInsideGym) System.Threading.Thread.Sleep(200);
+                if (!user.IsInsideGym) System.Threading.Thread.Sleep(200);
 
                 // When 5 second timer finishes, we close the door again automatically
-                 facility.IsOpenDoorRequested = false;
+                facility.IsOpenDoorRequested = false;
                 ViewBag.IsOpenDoorRequested = false;
                 facility.DoorOpened = false;
                 _facilityContext.Update(facility);
@@ -407,6 +298,120 @@ namespace GymPass.Controllers
             }
 
             return enteredGym;
+        }
+
+        private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail)
+        {
+            // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
+            float similarityThreshold = 70F;
+            String photo = "business-atire.jpg";
+            String targetImage = "fbPic.jpg"; // S3 bucket img match
+                                              // String targetImage = "C:\\fbPic.jpg"; // local img match TODO: appears to be a delay using local img tht does not allow detect face to proces
+                                              // String targetImage = "pris-face.jpg"; // S3 bucket mismatch
+            String bucket = "gym-user-bucket-i";
+
+            // ------------------------------ Recognition from image
+            try
+            {
+
+                Image imageSource = new Image()
+                {
+                    S3Object = new S3Object()
+                    {
+                        Name = photo,
+                        Bucket = bucket
+                    },
+                };
+                //  S3 bucket img matching
+                Image imageTarget = new Image()
+                {
+                    S3Object = new S3Object()
+                    {
+                        Name = targetImage,
+                        Bucket = bucket
+                    },
+                };
+
+                //  Local Image matching
+                // Amazon.Rekognition.Model.Image imageTarget = new Image();
+                //using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
+                //{
+                //    byte[] data = new byte[fs.Length];
+                //    data = new byte[fs.Length];
+                //    fs.Read(data, 0, (int)fs.Length);
+                //    imageTarget.Bytes = new MemoryStream(data);
+                //}
+
+                CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
+                {
+                    SourceImage = imageSource,
+                    TargetImage = imageTarget,
+                    SimilarityThreshold = similarityThreshold
+                };
+
+                // detect face features of img scanned
+                CompareFacesResponse compareFacesResponse = await AmazonRekognition.CompareFacesAsync(compareFacesRequest);
+
+                // Display results
+                foreach (CompareFacesMatch match in compareFacesResponse.FaceMatches)
+                {
+                    ComparedFace face = match.Face;
+                    // if confidence for similarity is over 90 then grant access
+                    if (match.Similarity > 90)
+                    {
+                        // if there is a match set scan success and display to the view the match
+                        user.IsCameraScanSuccessful = true;
+                    }
+                    else
+                    {
+                        ViewBag.MatchResult = "Facial Match Failed!";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(e.Message);
+            }
+
+            // ------------------------------ TODO: Now add detect from video/live streaming
+
+
+            // ------------------------------ Now add get facial details to display in the view.
+            DetectFacesRequest detectFacesRequest = new DetectFacesRequest()
+            {
+                Image = new Image()
+                {
+                    S3Object = new S3Object()
+                    {
+                        Name = targetImage,
+                        Bucket = bucket
+                    },
+                },
+                // Attributes can be "ALL" or "DEFAULT". 
+                // "DEFAULT": BoundingBox, Confidence, Landmarks, Pose, and Quality.
+                // "ALL": See https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/Rekognition/TFaceDetail.html
+                Attributes = new List<String>() { "ALL" }
+            };
+
+            try
+            {
+                DetectFacesResponse detectFacesResponse = await AmazonRekognition.DetectFacesAsync(detectFacesRequest);
+                bool hasAll = detectFacesRequest.Attributes.Contains("ALL");
+                foreach (FaceDetail face in detectFacesResponse.FaceDetails)
+                {
+                    if (hasAll) // consider removing of only certain features can be detected.
+                    {
+                        currentFacilityDetail.IsSmiling = face.Smile.Value;
+                        currentFacilityDetail.Gender = face.Gender.Value.ToString();
+                        currentFacilityDetail.AgeRangeLow = face.AgeRange.Low;
+                        currentFacilityDetail.AgeRangeHigh = face.AgeRange.High;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(e.Message);
+            }
         }
 
         public IActionResult Privacy()

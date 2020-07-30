@@ -93,9 +93,9 @@
             @* TODO: Change these select list to using a ul or ol as it seems it clicks first value when select first element it posts, so use divs instead *@
         <div id="est-drop-down">
 
-                <form asp-action="SelectTimeToEstimate" asp-controller="Facilities">
+            <form id="est-form" asp-action="SelectTimeToEstimate" asp-controller="Facilities" onchange="submitForm()">
 
-                    <select data-val="true" data-val-regex="Time must be between 00:00 to 23:59"
+                <select data-val="true" data-val-regex="Time must be between 00:00 to 23:59"
                         data-val-regex-pattern="((([0-1][0-9])|(2[0-3]))(:[0-5][0-9])(:[0-5][0-9])?)"
                         data-val-required="The Workout Duration field is required." id="userDetails"
                         name="userDetails">
@@ -104,8 +104,8 @@
                             value="@DateTime.Now">
                         0 minutes
                     </option>
-                    <option onClick="document.forms['userDetails'].submit();"
-                            value="@DateTime.Now.AddMinutes(20)">
+
+                    <option value="@DateTime.Now.AddMinutes(20)">
                         20 minutes
                     </option>
                     <option onClick="document.forms['userDetails'].submit();"
@@ -125,20 +125,22 @@
                         2 hours
                     </option>
                 </select>
-                    <input type="submit" value="submit" />
-                    @*<button class="dropbtn">
-                        Dropdown
-                        <i class="fa fa-caret-down"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        <div href="#">Link 1</div>
-                        <div href="#">Link 2</div>
-                        <div href="#">Link 3</div>
-                        <div href="#">Link 1</div>
-                        <div href="#">Link 2</div>
-                        <div href="#">Link 3</div>
-                    </div>*@
-                    </form>
+
+                <noscript><input type="submit" value="Submit"></noscript>
+
+                @*<button class="dropbtn">
+            Dropdown
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+            <div href="#">Link 1</div>
+            <div href="#">Link 2</div>
+            <div href="#">Link 3</div>
+            <div href="#">Link 1</div>
+            <div href="#">Link 2</div>
+            <div href="#">Link 3</div>
+        </div>*@
+            </form>
             </div>
 
         </div>
@@ -316,5 +318,10 @@
                                 $("#total-in-gym-icon")
                                 .css("display", "block" );
                                 });
-                                });
+    });
+
+    // submit form with divs instead of form
+    function submitForm() {
+        document.getElementById('est-form').submit();
+    }
 </script>
