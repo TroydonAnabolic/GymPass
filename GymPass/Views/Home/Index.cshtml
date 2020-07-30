@@ -125,21 +125,7 @@
                         2 hours
                     </option>
                 </select>
-
                 <noscript><input type="submit" value="Submit"></noscript>
-
-                @*<button class="dropbtn">
-            Dropdown
-            <i class="fa fa-caret-down"></i>
-        </button>
-        <div class="dropdown-content">
-            <div href="#">Link 1</div>
-            <div href="#">Link 2</div>
-            <div href="#">Link 3</div>
-            <div href="#">Link 1</div>
-            <div href="#">Link 2</div>
-            <div href="#">Link 3</div>
-        </div>*@
             </form>
             </div>
 
@@ -171,7 +157,31 @@
                 @* When we click open door we trigger this logic *@
 
                 <div id="camera-img">
-                    <h5> CAMERA IMAGE HERE</h5>
+                    @*CAMERA IMAGE HERE*@
+                    <div class="col-md-2"></div>
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Camera</div>
+                            <div class="panel-body">
+                                <div id="my_camera"></div>
+                                <!-- A button for taking snaps -->
+                                <form>
+                                    <input type="button" class="btn btn-success" value="Take Snapshot" onClick="take_snapshot()">
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Captured Photo</div>
+                            <div class="panel-body">
+                                <div id="results">Your captured image will appear here...</div>
+                            </div>
+                            <br />
+                            <br />
+                        </div>
+                    </div>
                 </div>
                 @* Show scan results, if successful display face details, if not smiling, say smile, if smiling say looks like your ready to smash the gym, have *@
                 @if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
@@ -303,25 +313,6 @@
 
 @* Hide the top navigation bar when on main page *@
 <script>
-    $(document).ready(function () {
-        $(" header").hide();
-                                // Change between estimated total and actual total
-                                // When we click user total, show est total
-                                $("#total-in-gym-icon").click(function () {
-                                $(this).css("display", "none" );
-                                $("#est-total-in-gym-icon")
-                                .css("display", "block" );
-                                });
-                                // other way around
-                                $("#est-total-in-gym-icon").click(function () {
-                                $(this).css("display", "none" );
-                                $("#total-in-gym-icon")
-                                .css("display", "block" );
-                                });
-    });
+  
 
-    // submit form with divs instead of form
-    function submitForm() {
-        document.getElementById('est-form').submit();
-    }
 </script>

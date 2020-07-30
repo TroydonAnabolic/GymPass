@@ -11,57 +11,103 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }
 
+// webcam
+function take_snapshot() {
+    // take snapshot and get image data  
+    Webcam.snap(function (data_uri) {
+        // display results in page  
+        document.getElementById('results').innerHTML =
+            '<img src="' +
+            data_uri +
+            '"/>';
+
+        Webcam.upload(data_uri,
+            '/Camera/Capture',
+            function (code, text) {
+                alert('Photo Captured');
+            });
+    });
+}  
+
+// submit form for check estimated total with divs instead of submit button
+function submitForm() {
+    document.getElementById('est-form').submit();
+}
+
 $(document).ready(function () {
-        /*
-        *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
-        */
-        $('.border-nav').mouseenter(function () {
-            $(this).css("border", "1px solid blue");
-        });
-        $('.border-nav').mouseleave(function () {
-            $(this).css("border", "1px solid grey");
-        });
+    /*
+    *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
+    */
+    $('.border-nav').mouseenter(function () {
+        $(this).css("border", "1px solid blue");
+    });
+    $('.border-nav').mouseleave(function () {
+        $(this).css("border", "1px solid grey");
+    });
 
-        /*
-         *  ------------------------------------------------ Landing Page Scripts ----------------------------------------------------------------
-         */
+    /*
+     *  ------------------------------------------------ Landing Page Scripts ----------------------------------------------------------------
+     */
 
-        // on page load we pre-select the checbox depending on if its opened or closed
-        $('#open-door').prop('checked', true);
-        $('#close-door').prop('checked', false);
+    // ------------------ Webcam Script -----------------------
+    Webcam.set({
+        width: 320,
+        height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90
+    });
+    Webcam.attach('#my_camera');  
 
-        // Lock Icon changer
-        // allows the changed icon to show unlocked icon change before the server applies the change from the delayed refresh
-        $("body > main > div.access > div > form > div:nth-child(3) > button").click(function () {
-            // only when it shows locked class
-            if ($(this).hasClass("locked")) {
-                // we remove the class and add the other class to this button
-                $('body > main > div.access > div > form > div:nth-child(3) > button > svg').remove();
-                $(this)
-                    .append("<i class='fas fa-lock-open'></i>")
-                    .addClass("unlocked")
-                    .removeClass("locked");
-            }
-        });
 
-        // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
-        // after 5 seconds it will remove scanning
-        var btn = $("#submit-icon");
 
-        btn.click(function () {
-            var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
-            setTimeout(function () {
-                scan.addClass('hidden');
-            }, 5000);
-        });
+    // ---------- Submit main button script ---------------------
+    // on page load we pre-select the checbox depending on if its opened or closed
+    $('#open-door').prop('checked', true);
+    $('#close-door').prop('checked', false);
 
-    //$('div').click(function () {
-    //    $('form').submit();
-    //});
+    // Lock Icon changer
+    // allows the changed icon to show unlocked icon change before the server applies the change from the delayed refresh
+    $("body > main > div.access > div > form > div:nth-child(3) > button").click(function () {
+        // only when it shows locked class
+        if ($(this).hasClass("locked")) {
+            // we remove the class and add the other class to this button
+            $('body > main > div.access > div > form > div:nth-child(3) > button > svg').remove();
+            $(this)
+                .append("<i class='fas fa-lock-open'></i>")
+                .addClass("unlocked")
+                .removeClass("locked");
+        }
+    });
 
-        /*
-        *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
-        */
+    // when we click the open button(given user is not inside and door), first show remove the hidden attr from the scanning, so it will show scanning
+    // after 5 seconds it will remove scanning
+    var btn = $("#submit-icon");
+
+    btn.click(function () {
+        var scan = $('body > main > div.access > div > div.door-status.temp-scan.hidden').removeClass('hidden');
+        setTimeout(function () {
+            scan.addClass('hidden');
+        }, 5000);
+    });
+
+    $(" header").hide();
+    // Change between estimated total and actual total
+    // When we click user total, show est total
+    $("#total-in-gym-icon").click(function () {
+        $(this).css("display", "none");
+        $("#est-total-in-gym-icon")
+            .css("display", "block");
+    });
+    // other way around
+    $("#est-total-in-gym-icon").click(function () {
+        $(this).css("display", "none");
+        $("#total-in-gym-icon")
+            .css("display", "block");
+    });
+
+    /*
+    *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
+    */
     // allows lat and long to be globally accessible within anything requiring it to be accessed.
     navigator.geolocation.watchPosition(function (position) {
         var pos = {
