@@ -71,7 +71,7 @@
                 </div>
                 @* The actual number shows by default, js will interchange between the two on click ( *@
                 <div id="total-in-gym-icon" class="realtime-indicator">
-                       <div class="realtime-icons">
+                    <div class="realtime-icons">
                         <img src="~/images/Capacity/capacity-80.png" />
                     </div>
                     Total:  @Model.NumberOfClientsInGym
@@ -91,42 +91,42 @@
                 </div>
             </div>
             @* TODO: Change these select list to using a ul or ol as it seems it clicks first value when select first element it posts, so use divs instead *@
-        <div id="est-drop-down">
+            <div id="est-drop-down">
 
-            <form id="est-form" asp-action="SelectTimeToEstimate" asp-controller="Facilities" onchange="submitForm()">
+                <form id="est-form" asp-action="SelectTimeToEstimate" asp-controller="Facilities" onchange="submitForm()">
 
-                <select data-val="true" data-val-regex="Time must be between 00:00 to 23:59"
-                        data-val-regex-pattern="((([0-1][0-9])|(2[0-3]))(:[0-5][0-9])(:[0-5][0-9])?)"
-                        data-val-required="The Workout Duration field is required." id="userDetails"
-                        name="userDetails">
-                    <option>Select hour to estimate</option>
-                    <option onClick="document.forms['userDetails'].submit();"
-                            value="@DateTime.Now">
-                        0 minutes
-                    </option>
+                    <select data-val="true" data-val-regex="Time must be between 00:00 to 23:59"
+                            data-val-regex-pattern="((([0-1][0-9])|(2[0-3]))(:[0-5][0-9])(:[0-5][0-9])?)"
+                            data-val-required="The Workout Duration field is required." id="userDetails"
+                            name="userDetails">
+                        <option>Select hour to estimate</option>
+                        <option onClick="document.forms['userDetails'].submit();"
+                                value="@DateTime.Now">
+                            0 minutes
+                        </option>
 
-                    <option value="@DateTime.Now.AddMinutes(20)">
-                        20 minutes
-                    </option>
-                    <option onClick="document.forms['userDetails'].submit();"
-                            value="@DateTime.Now.AddMinutes(40)">
-                        40 minutes
-                    </option>
-                    <option onClick="document.forms['userDetails'].submit();"
-                            value="@DateTime.Now.AddMinutes(60)">
-                        1 hour
-                    </option>
-                    <option onClick="document.forms['userDetails'].submit();"
-                            value="@DateTime.Now.AddMinutes(90)">
-                        1 hour 30 minutes
-                    </option>
-                    <option onClick="document.forms['userDetails'].submit();"
-                            value="@DateTime.Now.AddMinutes(120)">
-                        2 hours
-                    </option>
-                </select>
-                <noscript><input type="submit" value="Submit"></noscript>
-            </form>
+                        <option value="@DateTime.Now.AddMinutes(20)">
+                            20 minutes
+                        </option>
+                        <option onClick="document.forms['userDetails'].submit();"
+                                value="@DateTime.Now.AddMinutes(40)">
+                            40 minutes
+                        </option>
+                        <option onClick="document.forms['userDetails'].submit();"
+                                value="@DateTime.Now.AddMinutes(60)">
+                            1 hour
+                        </option>
+                        <option onClick="document.forms['userDetails'].submit();"
+                                value="@DateTime.Now.AddMinutes(90)">
+                            1 hour 30 minutes
+                        </option>
+                        <option onClick="document.forms['userDetails'].submit();"
+                                value="@DateTime.Now.AddMinutes(120)">
+                            2 hours
+                        </option>
+                    </select>
+                    <noscript><input type="submit" value="Submit"></noscript>
+                </form>
             </div>
 
         </div>
@@ -145,63 +145,7 @@
         </div>
     </div>
 
-    <!-- Camera Modal -->
-    <div id="camera" class="modalz">
-        <!-- Modal content -->
-        <div class="modalz-content">
-            <div class="modalz-header">
-                <span class="close">&times;</span>
-                <h4>@Model.FacilityName</h4>
-            </div>
-            <div class="modalz-body">
-                @* When we click open door we trigger this logic *@
 
-                <div id="camera-img">
-                    @*CAMERA IMAGE HERE*@
-                    <div class="col-md-2"></div>
-                    <div class="col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Camera</div>
-                            <div class="panel-body">
-                                <div id="my_camera"></div>
-                                <!-- A button for taking snaps -->
-                                <form>
-                                    <input type="button" class="btn btn-success" value="Take Snapshot" onClick="take_snapshot()">
-                                </form>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Captured Photo</div>
-                            <div class="panel-body">
-                                <div id="results">Your captured image will appear here...</div>
-                            </div>
-                            <br />
-                            <br />
-                        </div>
-                    </div>
-                </div>
-                @* Show scan results, if successful display face details, if not smiling, say smile, if smiling say looks like your ready to smash the gym, have *@
-                @if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
-                {
-                    <h4>Facial Match success!</h4>
-                    @if (ViewBag.IsSmiling)
-                    {
-                        <h6>Great! Looks like your ready to smash the gym</h6>
-                    }
-                    else
-                    {
-                        <h6>You are not smiling, dont forget to smash it!</h6>
-                    }
-                    <h6>Gender: @ViewBag.Gender</h6>
-                    <h6>Yoru age range low: @ViewBag.AgeRangeLow</h6>
-                    <h6>Your age range high: @ViewBag.AgeRangeHigh</h6>
-                }
-            </div>
-        </div>
-    </div>
 
     <div class="access">
 
@@ -224,7 +168,66 @@
                     <form asp-action="Index">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input type="hidden" asp-for="FacilityID" />
+                        @* start cam *@
+                        <!-- Camera Modal -->
+                        <div id="camera" class="modalz">
+                            <!-- Modal content -->
+                            <div class="modalz-content">
+                                <div class="modalz-header">
+                                    <span class="close">&times;</span>
+                                    <h4>@Model.FacilityName</h4>
+                                </div>
+                                <div class="modalz-body">
+                                    @* When we click open door we trigger this logic *@
 
+                                    <div id="camera-img">
+                                        @*CAMERA IMAGE HERE*@
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-4">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">Camera</div>
+                                                <div class="panel-body">
+                                                    <div id="my_camera"></div>
+                                                    <!-- A button for taking snaps -->
+                                                
+                                                        <input type="button" class="btn btn-success" value="Take Snapshot" onClick="take_snapshot()">
+                                                    
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">Captured Photo</div>
+                                                <div class="panel-body">
+                                                    <div id="results">Your captured image will appear here...</div>
+                                                </div>
+                                                <br />
+                                                <br />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* Show scan results, if successful display face details, if not smiling, say smile, if smiling say looks like your ready to smash the gym, have *@
+                                    @if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
+                                    {
+                                        <h4>Facial Match success!</h4>
+                                        @if (ViewBag.IsSmiling)
+                                        {
+                                            <h6>Great! Looks like your ready to smash the gym</h6>
+                                        }
+                                        else
+                                        {
+                                            <h6>You are not smiling, dont forget to smash it!</h6>
+                                        }
+                                        <h6>Gender: @ViewBag.Gender</h6>
+                                        <h6>Yoru age range low: @ViewBag.AgeRangeLow</h6>
+                                        <h6>Your age range high: @ViewBag.AgeRangeHigh</h6>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @* end cam *@
                         <div class="form-group form-check hidden" style="height:0px;">
                             <label class="form-check-label">
                                 <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
@@ -260,6 +263,67 @@
                     <form asp-action="Index">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input type="hidden" asp-for="FacilityID" />
+                        @* start cam *@
+                        <!-- Camera Modal -->
+                        <div id="camera" class="modalz">
+                            <!-- Modal content -->
+                            <div class="modalz-content">
+                                <div class="modalz-header">
+                                    <span class="close">&times;</span>
+                                    <h4>@Model.FacilityName</h4>
+                                </div>
+                                <div class="modalz-body">
+                                    @* When we click open door we trigger this logic *@
+
+                                    <div id="camera-img">
+                                        @*CAMERA IMAGE HERE*@
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-4">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">Camera</div>
+                                                <div class="panel-body">
+                                                    <div id="my_camera"></div>
+                                                    <!-- A button for taking snaps -->
+                                                    
+                                                        <input type="button" class="btn btn-success" value="Take Snapshot" onClick="take_snapshot()">
+                                                    
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">Captured Photo</div>
+                                                <div class="panel-body">
+                                                    <div id="results">Your captured image will appear here...</div>
+                                                </div>
+                                                <br />
+                                                <br />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* Show scan results, if successful display face details, if not smiling, say smile, if smiling say looks like your ready to smash the gym, have *@
+                                    @if (@UserManager.GetUserAsync(User).Result.IsInsideGym)
+                                    {
+                                        <h4>Facial Match success!</h4>
+                                        @if (ViewBag.IsSmiling)
+                                        {
+                                            <h6>Great! Looks like your ready to smash the gym</h6>
+                                        }
+                                        else
+                                        {
+                                            <h6>You are not smiling, dont forget to smash it!</h6>
+                                        }
+                                        <h6>Gender: @ViewBag.Gender</h6>
+                                        <h6>Yoru age range low: @ViewBag.AgeRangeLow</h6>
+                                        <h6>Your age range high: @ViewBag.AgeRangeHigh</h6>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @* end cam *@
+
                         <div class="form-group form-check hidden">
                             <label class="form-check-label">
                                 <input id="deep-lens-scan" class="form-check-input" asp-for="IsOpenDoorRequested " /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
@@ -313,6 +377,6 @@
 
 @* Hide the top navigation bar when on main page *@
 <script>
-  
+
 
 </script>
