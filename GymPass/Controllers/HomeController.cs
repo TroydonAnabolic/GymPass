@@ -302,6 +302,17 @@ namespace GymPass.Controllers
 
         private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail)
         {
+            // TODO: live recognition
+            // DetectFaceInLiveStream()
+
+            //  if (FaceDetectedInVideoStream() && !fiveSecondsPassed)
+            //    {
+            // TakePicture() // and save in S3 bucket
+            // if (ComparePicture()) 
+            //  set camera scan success
+            // }
+            // else if (!FaceDetectedInVideoStream() || fiveSecondsPassed)
+
             // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
             float similarityThreshold = 70F;
             String photo = "business-atire.jpg";
