@@ -165,17 +165,13 @@
                             <div class="panel-heading">Camera</div>
                             <div class="panel-body">
                                 <div id="my_camera"></div>
-                                <!-- A button for taking snaps -->
-                                @* Possibly leave this here and see if we can put two forms in the other form later *@
+                                <!-- A button for facial scan -->
                                 <form>
                                     <input id="btn-capture" type="button" class="btn btn-success" value="Take Snapshot" onClick="take_snapshot()">
                                 </form>
-
-
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">Captured Photo</div>
                             <div class="panel-body">
@@ -184,7 +180,6 @@
                             <br />
                             <br />
                         </div>
-                    </div>
                 </div>
                 @* Show scan results, if successful display face details, if not smiling, say smile, if smiling say looks like your ready to smash the gym, have *@
                 @if (@UserManager.GetUserAsync(User).Result.IsInsideGym)

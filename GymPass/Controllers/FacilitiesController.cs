@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GymPass.Data;
 using GymPass.Models;
@@ -12,6 +10,12 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using GymPass.Helpers;
+using Amazon.S3;
+using Amazon;
+using Amazon.Rekognition;
+using Amazon.S3.Transfer;
+using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace GymPass.Controllers
 {
@@ -20,16 +24,28 @@ namespace GymPass.Controllers
         private readonly FacilityContext _facilityContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private const string bucketName = "gym-user-bucket-i";
+        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast2;
+        private readonly IAmazonS3 S3Client;
+        private readonly ILogger<FacilitiesController> _logger;
+
+        IAmazonRekognition AmazonRekognition { get; set; }
 
         public FacilitiesController(
             FacilityContext facilityContext,
+            ILogger<FacilitiesController> logger,
             UserManager<ApplicationUser> userManager,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            IAmazonS3 s3Client,
+            IAmazonRekognition amazonRekognition
             )
         {
             _facilityContext = facilityContext;
             _userManager = userManager;
+            _logger = logger;
             _webHostEnvironment = webHostEnvironment;
+            S3Client = s3Client;
+            AmazonRekognition = amazonRekognition;
         }
 
         // GET: Facilities
@@ -215,7 +231,7 @@ namespace GymPass.Controllers
         [Route("Home/Index")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SelectTimeToEstimate(int idForUser, // TODO look into assigning the value for this id on argument
-           [Bind("UserOutOfGymDetailsID, FacilityID, EstimatedTimeToCheck, UniqueEntryID")] UsersOutOfGymDetails usersOutOfGymDetails, [Bind]DateTime userDetails)
+           [Bind("UserOutOfGymDetailsID, FacilityID, EstimatedTimeToCheck, UniqueEntryID")] UsersOutOfGymDetails usersOutOfGymDetails, [Bind] DateTime userDetails)
         {
 
             // get the user
@@ -227,7 +243,7 @@ namespace GymPass.Controllers
             }
 
             // set the PK entry to be the same as the one the usere created
-            idForUser =  _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().UsersOutOfGymDetailsID;
+            idForUser = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().UsersOutOfGymDetailsID;
             // ensure we are only updating for the user that entered the drop down list value
 
 
@@ -266,43 +282,18 @@ namespace GymPass.Controllers
         // POST: Home/Index/10
 
         [HttpPost]
-        public IActionResult Capture(string webcam)
+        public async Task<IActionResult> CaptureAsync(string webcam)
         {
             var files = HttpContext.Request.Form.Files;
-            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext);
+            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext)
+            {
+
+            };
 
             if (files != null)
             {
-                foreach (var file in files)
-                {
-                    if (file.Length > 0)
-                    {
-                        // Getting Filename  
-                        var fileName = file.FileName;
-                        // Unique filename "Guid"  
-                        var myUniqueFileName = Convert.ToString(Guid.NewGuid());
-                        // Getting Extension  
-                        var fileExtension = Path.GetExtension(fileName);
-                        // Concating filename + fileExtension (unique filename)  
-                        var newFileName = string.Concat(myUniqueFileName, fileExtension);
-                        //  Generating Path to store photo   
-                        var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
+                await SaveImageAsync(files, storeImageHelper);
 
-                        if (!string.IsNullOrEmpty(filepath))
-                        {
-                            // Storing Image in Folder  
-                            storeImageHelper.StoreInFolder(file, filepath);
-                        }
-
-                        var imageBytes = System.IO.File.ReadAllBytes(filepath);
-                        if (imageBytes != null)
-                        {
-                            // Storing Image in Folder  
-                            storeImageHelper.StoreInDatabase(imageBytes);
-                        }
-
-                    }
-                }
                 return Json(true);
             }
             else
@@ -312,17 +303,60 @@ namespace GymPass.Controllers
 
         }
 
-        /// <summary>  
-        /// Saving captured image into Folder.  
-        /// </summary>  
-        /// <param name="file"></param>  
-        /// <param name="fileName"></param>  
-        private void StoreInFolder(IFormFile file, string fileName)
+        private async Task SaveImageAsync(IFormFileCollection files, StoreImageHelper storeImageHelper)
         {
-            using (FileStream fs = System.IO.File.Create(fileName))
+            var fileTransferUtility = new TransferUtility(S3Client);
+            var user = await _userManager.GetUserAsync(User);
+            // set keyname to be user id, this way we can associate the one being scanned to the user ID to identify which item in the S3 bucket to check
+            string keyName = $"{user.Id}.jpg";
+
+            foreach (var file in files)
             {
-                file.CopyTo(fs);
-                fs.Flush();
+                if (file.Length > 0)
+                {
+                    // Getting Filename  
+                    var fileName = file.FileName;
+                    // Unique filename "Guid"  
+                    var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                    // Getting Extension  
+                    var fileExtension = Path.GetExtension(fileName);
+                    // Concating filename + fileExtension + a key ID based on userID (unique filename)  
+                    var newFileName = $"{ myUniqueFileName}_{keyName}{fileExtension}";
+                    //  Generating Path to store photo   
+                    var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
+
+                    if (!string.IsNullOrEmpty(filepath))
+                    {
+                        // Storing Image in Folder  
+                        storeImageHelper.StoreInFolder(file, filepath);
+                    }
+
+                    var imageBytes = System.IO.File.ReadAllBytes(filepath);
+                    if (imageBytes != null)
+                    {
+                        // Storing Image in Folder  
+                        await StoreInDatabaseAsync(imageBytes);
+                    }
+                    //TODO: delete image associated to the user once he leaves gym from db and folder
+
+                    // Now save this in the S3 bucket to use for facial recognition
+                    try
+                    {
+                        // grab the filePath from the image captured from the camera
+                        using (var fileToUpload =
+                            new FileStream(filepath, FileMode.Open, FileAccess.Read))
+                        {
+                            // upload it (if multiple are taken, they are overriden with the unique userID)
+                            await fileTransferUtility.UploadAsync(fileToUpload,
+                                                       bucketName, keyName);
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogInformation(e.Message);
+                    }
+                }
             }
         }
 
@@ -330,10 +364,12 @@ namespace GymPass.Controllers
         /// Saving captured image into database.  
         /// </summary>  
         /// <param name="imageBytes"></param>  
-        private void StoreInDatabase(byte[] imageBytes)
+        private async Task StoreInDatabaseAsync(byte[] imageBytes)
         {
             try
             {
+                var user = await _userManager.GetUserAsync(User);
+
                 if (imageBytes != null)
                 {
                     string base64String = Convert.ToBase64String(imageBytes, 0, imageBytes.Length);
@@ -343,7 +379,8 @@ namespace GymPass.Controllers
                     {
                         CreateDate = DateTime.Now,
                         ImageBase64String = imageUrl,
-                        ImageId = 0
+                        ImageId = 0,
+                        UniqueID = user.Id
                     };
 
                     _facilityContext.ImageStore.Add(imageStore);
@@ -383,7 +420,7 @@ namespace GymPass.Controllers
             "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer," +
             "UserTrainingDuration, TotalTrainingDuration, WillUseWeightsRoom, WillUseCardioRoom, WillUseStretchRoom," +
             "HasLoggedWorkoutToday, IsCameraScanSuccessful, IsWithin10m")] Facility facility)
-        { 
+        {
             if (id != facility.FacilityID)
             {
                 return NotFound();

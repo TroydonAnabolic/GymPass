@@ -32,28 +32,31 @@ namespace GymPass.Helpers
         /// Saving captured image into database.  
         /// </summary>  
         /// <param name="imageBytes"></param>  
-        public  void StoreInDatabase(byte[] imageBytes)
-        {
-            try
-            {
-                if (imageBytes != null)
-                {
-                    string base64String = Convert.ToBase64String(imageBytes, 0, imageBytes.Length);
-                    string imageUrl = string.Concat("data:image/jpg;base64,", base64String);
-                    ImageStore imageStore = new ImageStore()
-                    {
-                        CreateDate = DateTime.Now,
-                        ImageBase64String = imageUrl,
-                        ImageId = 0
-                    };
-                    _facilityContext.ImageStore.Add(imageStore);
-                    _facilityContext.SaveChanges();
-                }
-            }
-            catch (Exception)
-            {
+        //public  void StoreInDatabase(byte[] imageBytes)
+        //{
 
-            }
-        }
+
+        //    try
+        //    {
+        //        if (imageBytes != null)
+        //        {
+        //            string base64String = Convert.ToBase64String(imageBytes, 0, imageBytes.Length);
+        //            string imageUrl = string.Concat("data:image/jpg;base64,", base64String);
+        //            ImageStore imageStore = new ImageStore()
+        //            {
+        //                CreateDate = DateTime.Now,
+        //                ImageBase64String = imageUrl,
+        //                ImageId = 0,
+        //                UniqueID = Convert.ToString(Guid.NewGuid())
+        //        };
+        //            _facilityContext.ImageStore.Add(imageStore);
+        //            _facilityContext.SaveChanges();
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //    }
     }
 }
+

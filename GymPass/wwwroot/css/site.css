@@ -720,6 +720,14 @@ body > main > div.main-gym > div > div.log-workout-home > a {
 select#userDetails {
     border: none;
 }
+
+/* Camera Display */
+#results {
+    text-align: center;
+}
+#base64image {
+    height: 5rem;
+}
 /* Log workout styling */
 .workout-log-bg {
     position: absolute;

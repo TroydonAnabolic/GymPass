@@ -14,5 +14,7 @@ namespace GymPass.Models
         public int ImageId { get; set; }
         public string ImageBase64String { get; set; }
         public DateTime? CreateDate { get; set; }
+        public string UniqueID { get; set; }
+
     }
 }

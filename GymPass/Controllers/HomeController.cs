@@ -26,6 +26,8 @@ namespace GymPass.Controllers
         private readonly FacilityContext _facilityContext;
         IAmazonS3 S3Client { get; set; }
         IAmazonRekognition AmazonRekognition { get; set; } // access amazon rekognition API ref
+        private const string bucket = "gym-user-bucket-i";
+
 
         public HomeController(
             UserManager<ApplicationUser> userManager,
@@ -103,24 +105,24 @@ namespace GymPass.Controllers
             // if there are entries get the estimated exit time
             if (facilityDetails.Count > 0)
             {
-                    int i = 0;
-                    foreach (var userInGym in facilityDetails)
-                    {
-                        // get all the logged in users and assign est training time for each one
-                        estimatedExitTimeCurrentUser = facilityDetails[i].TimeAccessGranted.Add(facilityDetails[i].EstimatedTrainingTime); // appears if user is not in the gym he cannot check, need to est exit time for all users
+                int i = 0;
+                foreach (var userInGym in facilityDetails)
+                {
+                    // get all the logged in users and assign est training time for each one
+                    estimatedExitTimeCurrentUser = facilityDetails[i].TimeAccessGranted.Add(facilityDetails[i].EstimatedTrainingTime); // appears if user is not in the gym he cannot check, need to est exit time for all users
 
-                        // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
-                        // somehow get the clicked value to replace this datetime.now. possibly use another action method
-                        if (estimatedTimeToCheck < estimatedExitTimeCurrentUser) //
-                        {
-                            // if the current user is still within his estimated training time, then add estimated number of gym users list
-                            ViewBag.EstimatedNumberInGym++; //TODO: instead of viewbag, this will be data extracted fromt the db
-                        }
-                        // otherwise remove users from the gym, ensure not to go to negative
-                        else if (estimatedTimeToCheck > estimatedExitTimeCurrentUser && ViewBag.EstimatedNumberInGym != 0)
-                            ViewBag.EstimatedNumberInGym--;
-                        i++;
+                    // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
+                    // somehow get the clicked value to replace this datetime.now. possibly use another action method
+                    if (estimatedTimeToCheck < estimatedExitTimeCurrentUser) //
+                    {
+                        // if the current user is still within his estimated training time, then add estimated number of gym users list
+                        ViewBag.EstimatedNumberInGym++; //TODO: instead of viewbag, this will be data extracted fromt the db
                     }
+                    // otherwise remove users from the gym, ensure not to go to negative
+                    else if (estimatedTimeToCheck > estimatedExitTimeCurrentUser && ViewBag.EstimatedNumberInGym != 0)
+                        ViewBag.EstimatedNumberInGym--;
+                    i++;
+                }
             }
             // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
             if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
@@ -136,8 +138,8 @@ namespace GymPass.Controllers
             "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful, IsWithin10m")] Facility facilityView
             ) // 
         {
-           // var routeValue = Request.RouteValues.Values; -- TROUBLESHOOTING
-   
+            // var routeValue = Request.RouteValues.Values; -- TROUBLESHOOTING
+
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
 
@@ -198,7 +200,7 @@ namespace GymPass.Controllers
             {
 
                 // perform facial recognition scan if not inside the gym
-                if(!user.IsInsideGym)await FacialRecognitionScan(user, currentFacilityDetail);
+                if (!user.IsInsideGym) await FacialRecognitionScan(user, currentFacilityDetail);
 
                 // --------------------------------------------------------end facial recognition-------------------------------------------------------------
 
@@ -235,13 +237,15 @@ namespace GymPass.Controllers
                         enteredGym = true;
                         // TODO: Use AJAX to async send to and from the client at the same time
                     }
+                    // <--------------------------------- LEAVE GYM -----------------------------------------------------------
                     // if the user is already in the gym, when button is pushed then make reset all access to false, and decrement the number of ppl in the gym by 1
                     else if (user.IsInsideGym)
                     {
                         user.IsInsideGym = false;
                         // if it is not 0 then we can decrement to avoid negatives
-                        if(facility.NumberOfClientsInGym != 0) facility.NumberOfClientsInGym--;
+                        if (facility.NumberOfClientsInGym != 0) facility.NumberOfClientsInGym--;
 
+                        // set all will use gym to negative
                         if (user.WillUseWeightsRoom)
                         {
                             facility.NumberOfClientsUsingWeightRoom--;
@@ -268,6 +272,27 @@ namespace GymPass.Controllers
                         user.IsWithin10m = false;
                         user.IsCameraScanSuccessful = false;
                         user.AccessGrantedToFacility = false;
+
+                        // delete detected image from S3 bucket
+                        try
+                        {
+                            //var deleteObjectRequest = new DeleteObjectRequest
+                            //{
+                            //    BucketName = bucketName,
+                            //    Key = keyName
+                            //};
+
+                            //Console.WriteLine("Deleting an object");
+                            //await client.DeleteObjectAsync(deleteObjectRequest);
+                        }
+                        catch (AmazonS3Exception e)
+                        {
+                            Console.WriteLine("Error encountered on server. Message:'{0}' when deleting an object", e.Message);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Unknown encountered on server. Message:'{0}' when deleting an object", e.Message);
+                        }
                     }
 
                 } // end access granted
@@ -306,7 +331,7 @@ namespace GymPass.Controllers
 
         private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail)
         {
-           
+
 
             // TODO: live recognition
             // DetectFaceInLiveStream()
@@ -321,11 +346,12 @@ namespace GymPass.Controllers
 
             // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
             float similarityThreshold = 70F;
+            string keyName = user.Id;
+
             String photo = "business-atire.jpg";
             String targetImage = "fbPic.jpg"; // S3 bucket img match
                                               // String targetImage = "C:\\fbPic.jpg"; // local img match TODO: appears to be a delay using local img tht does not allow detect face to proces
                                               // String targetImage = "pris-face.jpg"; // S3 bucket mismatch
-            String bucket = "gym-user-bucket-i";
 
             // ------------------------------ Recognition from image
             try
