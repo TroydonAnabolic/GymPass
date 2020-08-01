@@ -308,8 +308,11 @@ namespace GymPass.Controllers
             var fileTransferUtility = new TransferUtility(S3Client);
             var user = await _userManager.GetUserAsync(User);
             // set keyname to be user id, this way we can associate the one being scanned to the user ID to identify which item in the S3 bucket to check
-            string keyName = $"{user.Id}.jpg";
+            string keyName = $"{user.FirstName}_{user.Id}.jpg";
 
+            // TODO: Apply the detect faces from video stream here, if a face is detected, then run the below
+
+            // Capture and save image
             foreach (var file in files)
             {
                 if (file.Length > 0)

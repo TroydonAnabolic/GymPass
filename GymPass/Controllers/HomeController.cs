@@ -276,14 +276,16 @@ namespace GymPass.Controllers
                         // delete detected image from S3 bucket
                         try
                         {
-                            //var deleteObjectRequest = new DeleteObjectRequest
-                            //{
-                            //    BucketName = bucketName,
-                            //    Key = keyName
-                            //};
+                            string keyName = $"{user.FirstName}_{user.Id}.jpg";
 
-                            //Console.WriteLine("Deleting an object");
-                            //await client.DeleteObjectAsync(deleteObjectRequest);
+                            var deleteObjectRequest = new Amazon.S3.Model.DeleteObjectRequest
+                            {
+                                BucketName = bucket,
+                                Key = keyName
+                            };
+
+                            Console.WriteLine("Deleting an object");
+                            await S3Client.DeleteObjectAsync(deleteObjectRequest);
                         }
                         catch (AmazonS3Exception e)
                         {
@@ -346,7 +348,7 @@ namespace GymPass.Controllers
 
             // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
             float similarityThreshold = 70F;
-            string photo = $"{user.Id}.jpg";
+            string photo = $"{user.FirstName}_{user.Id}.jpg";
 
             //String photo = "business-atire.jpg";
             String targetImage = "fbPic.jpg"; // S3 bucket img match
