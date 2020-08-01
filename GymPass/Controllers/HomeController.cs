@@ -10,12 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using GymPass.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.IO;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
 using Amazon.S3;
-using GymPass.Helpers;
-using Microsoft.AspNetCore.Hosting;
 
 namespace GymPass.Controllers
 {
@@ -241,60 +238,7 @@ namespace GymPass.Controllers
                     // if the user is already in the gym, when button is pushed then make reset all access to false, and decrement the number of ppl in the gym by 1
                     else if (user.IsInsideGym)
                     {
-                        user.IsInsideGym = false;
-                        // if it is not 0 then we can decrement to avoid negatives
-                        if (facility.NumberOfClientsInGym != 0) facility.NumberOfClientsInGym--;
-
-                        // set all will use gym to negative
-                        if (user.WillUseWeightsRoom)
-                        {
-                            facility.NumberOfClientsUsingWeightRoom--;
-                            user.WillUseWeightsRoom = false;
-                        }
-                        if (user.WillUseCardioRoom && facility.NumberOfClientsUsingCardioRoom != 0)
-                        {
-                            facility.NumberOfClientsUsingCardioRoom--;
-                            user.WillUseCardioRoom = false;
-                        }
-                        if (user.WillUseStretchRoom && facility.NumberOfClientsUsingStretchRoom != 0)
-                        {
-                            facility.NumberOfClientsUsingStretchRoom--;
-                            user.WillUseWeightsRoom = false;
-                        }
-
-                        // if there are entries for facilities, loop through all the facilities, remove the entry which is stamped with the current user entry
-                        if (facilityDetails.Count() > 0)
-                        {
-                            _facilityContext.UsersInGymDetails.Remove(currentFacilityDetailDb);
-                        }
-
-                        facilityView.IsCameraScanSuccessful = false;
-                        user.IsWithin10m = false;
-                        user.IsCameraScanSuccessful = false;
-                        user.AccessGrantedToFacility = false;
-
-                        // delete detected image from S3 bucket
-                        try
-                        {
-                            string keyName = $"{user.FirstName}_{user.Id}.jpg";
-
-                            var deleteObjectRequest = new Amazon.S3.Model.DeleteObjectRequest
-                            {
-                                BucketName = bucket,
-                                Key = keyName
-                            };
-
-                            Console.WriteLine("Deleting an object");
-                            await S3Client.DeleteObjectAsync(deleteObjectRequest);
-                        }
-                        catch (AmazonS3Exception e)
-                        {
-                            Console.WriteLine("Error encountered on server. Message:'{0}' when deleting an object", e.Message);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Unknown encountered on server. Message:'{0}' when deleting an object", e.Message);
-                        }
+                        await LeaveGym(facilityView, user, facility, facilityDetails, currentFacilityDetailDb);
                     }
 
                 } // end access granted
@@ -329,6 +273,64 @@ namespace GymPass.Controllers
             }
 
             return enteredGym;
+        }
+
+        private async Task LeaveGym(Facility facilityView, ApplicationUser user, Facility facility, List<UsersInGymDetail> facilityDetails, UsersInGymDetail currentFacilityDetailDb)
+        {
+            user.IsInsideGym = false;
+            // if it is not 0 then we can decrement to avoid negatives
+            if (facility.NumberOfClientsInGym != 0) facility.NumberOfClientsInGym--;
+
+            // set all will use gym to negative
+            if (user.WillUseWeightsRoom)
+            {
+                facility.NumberOfClientsUsingWeightRoom--;
+                user.WillUseWeightsRoom = false;
+            }
+            if (user.WillUseCardioRoom && facility.NumberOfClientsUsingCardioRoom != 0)
+            {
+                facility.NumberOfClientsUsingCardioRoom--;
+                user.WillUseCardioRoom = false;
+            }
+            if (user.WillUseStretchRoom && facility.NumberOfClientsUsingStretchRoom != 0)
+            {
+                facility.NumberOfClientsUsingStretchRoom--;
+                user.WillUseWeightsRoom = false;
+            }
+
+            // if there are entries for facilities, loop through all the facilities, remove the entry which is stamped with the current user entry
+            if (facilityDetails.Count() > 0)
+            {
+                _facilityContext.UsersInGymDetails.Remove(currentFacilityDetailDb);
+            }
+
+            facilityView.IsCameraScanSuccessful = false;
+            user.IsWithin10m = false;
+            user.IsCameraScanSuccessful = false;
+            user.AccessGrantedToFacility = false;
+
+            // delete detected image from S3 bucket
+            try
+            {
+                string keyName = $"{user.FirstName}_{user.Id}.jpg";
+
+                var deleteObjectRequest = new Amazon.S3.Model.DeleteObjectRequest
+                {
+                    BucketName = bucket,
+                    Key = keyName
+                };
+
+                Console.WriteLine("Deleting an object");
+                await S3Client.DeleteObjectAsync(deleteObjectRequest);
+            }
+            catch (AmazonS3Exception e)
+            {
+                _logger.LogInformation(e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(e.Message);
+            }
         }
 
         private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail)
