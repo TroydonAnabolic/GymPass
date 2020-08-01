@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using GymPass.Data;
 using GymPass.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using GymPass.Helpers;
 
 namespace GymPass.Controllers
 {
@@ -15,15 +19,17 @@ namespace GymPass.Controllers
     {
         private readonly FacilityContext _facilityContext;
         private readonly UserManager<ApplicationUser> _userManager;
-
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public FacilitiesController(
             FacilityContext facilityContext,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IWebHostEnvironment webHostEnvironment
             )
         {
             _facilityContext = facilityContext;
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Facilities
@@ -257,8 +263,102 @@ namespace GymPass.Controllers
         }
 
 
-            // GET: Facilities/Edit/5
-            public async Task<IActionResult> Edit(int? id)
+        // POST: Home/Index/10
+
+        [HttpPost]
+        public IActionResult Capture(string webcam)
+        {
+            var files = HttpContext.Request.Form.Files;
+            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext);
+
+            if (files != null)
+            {
+                foreach (var file in files)
+                {
+                    if (file.Length > 0)
+                    {
+                        // Getting Filename  
+                        var fileName = file.FileName;
+                        // Unique filename "Guid"  
+                        var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                        // Getting Extension  
+                        var fileExtension = Path.GetExtension(fileName);
+                        // Concating filename + fileExtension (unique filename)  
+                        var newFileName = string.Concat(myUniqueFileName, fileExtension);
+                        //  Generating Path to store photo   
+                        var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
+
+                        if (!string.IsNullOrEmpty(filepath))
+                        {
+                            // Storing Image in Folder  
+                            storeImageHelper.StoreInFolder(file, filepath);
+                        }
+
+                        var imageBytes = System.IO.File.ReadAllBytes(filepath);
+                        if (imageBytes != null)
+                        {
+                            // Storing Image in Folder  
+                            storeImageHelper.StoreInDatabase(imageBytes);
+                        }
+
+                    }
+                }
+                return Json(true);
+            }
+            else
+            {
+                return Json(false);
+            }
+
+        }
+
+        /// <summary>  
+        /// Saving captured image into Folder.  
+        /// </summary>  
+        /// <param name="file"></param>  
+        /// <param name="fileName"></param>  
+        private void StoreInFolder(IFormFile file, string fileName)
+        {
+            using (FileStream fs = System.IO.File.Create(fileName))
+            {
+                file.CopyTo(fs);
+                fs.Flush();
+            }
+        }
+
+        /// <summary>  
+        /// Saving captured image into database.  
+        /// </summary>  
+        /// <param name="imageBytes"></param>  
+        private void StoreInDatabase(byte[] imageBytes)
+        {
+            try
+            {
+                if (imageBytes != null)
+                {
+                    string base64String = Convert.ToBase64String(imageBytes, 0, imageBytes.Length);
+                    string imageUrl = string.Concat("data:image/jpg;base64,", base64String);
+
+                    ImageStore imageStore = new ImageStore()
+                    {
+                        CreateDate = DateTime.Now,
+                        ImageBase64String = imageUrl,
+                        ImageId = 0
+                    };
+
+                    _facilityContext.ImageStore.Add(imageStore);
+                    _facilityContext.SaveChanges();
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        // GET: Facilities/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {

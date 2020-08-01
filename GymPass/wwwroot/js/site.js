@@ -21,57 +21,26 @@ function take_snapshot() {
             data_uri +
             '"/>';
 
-        // try javascript
-        var request = new XMLHttpRequest();
-
-        request.open("POST", "/upload/url", true);
-
-        var data = new FormData();
-        var dataURI = snapshot.firstChild.getAttribute("src");
-        var imageData = dataURItoBlob(dataURI);
-        data.append("image", imageData, "myimage");
-        request.send(data);
-
-        // upload webcam api
+   //      upload webcam api
         Webcam.upload(data_uri,
             '/Facilities/Capture',
             function (code, text) {
-                // since to above is not sending to controller, try ajax
-
                 console.log('Photo Captured');  
             });
 
-        $.ajax({
-            type: "POST",
-            url: '@Url.Action("Capture", "Facilities")', // trying to get: https://localhost:44314/Home/Index/10
-            // may need to convert data_uri to string here
-            data: JSON.stringify({ webcam: data_uri }),
-            dataType: "text",
-            success: function (msg) {
-                console.log("Success");
-                console.log("data_uri");
-                console.log(data_uri);
-                //  console.log("data"); not defined error
-                //console.log(data);
-                //console.log("webcam");
-                //console.log(webcam);
-                //console.log("stringdata");
-                //console.log(stringData);
-
-
-            },
-            error: function (req, status, error) {
-                console.log("Error");
-                console.log("data_uri");
-                console.log(data_uri);
-                  console.log("data"); //not defined error
-               // console.log("webcam");
-               // console.log(webcam);
-               // console.log("stringdata");
-               // console.log(stringData);
-            }
-        });
-
+        //$.ajax({
+        //    type: "POST",
+        //    url: '@Url.Action("Capture", "Facilities")', // trying to get: https://localhost:44314/Home/Index/10
+        //    // may need to convert data_uri to string here
+        //    data:{ webcam: data_uri },
+        //    dataType: "text",
+        //    success: function (msg = " Success") {
+        //        console.log(msg);
+        //    },
+        //    error: function (req, status, error) {
+        //        console.log("Error");
+        //    }
+        //});
     });
 }  
 
@@ -98,15 +67,13 @@ $(document).ready(function () {
 
     // ------------------ Webcam Script -----------------------
     // set the camera and attach it
-    //Webcam.set({
-    //    width: 240,
-    //    height: 240,
-    //    image_format: 'jpeg',
-    //    jpeg_quality: 90
-    //});
-    //Webcam.attach('#my_camera');  
-
-
+    Webcam.set({
+        width: 240,
+        height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90
+    });
+    Webcam.attach('#my_camera');  
 
     // ---------- Submit main button script ---------------------
     // on page load we pre-select the checbox depending on if its opened or closed
