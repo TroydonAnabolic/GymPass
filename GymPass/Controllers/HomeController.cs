@@ -346,9 +346,9 @@ namespace GymPass.Controllers
 
             // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
             float similarityThreshold = 70F;
-            string keyName = user.Id;
+            string photo = $"{user.Id}.jpg";
 
-            String photo = "business-atire.jpg";
+            //String photo = "business-atire.jpg";
             String targetImage = "fbPic.jpg"; // S3 bucket img match
                                               // String targetImage = "C:\\fbPic.jpg"; // local img match TODO: appears to be a delay using local img tht does not allow detect face to proces
                                               // String targetImage = "pris-face.jpg"; // S3 bucket mismatch
