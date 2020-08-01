@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymPass.Migrations.Facility
 {
     [DbContext(typeof(FacilityContext))]
-    [Migration("20200728090210_perfect time estimate")]
-    partial class perfecttimeestimate
+    [Migration("20200731093835_store images from webcam")]
+    partial class storeimagesfromwebcam
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -78,6 +78,24 @@ namespace GymPass.Migrations.Facility
                     b.ToTable("Facility");
                 });
 
+            modelBuilder.Entity("GymPass.Models.ImageStore", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageBase64String")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ImageId");
+
+                    b.ToTable("ImageStore");
+                });
+
             modelBuilder.Entity("GymPass.Models.UsersInGymDetail", b =>
                 {
                     b.Property<int>("UsersInGymDetailID")
@@ -90,9 +108,6 @@ namespace GymPass.Migrations.Facility
 
                     b.Property<int>("AgeRangeLow")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("EstimatedTimeToCheck")
-                        .HasColumnType("datetime2");
 
                     b.Property<TimeSpan>("EstimatedTrainingTime")
                         .HasColumnType("time");
@@ -122,10 +137,42 @@ namespace GymPass.Migrations.Facility
                     b.ToTable("UsersInGymDetails");
                 });
 
+            modelBuilder.Entity("GymPass.Models.UsersOutOfGymDetails", b =>
+                {
+                    b.Property<int>("UsersOutOfGymDetailsID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("EstimatedTimeToCheck")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FacilityID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UniqueEntryID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UsersOutOfGymDetailsID");
+
+                    b.HasIndex("FacilityID");
+
+                    b.ToTable("UsersOutofGymDetails");
+                });
+
             modelBuilder.Entity("GymPass.Models.UsersInGymDetail", b =>
                 {
                     b.HasOne("GymPass.Models.Facility", "Facility")
                         .WithMany("UsersInGymDetails")
+                        .HasForeignKey("FacilityID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GymPass.Models.UsersOutOfGymDetails", b =>
+                {
+                    b.HasOne("GymPass.Models.Facility", "Facility")
+                        .WithMany("UsersOutOfGymDetails")
                         .HasForeignKey("FacilityID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

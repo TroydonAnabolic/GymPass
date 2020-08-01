@@ -76,6 +76,24 @@ namespace GymPass.Migrations.Facility
                     b.ToTable("Facility");
                 });
 
+            modelBuilder.Entity("GymPass.Models.ImageStore", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageBase64String")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ImageId");
+
+                    b.ToTable("ImageStore");
+                });
+
             modelBuilder.Entity("GymPass.Models.UsersInGymDetail", b =>
                 {
                     b.Property<int>("UsersInGymDetailID")

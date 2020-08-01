@@ -35,7 +35,7 @@ namespace GymPass
 
             IAmazonS3 client = options.CreateServiceClient<IAmazonS3>();
 
-          //  services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            //  services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
 
 
             services.AddAWSService<IAmazonS3>();
@@ -74,13 +74,8 @@ namespace GymPass
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "userDetails",
-                    pattern: "{controller=Facilities}/{action=SelectTimeToEstimate}/{id?}");
-                endpoints.MapRazorPages();
-
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
 

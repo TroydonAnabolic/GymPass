@@ -14,6 +14,8 @@ using System.IO;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
 using Amazon.S3;
+using GymPass.Helpers;
+using Microsoft.AspNetCore.Hosting;
 
 namespace GymPass.Controllers
 {
@@ -22,6 +24,7 @@ namespace GymPass.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly FacilityContext _facilityContext;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         IAmazonS3 S3Client { get; set; }
         IAmazonRekognition AmazonRekognition { get; set; } // access amazon rekognition API ref
 
@@ -30,7 +33,8 @@ namespace GymPass.Controllers
             ILogger<HomeController> logger,
             FacilityContext facilityContext,
             IAmazonS3 s3Client,
-            IAmazonRekognition amazonRekognition
+            IAmazonRekognition amazonRekognition,
+            IWebHostEnvironment webHostEnvironment
             )
         {
             _userManager = userManager;
@@ -38,6 +42,7 @@ namespace GymPass.Controllers
             _facilityContext = facilityContext;
             S3Client = s3Client;
             AmazonRekognition = amazonRekognition;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [BindProperty]
@@ -128,13 +133,15 @@ namespace GymPass.Controllers
         }
 
         [HttpPost]
+        [Route("Home/Index/{id?}", Name = "Auth")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(int id, [Bind("FacilityID,FacilityName,NumberOfClientsUsingWeightRoom,NumberOfClientsUsingCardioRoom," +
-            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful, IsWithin10m")] Facility facilityView
+            "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful, IsWithin10m")] Facility facilityView,
+            [Bind]string webcam 
             ) // 
         {
-            var UserDetails = Request.QueryString.ToString();
-
+            var routeValue = Request.RouteValues.Values;
+   
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
 
@@ -151,7 +158,6 @@ namespace GymPass.Controllers
             UsersInGymDetail currentFacilityDetail = new UsersInGymDetail();
             var currentFacilityDetailDb = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
             var allGymUserRecords = await _facilityContext.UsersOutofGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
-
 
             bool enteredGym = false;
 
@@ -170,7 +176,7 @@ namespace GymPass.Controllers
                 try
                 { // maybe make is open door requested a user property
                   // if door open is requested from the view by clicking the button, then run the below logic to test if user is authorized and also apply crowdsensing functions
-                    enteredGym = await DetermineEnterOrExitGym(facilityView, user, facility, facilityDetails, currentFacilityDetail, currentFacilityDetailDb, enteredGym, allGymUserRecords);
+                    enteredGym = await DetermineEnterOrExitGym(facilityView, user, facility, facilityDetails, currentFacilityDetail, currentFacilityDetailDb, enteredGym, allGymUserRecords, webcam);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -190,11 +196,13 @@ namespace GymPass.Controllers
         }
 
         private async Task<bool> DetermineEnterOrExitGym(Facility facilityView, ApplicationUser user, Facility facility, List<UsersInGymDetail> facilityDetails, UsersInGymDetail currentFacilityDetail,
-            UsersInGymDetail currentFacilityDetailDb, bool enteredGym, UsersOutOfGymDetails allGymUserRecords)
+            UsersInGymDetail currentFacilityDetailDb, bool enteredGym, UsersOutOfGymDetails allGymUserRecords, string webcam)
         {
             if (facilityView.IsOpenDoorRequested)
             {
-                await FacialRecognitionScan(user, currentFacilityDetail);
+
+                // perform facial recognition scan if not inside the gym
+                if(!user.IsInsideGym)await FacialRecognitionScan(user, currentFacilityDetail, webcam);
 
                 // --------------------------------------------------------end facial recognition-------------------------------------------------------------
 
@@ -300,8 +308,11 @@ namespace GymPass.Controllers
             return enteredGym;
         }
 
-        private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail)
+        private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail, string webcam)
         {
+            // take a photo when face scan requested
+             CapturePhoto(webcam);
+
             // TODO: live recognition
             // DetectFaceInLiveStream()
 
@@ -422,6 +433,53 @@ namespace GymPass.Controllers
             catch (Exception e)
             {
                 _logger.LogInformation(e.Message);
+            }
+        }
+
+        // this method returns image as  a JSON result : TODO - currently not storing file in folder - look into potentially needing a new action called capture and submit an initial pic to db before pressing button
+        private JsonResult CapturePhoto(string webcam)
+        {
+
+            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext);
+            var files = HttpContext.Request.Form.Files;
+            if (files != null)
+            {
+                foreach (var file in files)
+                {
+                    if (file.Length > 0)
+                    {
+                        // Getting Filename  
+                        var fileName = file.FileName;
+                        // Unique filename "Guid"  
+                        var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                        // Getting Extension  
+                        var fileExtension = Path.GetExtension(fileName);
+                        // Concating filename + fileExtension (unique filename)  
+                        var newFileName = string.Concat(myUniqueFileName, fileExtension);
+                        //  Generating Path to store photo   
+                        var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
+
+                        if (!string.IsNullOrEmpty(filepath))
+                        {
+                            // Storing Image in Folder  
+                            storeImageHelper.StoreInFolder(file, filepath);
+
+                        }
+
+                        var imageBytes = System.IO.File.ReadAllBytes(filepath);
+                        if (imageBytes != null)
+                        {
+                            // Storing Image in Folder  
+                            storeImageHelper.StoreInDatabase(imageBytes);
+                        }
+
+                    }
+                }
+                return Json(true);
+            }
+            else
+            {
+                return Json(false);
             }
         }
 
