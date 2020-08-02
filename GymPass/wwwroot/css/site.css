@@ -412,21 +412,20 @@ header {
 
 .expand-select-duration-arrow {
     position: absolute;
-    border: solid #fff;
-    border-width: 0 3px 3px 0;
-    padding: 3px;
-    width: 15%;
     right: 0;
-    top: 0;
-    margin: 2px;
+    bottom: 1rem;
+    font-size: 0.3rem;
+    line-height: 0;
+    color: #000;
 }
 
-.right {
-    transform: rotate(-45deg);
-    -webkit-transform: rotate(-45deg);
+#svg-arrow {
+    font-size: 1rem;
+    padding: 2px;
+    background-color: #fff;
 }
 
-.est-data{
+.est-data {
     width: 80%;
 }
 
@@ -714,7 +713,6 @@ body > main > div.main-gym > div > div.log-workout-home > a {
     font-size: 0.7rem;
     color: #fff;
     background-color: #000;
-    margin-bottom:1px;
 }
 
 select#userDetails {

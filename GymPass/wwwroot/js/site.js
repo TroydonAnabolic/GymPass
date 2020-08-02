@@ -48,7 +48,7 @@ function take_snapshot() {
     }
 }
 
-// submit form for check estimated total with divs instead of submit button
+// submit form for check estimated total with divs instead of submit button -- 
 function submitForm() {
     document.getElementById('est-form').submit();
 }
@@ -127,9 +127,8 @@ $(document).ready(function () {
         }, 5000);
     });
 
-    $(" header").hide();
     // Change between estimated total and actual total
-    // When we click user total, show est total
+    // When we click user total, show est total, and arrow
     $("#total-in-gym-icon").click(function () {
         $(this).css("display", "none");
         $("#est-total-in-gym-icon")
@@ -141,6 +140,12 @@ $(document).ready(function () {
         $("#total-in-gym-icon")
             .css("display", "block");
     });
+
+    // script to display select estimated training time list
+    $('#svg-arrow > path').click(function () {
+        $('#est-drop-down').toggleClass("hidden");
+    });
+
 
     /*
     *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
@@ -278,6 +283,7 @@ $(document).ready(function () {
             $('#mapContainer > div').remove();
         }
     });
+
 
     // TODO: Progress Bar Depelete each time the open door button is pressed.
     //$(function () {
