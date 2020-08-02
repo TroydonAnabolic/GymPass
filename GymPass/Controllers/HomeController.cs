@@ -13,6 +13,9 @@ using System.Collections.Generic;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
 using Amazon.S3;
+using System.Text.Json;
+
+
 
 namespace GymPass.Controllers
 {

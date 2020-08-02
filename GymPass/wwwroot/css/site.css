@@ -725,8 +725,13 @@ select#userDetails {
 #results {
     text-align: center;
 }
-#base64image {
-    height: 5rem;
+
+div#my_camera {
+    width: 0;
+}
+
+.panel-body {
+    text-align: center;
 }
 /* Log workout styling */
 .workout-log-bg {

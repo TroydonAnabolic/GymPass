@@ -21,11 +21,11 @@ function take_snapshot() {
             data_uri +
             '"/>';
 
-   //      upload webcam api
+        //      upload webcam api
         Webcam.upload(data_uri,
             '/Facilities/Capture',
             function (code, text) {
-                console.log('Photo Captured');  
+                console.log('Photo Captured');
             });
 
         //$.ajax({
@@ -42,13 +42,12 @@ function take_snapshot() {
         //    }
         //});
     });
-}  
+}
 
 // submit form for check estimated total with divs instead of submit button
 function submitForm() {
     document.getElementById('est-form').submit();
 }
-
 
 $(document).ready(function () {
     /*
@@ -73,7 +72,24 @@ $(document).ready(function () {
         image_format: 'jpeg',
         jpeg_quality: 90
     });
-    Webcam.attach('#my_camera');  
+    Webcam.attach('#my_camera');
+    // add style to the inserted id
+    $('#my_camera').css("width", "0");
+    $('.panel-body').css("text-align", "center");
+
+    // ---------------- Use AJAX to dynamically apply styling to hide reveal webcam stream based on whether use is in gym, as using c# seems to be causing failed to load webcam.js errors
+    $.ajax({
+        url: '@Url.Action("Index", "Home")',
+        type: 'GET',
+        dataType: 'text',
+        success: function (data, textStatus, xhr) {
+            var obj = JSON.parse(data);
+            console.log(data);
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.log('Error in Operation');
+        }
+    });
 
     // ---------- Submit main button script ---------------------
     // on page load we pre-select the checbox depending on if its opened or closed
