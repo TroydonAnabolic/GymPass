@@ -22,10 +22,10 @@ namespace GymPass.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly FacilityContext _facilityContext;
         IAmazonS3 S3Client { get; set; }
-        IAmazonRekognition AmazonRekognition { get; set; } // access amazon rekognition API ref
+        IAmazonRekognition AmazonRekognition { get; set; }
         private const string bucket = "gym-user-bucket-i";
 
-
+        // dependency injections for services
         public HomeController(
             UserManager<ApplicationUser> userManager,
             ILogger<HomeController> logger,
@@ -54,25 +54,19 @@ namespace GymPass.Controllers
             ViewBag.EstimatedNumberInGym = 0;
             ViewBag.IsOpenDoorRequested = false;
 
-            // initiall set the access view bag to false, as this will prevent null exception
+            // if user does not exist return not found, if id is null, send to login page
+            if (user.Id == null) return NotFound();
 
-            if (user.Id == null)
-            {
-                return NotFound();
-            }
-
-            id = user.DefaultGym;
-
-            if (id == null)
-            {
-                return RedirectToPage("/Identity/Account/Login");
-            }
+            id = user.DefaultGym; // set the ID to be current user's default gym
+            if (id == null) return RedirectToPage("/Identity/Account/Login");
 
             var facility = await _facilityContext.Facilities.FindAsync(id);
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
             UsersInGymDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
 
-            // if there is a user in gym, get facial recognition details to show
+            if (facility == null) return NotFound(); // ensure facility exists
+
+            // if there is a user in gym, retreive facial recognition results from the database
             if (UsersInGymDetail != null)
             {
                 ViewBag.IsSmiling = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().IsSmiling;
@@ -81,25 +75,31 @@ namespace GymPass.Controllers
                 ViewBag.AgeRangeHigh = _facilityContext.UsersInGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().AgeRangeHigh;
             }
 
-            // calculations for estimated time
+            // Calculations for estimated time
             // get estimated time to check submitted to the db for the user submitting
-            DateTime estimatedTimeToCheck = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().EstimatedTimeToCheck; // TODO: add an option to create an entry for each user during sign up
+            DateTime estimatedTimeToCheck = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().EstimatedTimeToCheck;
             DateTime estimatedExitTimeCurrentUser = DateTime.Now;
-
-            if (facility == null)
-            {
-                return NotFound();
-            }
 
             // default to false for access
             ViewBag.AccessGrantedToFacility = false;
             // door open status depends on database value
             ViewBag.DoorOpened = facility.DoorOpened;
-            // access denied message is normally true
-            ViewBag.AccessDeniedMsgRecieved = true;
 
             // Decide to increase or decrease the estimated numbers in gym
             // if there are entries get the estimated exit time
+            estimatedExitTimeCurrentUser = GetEstimatedNumberOfGymUsers(facilityDetails, estimatedTimeToCheck, estimatedExitTimeCurrentUser);
+
+            // access denied message is normally true
+            // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received so present the access denial
+            ViewBag.AccessDeniedMsgRecieved = true;
+            if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
+                ViewBag.AccessDeniedMsgRecieved = false;
+
+            return View(facility);
+        }
+
+        private DateTime GetEstimatedNumberOfGymUsers(List<UsersInGymDetail> facilityDetails, DateTime estimatedTimeToCheck, DateTime estimatedExitTimeCurrentUser)
+        {
             if (facilityDetails.Count > 0)
             {
                 int i = 0;
@@ -121,11 +121,8 @@ namespace GymPass.Controllers
                     i++;
                 }
             }
-            // if time since the date where user was denied, is more than 5 seconds, then access denied msg received is not received
-            if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
-                ViewBag.AccessDeniedMsgRecieved = false;
 
-            return View(facility);
+            return estimatedExitTimeCurrentUser;
         }
 
         [HttpPost]
@@ -135,36 +132,26 @@ namespace GymPass.Controllers
             "NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer,IsCameraScanSuccessful, IsWithin10m")] Facility facilityView
             ) // 
         {
-            // var routeValue = Request.RouteValues.Values; -- TROUBLESHOOTING
-
             // Get the default gym for a user and set it to be the Id for the gym being edited
             var user = await _userManager.GetUserAsync(User);
 
-            if (user.Id == null)
-            {
-                return NotFound();
-            }
+            if (user.Id == null) return NotFound();
 
             id = user.DefaultGym;
 
-            // note that variable facility is the database values, facilityView, binds data from the view
+            // Variable facility is the database values, facilityView, binds data from the view to post to DB
             var facility = await _facilityContext.Facilities.FindAsync(id);
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
             UsersInGymDetail currentFacilityDetail = new UsersInGymDetail();
             var currentFacilityDetailDb = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
             var allGymUserRecords = await _facilityContext.UsersOutofGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
-
             bool enteredGym = false;
 
             if (id != facility.FacilityID || id != facilityView.FacilityID)
-            {
                 return NotFound();
-            }
 
             if (!ModelState.IsValid)
-            {
                 return RedirectToAction(nameof(Index));
-            }
 
             if (ModelState.IsValid)
             {
@@ -173,35 +160,30 @@ namespace GymPass.Controllers
                   // if door open is requested from the view by clicking the button, then run the below logic to test if user is authorized and also apply crowdsensing functions
                     enteredGym = await DetermineEnterOrExitGym(facilityView, user, facility, facilityDetails, currentFacilityDetail, currentFacilityDetailDb, enteredGym, allGymUserRecords);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException e)
                 {
                     if (!FacilityExists(facility.FacilityID))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
-                        throw;
-                    }
+                        _logger.LogInformation(e.Message);
                 }
+
                 // if the user has logged in successfully and not logged workout, then send to questionnaire TODO: for now, later will use AJAX to post questionaire here, and have option to later log in workout
                 return (user.AccessGrantedToFacility) && (!user.HasLoggedWorkoutToday) ? RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym }) : RedirectToAction(nameof(Index));
             }
             return View(facility);
         }
 
+        // Method that applies action based on whether user is entering or exiting the gym
         private async Task<bool> DetermineEnterOrExitGym(Facility facilityView, ApplicationUser user, Facility facility, List<UsersInGymDetail> facilityDetails, UsersInGymDetail currentFacilityDetail,
             UsersInGymDetail currentFacilityDetailDb, bool enteredGym, UsersOutOfGymDetails allGymUserRecords)
         {
             if (facilityView.IsOpenDoorRequested)
             {
-
                 // perform facial recognition scan if not inside the gym
                 if (!user.IsInsideGym) await FacialRecognitionScan(user, currentFacilityDetail);
 
-                // --------------------------------------------------------end facial recognition-------------------------------------------------------------
-
-                // gathers location scan results
+                // Location scan (results from HERE API using javascript)
                 if (facilityView.IsWithin10m)
                     user.IsWithin10m = true;
 
@@ -220,13 +202,12 @@ namespace GymPass.Controllers
                 if (user.AccessGrantedToFacility)
                 {
                     facility.DoorOpened = true;
-                    // if the user is not in the gym, then say this user is not in the gym, and increase the number of ppl in the gym by 1
+                    // if the user is not in the gym, then say this user is not in the gym, and increase object values as required.
                     if (!user.IsInsideGym)
                     {
                         facility.NumberOfClientsInGym++;
                         user.IsInsideGym = true;
                         user.TimeAccessGranted = DateTime.Now;
-                        // fill in facility details table, TODO: Exchange user time access with facility list
                         currentFacilityDetail.TimeAccessGranted = DateTime.Now;
                         currentFacilityDetail.FirstName = user.FirstName;
                         currentFacilityDetail.UniqueEntryID = user.Id;
@@ -335,15 +316,15 @@ namespace GymPass.Controllers
 
         private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail)
         {
-            // ----------------- Begin Facial recognition---------------------- TODO: Compare face with collection in database
+            // initialize similarity threshold for accepting face match, source and target img.
+            // S3 bucket img, dynamically selected based on user currently logged in.
             float similarityThreshold = 70F;
             string photo = $"{user.FirstName}_{user.Id}.jpg";
-            String targetImage = $"{user.FirstName}_{user.Id}_Target.jpg"; // S3 bucket img, dynamically selected based on user currently logged in.
+            String targetImage = $"{user.FirstName}_{user.Id}_Target.jpg"; 
 
-            // ------------------------------ Recognition from image-----------------------------------------------------------
             try
             {
-
+                // create image objects
                 Image imageSource = new Image()
                 {
                     S3Object = new S3Object()
@@ -352,7 +333,6 @@ namespace GymPass.Controllers
                         Bucket = bucket
                     },
                 };
-                //  S3 bucket img matching
                 Image imageTarget = new Image()
                 {
                     S3Object = new S3Object()
@@ -361,7 +341,7 @@ namespace GymPass.Controllers
                         Bucket = bucket
                     },
                 };
-
+                // create a compare face request object
                 CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
                 {
                     SourceImage = imageSource,
@@ -378,14 +358,10 @@ namespace GymPass.Controllers
                     ComparedFace face = match.Face;
                     // if confidence for similarity is over 90 then grant access
                     if (match.Similarity > 90)
-                    {
-                        // if there is a match set scan success and display to the view the match
+                        // if there is a match set scan success
                         user.IsCameraScanSuccessful = true;
-                    }
                     else
-                    {
                         ViewBag.MatchResult = "Facial Match Failed!";
-                    }
                 }
             }
             catch (Exception e)
@@ -393,7 +369,7 @@ namespace GymPass.Controllers
                 _logger.LogInformation(e.Message);
             }
 
-            // ------------------------------ Now add get facial details to display in the view.
+            // now add get facial details to display in the view.
             DetectFacesRequest detectFacesRequest = new DetectFacesRequest()
             {
                 Image = new Image()
@@ -404,9 +380,7 @@ namespace GymPass.Controllers
                         Bucket = bucket
                     },
                 },
-                // Attributes can be "ALL" or "DEFAULT". 
                 // "DEFAULT": BoundingBox, Confidence, Landmarks, Pose, and Quality.
-                // "ALL": See https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/Rekognition/TFaceDetail.html
                 Attributes = new List<String>() { "ALL" }
             };
 
@@ -416,7 +390,8 @@ namespace GymPass.Controllers
                 bool hasAll = detectFacesRequest.Attributes.Contains("ALL");
                 foreach (FaceDetail face in detectFacesResponse.FaceDetails)
                 {
-                    if (hasAll) // consider removing of only certain features can be detected.
+                    // if the face found has all attributes within a Detect Face object then save these values to the database.
+                    if (hasAll) 
                     {
                         currentFacilityDetail.IsSmiling = face.Smile.Value;
                         currentFacilityDetail.Gender = face.Gender.Value.ToString();
