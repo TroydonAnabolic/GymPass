@@ -335,29 +335,13 @@ namespace GymPass.Controllers
 
         private async Task FacialRecognitionScan(ApplicationUser user, UsersInGymDetail currentFacilityDetail)
         {
-
-
-            // TODO: live recognition
-            // DetectFaceInLiveStream()
-
-            //  if (FaceDetectedInVideoStream() && !fiveSecondsPassed)
-            //    {
-            // TakePicture() // and save in S3 bucket
-            // if (ComparePicture()) 
-            //  set camera scan success
-            // }
-            // else if (!FaceDetectedInVideoStream() || fiveSecondsPassed)
-
-            // ----------------- Begin Facial recognition---------------------- TODO: Extract to facial recognition scan method
+            // ----------------- Begin Facial recognition---------------------- TODO: Compare face with collection in database
             float similarityThreshold = 70F;
             string photo = $"{user.FirstName}_{user.Id}.jpg";
 
-            //String photo = "business-atire.jpg";
-            String targetImage = "fbPic.jpg"; // S3 bucket img match
-                                              // String targetImage = "C:\\fbPic.jpg"; // local img match TODO: appears to be a delay using local img tht does not allow detect face to proces
-                                              // String targetImage = "pris-face.jpg"; // S3 bucket mismatch
+            String targetImage = $"{user.FirstName}_{user.Id}_Target.jpg";// S3 bucket img match
 
-            // ------------------------------ Recognition from image
+            // ------------------------------ Recognition from image-----------------------------------------------------------
             try
             {
 
@@ -378,16 +362,6 @@ namespace GymPass.Controllers
                         Bucket = bucket
                     },
                 };
-
-                //  Local Image matching
-                // Amazon.Rekognition.Model.Image imageTarget = new Image();
-                //using (FileStream fs = new FileStream(targetImage, FileMode.Open, FileAccess.Read))
-                //{
-                //    byte[] data = new byte[fs.Length];
-                //    data = new byte[fs.Length];
-                //    fs.Read(data, 0, (int)fs.Length);
-                //    imageTarget.Bytes = new MemoryStream(data);
-                //}
 
                 CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
                 {
@@ -419,9 +393,6 @@ namespace GymPass.Controllers
             {
                 _logger.LogInformation(e.Message);
             }
-
-            // ------------------------------ TODO: Now add detect from video/live streaming
-
 
             // ------------------------------ Now add get facial details to display in the view.
             DetectFacesRequest detectFacesRequest = new DetectFacesRequest()
