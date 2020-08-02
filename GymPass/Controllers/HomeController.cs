@@ -338,8 +338,7 @@ namespace GymPass.Controllers
             // ----------------- Begin Facial recognition---------------------- TODO: Compare face with collection in database
             float similarityThreshold = 70F;
             string photo = $"{user.FirstName}_{user.Id}.jpg";
-
-            String targetImage = $"{user.FirstName}_{user.Id}_Target.jpg";// S3 bucket img match
+            String targetImage = $"{user.FirstName}_{user.Id}_Target.jpg"; // S3 bucket img, dynamically selected based on user currently logged in.
 
             // ------------------------------ Recognition from image-----------------------------------------------------------
             try
