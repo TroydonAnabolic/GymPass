@@ -150,7 +150,7 @@ $(document).ready(function () {
     /*
     *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
     */
-    // allows lat and long to be globally accessible within anything requiring it to be accessed.
+    // Assigns pos variable with latitude and longitutude as key value pairs, accessible to any variable within it's scope
     navigator.geolocation.watchPosition(function (position) {
         var pos = {
             lat: position.coords.latitude,
@@ -201,7 +201,7 @@ $(document).ready(function () {
             }
         }
 
-        // sets the default gym to values on hidden elements
+        // gets the latitude and longitude for the current user's gym location
         var defaultGymLat = $('#dlat').html();
         var defaultGymLong = $('#dlong').html();
 
@@ -225,6 +225,7 @@ $(document).ready(function () {
 
         var differenceBetweenUser = getDistanceFromLatLonInKm(pos.lat, pos.lng, defaultGymLat, defaultGymLong).toFixed(1);
 
+        // if the difference is less than 40m then make user location box checked therefore settings isWithin40m to true
         if (differenceBetweenUser < 40) {
             $('#user-location').prop('checked', true);
         }
@@ -233,6 +234,7 @@ $(document).ready(function () {
             $('#user-location').prop('checked', false);
         }
 
+        // Everything below draws the map with HERE API
         //Step 1: initializeMap communication with the platform
         async function initializeMap() {
             var platform = new H.service.Platform({

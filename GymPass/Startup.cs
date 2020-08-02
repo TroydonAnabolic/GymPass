@@ -31,13 +31,8 @@ namespace GymPass
         public void ConfigureServices(IServiceCollection services)
         {
             // configure AWS services
-            var options = Configuration.GetAWSOptions("AWSService");
-
+            var options = Configuration.GetAWSOptions("AWSService"); // gets AWSService key value pair from secrets.json
             IAmazonS3 client = options.CreateServiceClient<IAmazonS3>();
-
-            //  services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-
-
             services.AddAWSService<IAmazonS3>();
             services.AddAWSService<IAmazonRekognition>();
 

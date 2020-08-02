@@ -602,6 +602,11 @@ body > main > div.main-gym > div > div.log-workout-home > a {
     right: 0;
 }
 
+#camera-img {
+    margin-left: 5%;
+
+}
+
     #map-button > svg, #camera-button > svg {
         height: 100%;
         width: 100%;

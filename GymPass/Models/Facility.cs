@@ -34,6 +34,9 @@ namespace GymPass.Models
         public bool WillUseStretchRoom { get; set; }
         public bool IsCameraScanSuccessful { get; set; }
         public bool IsWithin10m { get; set; }
+        public string Latitude { get; set; } = "-34.006388";
+        public string Longitude { get; set; } = "150.858975";
+
 
         // public bool IsSmiling { get; internal set; }
         //public bool IsDeepLensRequested { get; set; } = false;

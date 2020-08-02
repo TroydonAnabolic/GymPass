@@ -98,6 +98,11 @@ namespace GymPass.Controllers
             if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
                 ViewBag.AccessDeniedMsgRecieved = false;
 
+            // if current time after last workout logged then send to log workout, and inside gym
+            //if (DateTime.Now > user.TimeLoggedWorkout && user.IsInsideGym)
+            //    return RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym });
+
+
             return View(facility);
         }
 
