@@ -409,7 +409,23 @@ namespace GymPass.Controllers
             }
         }
 
-        public IActionResult Privacy()
+        public bool UserInfo { get; set; }
+        // return the value of user inside gym
+        [HttpGet]
+        public async Task<IActionResult> OnSelectCamButton()
+        {
+
+        var UserInfo = await _userManager.GetUserAsync(User);
+
+
+            if (UserInfo.Id == null) return NotFound();
+
+            var UserInfoVM = UserInfo.IsInsideGym;
+
+            return View(UserInfoVM);
+        }
+
+            public IActionResult Privacy()
         {
             return View();
         }

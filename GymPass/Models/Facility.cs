@@ -12,7 +12,7 @@ namespace GymPass.Models
         public int FacilityID { get; set; }
         public ICollection<UsersInGymDetail> UsersInGymDetails { get; set; }
         public ICollection<UsersOutOfGymDetails> UsersOutOfGymDetails { get; set; }
-        public string FacilityName { get; set; }
+        public string FacilityName { get; set; } // TODO: user javascript to split names on caps except first letter, then add a space to replace
         public int? NumberOfClientsInGym { get; set; }
         public int? NumberOfClientsUsingWeightRoom { get; set; }
         public int? NumberOfClientsUsingCardioRoom { get; set; }

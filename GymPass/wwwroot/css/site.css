@@ -733,6 +733,12 @@ div#my_camera {
 .panel-body {
     text-align: center;
 }
+
+.face-match-outcome {
+    margin: 1rem;
+}
+
+
 /* Log workout styling */
 .workout-log-bg {
     position: absolute;

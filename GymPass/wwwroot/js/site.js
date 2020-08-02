@@ -1,8 +1,10 @@
 ﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
+var homePage = 'https://localhost:44314/'; // TODO: Try to use a function to avoid using static
+var homePageClick = 'https://localhost:44314/Home/Index/10'; // TODO: Try to use a function to avoid using static
+var currentPage = window.location.href;
 
 // Navigation
-
 function openNav() {
     document.getElementById("mySidenav").style.width = "80%";
 }
@@ -13,41 +15,45 @@ function closeNav() {
 
 // webcam
 function take_snapshot() {
-    // take snapshot and get image data  
-    Webcam.snap(function (data_uri) {
-        // display results in page  
-        document.getElementById('results').innerHTML =
-            '<img id="base64image" src="' +
-            data_uri +
-            '"/>';
+    if (currentPage == homePage || currentPage == homePageClick) {
+        // take snapshot and get image data  
+        Webcam.snap(function (data_uri) {
+            // display results in page  
+            document.getElementById('results').innerHTML =
+                '<img id="base64image" src="' +
+                data_uri +
+                '"/>';
 
-        //      upload webcam api
-        Webcam.upload(data_uri,
-            '/Facilities/Capture',
-            function (code, text) {
-                console.log('Photo Captured');
-            });
+            //      upload webcam api
+            Webcam.upload(data_uri,
+                '/Facilities/Capture',
+                function (code, text) {
+                    console.log('Photo Captured');
+                });
 
-        //$.ajax({
-        //    type: "POST",
-        //    url: '@Url.Action("Capture", "Facilities")', // trying to get: https://localhost:44314/Home/Index/10
-        //    // may need to convert data_uri to string here
-        //    data:{ webcam: data_uri },
-        //    dataType: "text",
-        //    success: function (msg = " Success") {
-        //        console.log(msg);
-        //    },
-        //    error: function (req, status, error) {
-        //        console.log("Error");
-        //    }
-        //});
-    });
+            //$.ajax({
+            //    type: "POST",
+            //    url: '@Url.Action("Capture", "Facilities")', // trying to get: https://localhost:44314/Home/Index/10
+            //    // may need to convert data_uri to string here
+            //    data:{ webcam: data_uri },
+            //    dataType: "text",
+            //    success: function (msg = " Success") {
+            //        console.log(msg);
+            //    },
+            //    error: function (req, status, error) {
+            //        console.log("Error");
+            //    }
+            //});
+        });
+    }
 }
 
 // submit form for check estimated total with divs instead of submit button
 function submitForm() {
     document.getElementById('est-form').submit();
 }
+
+
 
 $(document).ready(function () {
     /*
@@ -65,6 +71,10 @@ $(document).ready(function () {
      */
 
     // ------------------ Webcam Script -----------------------
+
+    // only attach camera to home page to avoid error
+
+    if (currentPage == homePage || currentPage == homePageClick ) {
     // set the camera and attach it
     Webcam.set({
         width: 240,
@@ -72,24 +82,20 @@ $(document).ready(function () {
         image_format: 'jpeg',
         jpeg_quality: 90
     });
-    Webcam.attach('#my_camera');
+        Webcam.attach('#my_camera');
+    }
+
     // add style to the inserted id
     $('#my_camera').css("width", "0");
     $('.panel-body').css("text-align", "center");
 
-    // ---------------- Use AJAX to dynamically apply styling to hide reveal webcam stream based on whether use is in gym, as using c# seems to be causing failed to load webcam.js errors
-    $.ajax({
-        url: '@Url.Action("Index", "Home")',
-        type: 'GET',
-        dataType: 'text',
-        success: function (data, textStatus, xhr) {
-            var obj = JSON.parse(data);
-            console.log(data);
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.log('Error in Operation');
-        }
-    });
+    // hide camera icon conditionally based on the whether there is a font showing facial match success
+    var entryStatus = $('#face-match-result').html();
+    if (entryStatus == 'Facial Match Success!') {
+        $('.panel-body').css("display", "none");
+    }
+
+    // avoid tryi
 
     // ---------- Submit main button script ---------------------
     // on page load we pre-select the checbox depending on if its opened or closed
@@ -250,7 +256,7 @@ $(document).ready(function () {
             var LocationOfGym = { lat: defaultGymLat, lng: defaultGymLong };
             //// Create a marker icon from an image URL: 
             var pngIcon = new H.map.Icon('/images/gym-map.png', { size: { w: 56, h: 56 } });
-            var myIcon = new H.map.Icon('/images/your-location.png', { size: { w: 56, h: 56 } });
+            var myIcon = new H.map.Icon('/images/your-location.png', { size: { w: 26, h: 26 } });
             //// Create a marker using the previously instantiated icon:
             var marker = new H.map.Marker(LocationOfGym, { icon: pngIcon });
             // show your location
