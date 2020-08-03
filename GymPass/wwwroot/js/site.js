@@ -13,7 +13,7 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }
 
-// webcam
+// webcam take snapshot
 function take_snapshot() {
     if (currentPage == homePage || currentPage == homePageClick) {
         // take snapshot and get image data  
@@ -53,8 +53,6 @@ function submitForm() {
     document.getElementById('est-form').submit();
 }
 
-
-
 $(document).ready(function () {
     /*
     *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
@@ -73,7 +71,6 @@ $(document).ready(function () {
     // ------------------ Webcam Script -----------------------
 
     // only attach camera to home page to avoid error
-
     if (currentPage == homePage || currentPage == homePageClick ) {
     // set the camera and attach it
     Webcam.set({
@@ -94,8 +91,6 @@ $(document).ready(function () {
     if (entryStatus == 'Facial Match Success!') {
         $('.panel-body').css("display", "none");
     }
-
-    // avoid tryi
 
     // ---------- Submit main button script ---------------------
     // on page load we pre-select the checbox depending on if its opened or closed
@@ -146,7 +141,6 @@ $(document).ready(function () {
         $('#est-drop-down').toggleClass("hidden");
     });
 
-
     /*
     *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
     */
@@ -156,6 +150,8 @@ $(document).ready(function () {
             lat: position.coords.latitude,
             lng: position.coords.longitude
         };
+
+        console.log("Current cords is: ",pos.lat, pos.lng);
 
         // Modal animation for map and camera
         // Get the modal

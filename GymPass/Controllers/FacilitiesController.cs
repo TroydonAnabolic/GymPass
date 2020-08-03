@@ -280,7 +280,6 @@ namespace GymPass.Controllers
 
 
         // POST: Home/Index/10
-
         [HttpPost]
         public async Task<IActionResult> CaptureAsync(string webcam)
         {
@@ -300,9 +299,8 @@ namespace GymPass.Controllers
             {
                 return Json(false);
             }
-
         }
-
+        // Implements the save/upload image to database and S3 functionality
         private async Task SaveImageAsync(IFormFileCollection files, StoreImageHelper storeImageHelper)
         {
             var fileTransferUtility = new TransferUtility(S3Client);
@@ -340,7 +338,6 @@ namespace GymPass.Controllers
                         // Storing Image in Folder  
                         await StoreInDatabaseAsync(imageBytes);
                     }
-                    //TODO: delete image associated to the user once he leaves gym from db and folder
 
                     // Now save this in the S3 bucket to use for facial recognition
                     try
