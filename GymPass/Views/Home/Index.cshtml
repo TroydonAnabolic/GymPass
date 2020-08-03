@@ -222,37 +222,37 @@
                 {
                     // Hide these form inputs and automatically post set values on click
 
-                    <form asp-action="Index">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="FacilityID" />
+                        <form asp-action="Index">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="FacilityID" />
 
-                        <div class="form-group form-check hidden" style="height:0px;">
-                            <label class="form-check-label">
-                                <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
-                            </label>
-                        </div>
+                            <div class="form-group form-check hidden" style="height:0px;">
+                                <label class="form-check-label">
+                                    <input id="open-door" class="form-check-input" asp-for="IsOpenDoorRequested" /> @Html.DisplayNameFor(model => model.IsOpenDoorRequested)
+                                </label>
+                            </div>
+                            @*  lat: -34.006388 Lng: 150.858975 *@
+                            <div id="dlat" class="hidden">@Model.Latitude</div><div id="dlong" class="hidden">@Model.Longitude</div>
 
-                        <div id="dlat" class="hidden">@Model.Latitude</div><div id="dlong" class="hidden">@Model.Longitude</div>
+                            @* Location Entry *@
+                            <div class="form-group form-check hidden" style="height:0px;">
+                                <label class="form-check-label">
+                                    <input id="user-location" class="form-check-input" asp-for="IsWithin10m" /> @Html.DisplayNameFor(model => model.IsWithin10m)
+                                </label>
+                            </div>
 
-                        @* Location Entry *@
-                        <div class="form-group form-check hidden" style="height:0px;">
-                            <label class="form-check-label">
-                                <input id="user-location" class="form-check-input" asp-for="IsWithin10m" /> @Html.DisplayNameFor(model => model.IsWithin10m)
-                            </label>
-                        </div>
+                            @if (ViewBag.AccessGrantedToFacility)
+                            {
+                                // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view to enter exercise log on the same page?
+                            }
+                            @* End Modal for training intentions *@
 
-                        @if (ViewBag.AccessGrantedToFacility)
-                        {
-                            // TODO: Learn/use AJAX to asynchronously transfer the data in between controller and view to enter exercise log on the same page?
-                        }
-                        @* End Modal for training intentions *@
-
-                        <div class="form-group">
-                            <button type="submit" class="locked nav-link btn">
-                                <i id="submit-icon" class="fa fa-lock" onClick="take_snapshot()"></i>
-                            </button>
-                        </div>
-                    </form>
+                            <div class="form-group">
+                                <button type="submit" class="locked nav-link btn">
+                                    <i id="submit-icon" class="fa fa-lock" onClick="take_snapshot()"></i>
+                                </button>
+                            </div>
+                        </form>
 
                 }
                 // if the door is opened show the unlocked symbol and also present the modal

@@ -107,13 +107,14 @@ namespace GymPass.Controllers
 
         private DateTime GetEstimatedNumberOfGymUsers(List<UsersInGymDetail> facilityDetails, DateTime estimatedTimeToCheck, DateTime estimatedExitTimeCurrentUser)
         {
+            // if there are people in the gym
             if (facilityDetails.Count > 0)
             {
                 int i = 0;
                 foreach (var userInGym in facilityDetails)
                 {
                     // get all the logged in users and assign est training time for each one
-                    estimatedExitTimeCurrentUser = facilityDetails[i].TimeAccessGranted.Add(facilityDetails[i].EstimatedTrainingTime); // appears if user is not in the gym he cannot check, need to est exit time for all users
+                    estimatedExitTimeCurrentUser = facilityDetails[i].TimeAccessGranted.AddMinutes(facilityDetails[i].EstimatedTrainingTime.TotalMinutes); // appears if user is not in the gym he cannot check, need to est exit time for all users
 
                     // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
                     // somehow get the clicked value to replace this datetime.now. possibly use another action method

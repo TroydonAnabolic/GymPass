@@ -230,7 +230,7 @@ namespace GymPass.Controllers
         [HttpPost]
         [Route("Home/Index")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SelectTimeToEstimate(int idForUser, // TODO look into assigning the value for this id on argument
+        public async Task<IActionResult> SelectTimeToEstimate(int idForUser,
            [Bind("UserOutOfGymDetailsID, FacilityID, EstimatedTimeToCheck, UniqueEntryID")] UsersOutOfGymDetails usersOutOfGymDetails, [Bind] DateTime userDetails)
         {
 
@@ -245,8 +245,6 @@ namespace GymPass.Controllers
             // set the PK entry to be the same as the one the usere created
             idForUser = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault().UsersOutOfGymDetailsID;
             // ensure we are only updating for the user that entered the drop down list value
-
-
             var currentUserDetail = _facilityContext.UsersOutofGymDetails.Where(o => o.UniqueEntryID == user.Id).FirstOrDefault();
 
             if (idForUser != currentUserDetail.UsersOutOfGymDetailsID)
