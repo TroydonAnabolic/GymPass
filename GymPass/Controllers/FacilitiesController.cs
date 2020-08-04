@@ -310,10 +310,8 @@ namespace GymPass.Controllers
                     var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
 
                     if (!string.IsNullOrEmpty(filepath))
-                    {
                         // Storing Image in Folder  
                         storeImageHelper.StoreInFolder(file, filepath);
-                    }
 
                     var imageBytes = System.IO.File.ReadAllBytes(filepath);
                     if (imageBytes != null)
