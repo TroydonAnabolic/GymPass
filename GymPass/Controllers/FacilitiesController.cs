@@ -15,7 +15,6 @@ using Amazon;
 using Amazon.Rekognition;
 using Amazon.S3.Transfer;
 using Microsoft.Extensions.Logging;
-using System.Text;
 
 namespace GymPass.Controllers
 {
@@ -151,12 +150,10 @@ namespace GymPass.Controllers
             var user = await _userManager.GetUserAsync(User);
             var currentFacilityDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();
 
-
             if (ModelState.IsValid)
             {
                 try
                 {
-
                     if (user.Id == null)
                     {
                         return NotFound();
@@ -170,7 +167,6 @@ namespace GymPass.Controllers
                         {
                             user.HasLoggedWorkoutToday = false;
                         }
-
                         // if the user has not logged workout today, then add the estimated training duration
                         if (!user.HasLoggedWorkoutToday)
                         {
@@ -209,17 +205,12 @@ namespace GymPass.Controllers
                         await _userManager.UpdateAsync(user);
                     }
                 }
-
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException e)
                 {
                     if (!FacilityExists(facilityView.FacilityID))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
-                        throw;
-                    }
+                        _logger.LogInformation(e.Message);
                 }
                 return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
             }
@@ -233,7 +224,6 @@ namespace GymPass.Controllers
         public async Task<IActionResult> SelectTimeToEstimate(int idForUser,
            [Bind("UserOutOfGymDetailsID, FacilityID, EstimatedTimeToCheck, UniqueEntryID")] UsersOutOfGymDetails usersOutOfGymDetails, [Bind] DateTime userDetails)
         {
-
             // get the user
             var user = await _userManager.GetUserAsync(User);
 
@@ -276,21 +266,16 @@ namespace GymPass.Controllers
             return RedirectToAction("Index", "Home", new { id = user.DefaultGym });
         }
 
-
         // POST: Home/Index/10
         [HttpPost]
         public async Task<IActionResult> CaptureAsync(string webcam)
         {
             var files = HttpContext.Request.Form.Files;
-            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext)
-            {
-
-            };
+            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext) {};
 
             if (files != null)
             {
                 await SaveImageAsync(files, storeImageHelper);
-
                 return Json(true);
             }
             else
@@ -348,7 +333,6 @@ namespace GymPass.Controllers
                             await fileTransferUtility.UploadAsync(fileToUpload,
                                                        bucketName, keyName);
                         }
-
                     }
                     catch (Exception e)
                     {
@@ -385,96 +369,10 @@ namespace GymPass.Controllers
                     _facilityContext.SaveChanges();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                _logger.LogInformation(e.Message);
             }
-        }
-
-
-        // GET: Facilities/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var facility = await _facilityContext.Facilities.FindAsync(id);
-            if (facility == null)
-            {
-                return NotFound();
-            }
-            return View(facility);
-        }
-
-        // POST: Facilities/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,
-           [Bind("FacilityID,FacilityName,NumberOfClientsInGym,NumberOfClientsUsingWeightRoom," +
-            "NumberOfClientsUsingCardioRoom,NumberOfClientsUsingStretchRoom,IsOpenDoorRequested,DoorOpened,DoorCloseTimer," +
-            "UserTrainingDuration, TotalTrainingDuration, WillUseWeightsRoom, WillUseCardioRoom, WillUseStretchRoom," +
-            "HasLoggedWorkoutToday, IsCameraScanSuccessful, IsWithin10m")] Facility facility)
-        {
-            if (id != facility.FacilityID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _facilityContext.Update(facility);
-                    await _facilityContext.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FacilityExists(facility.FacilityID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(facility);
-        }
-
-        // GET: Facilities/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var facility = await _facilityContext.Facilities
-                .FirstOrDefaultAsync(m => m.FacilityID == id);
-            if (facility == null)
-            {
-                return NotFound();
-            }
-
-            return View(facility);
-        }
-
-        // POST: Facilities/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var facility = await _facilityContext.Facilities.FindAsync(id);
-
-            _facilityContext.Facilities.Remove(facility);
-            await _facilityContext.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool FacilityExists(int id)

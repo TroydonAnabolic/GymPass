@@ -27,8 +27,7 @@ namespace GymPass.Helpers
                 fs.Flush();
             }
         }
-
-        /// <summary>  
+        /// <summary>  TODO: Try to put store image in database here instead of controller.
         /// Saving captured image into database.  
         /// </summary>  
         /// <param name="imageBytes"></param>  
