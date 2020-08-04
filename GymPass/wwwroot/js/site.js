@@ -151,7 +151,7 @@ $(document).ready(function () {
             lng: position.coords.longitude
         };
 
-        // console.log("Current cords is: ",pos.lat, pos.lng);
+         console.log("Current cords is: ",pos.lat, pos.lng);
 
         // Modal animation for map and camera
         // Get the modal

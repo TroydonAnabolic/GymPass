@@ -97,7 +97,7 @@ namespace GymPass.Controllers
             if (DateTime.Now <= (user.TimeAccessDenied.AddSeconds(10)))
                 ViewBag.AccessDeniedMsgRecieved = false;
 
-            // if current time after last workout logged then send to log workout, and inside gym
+            // TODO: Logic for conditonally displaying if current time after last workout logged then send to log workout, and inside gym
             //if (DateTime.Now > user.TimeLoggedWorkout && user.IsInsideGym)
             //    return RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym });
 
@@ -239,28 +239,21 @@ namespace GymPass.Controllers
 
                 // if door has been opened and user is authorised
                 if (facility.DoorOpened && user.AccessGrantedToFacility)
-                {
                     // log the time granted, and wait 5 seconds.
-                    System.Threading.Thread.Sleep(200);
-                }
-                // delay 10s when entering
-                if (!user.IsInsideGym) System.Threading.Thread.Sleep(200);
+                    System.Threading.Thread.Sleep(5000);
 
                 // When 5 second timer finishes, we close the door again automatically
                 facility.IsOpenDoorRequested = false;
                 ViewBag.IsOpenDoorRequested = false;
                 facility.DoorOpened = false;
-                _facilityContext.Update(facility);
 
+                _facilityContext.Update(facility);
                 // if we are entering gym, use the new facility object, if we are leaving, use the facility detail using Db values.
                 if (enteredGym) _facilityContext.Update(currentFacilityDetail);
-                // else if (leftGym) _facilityContext.Update(currentFacilityDetailDb);
-
                 // after a facility exist, then we can update facility to avoid foreign key constraint?
                 await _facilityContext.SaveChangesAsync();
                 await _userManager.UpdateAsync(user);
             }
-
             return enteredGym;
         }
 
