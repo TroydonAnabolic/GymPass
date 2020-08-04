@@ -23,7 +23,7 @@ function take_snapshot() {
                 '<img id="base64image" src="' +
                 data_uri +
                 '"/>';
-
+            console.log(data_uri)
             //      upload webcam api
             Webcam.upload(data_uri,
                 '/Facilities/Capture',
