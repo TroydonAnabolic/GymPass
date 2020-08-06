@@ -27,6 +27,17 @@ namespace GymPass.Helpers
                 fs.Flush();
             }
         }
+
+        /// <summary>  
+        /// Saving captured image into Folder.  
+        /// </summary>  
+        /// <param name="file"></param>  
+        /// <param name="fileName"></param> 
+        public void DeleteFromFolder(string filePath)
+        {
+            File.Delete(filePath);
+        }
+
         /// <summary>  TODO: Try to put store image in database here instead of controller.
         /// Saving captured image into database.  
         /// </summary>  

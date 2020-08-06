@@ -310,7 +310,7 @@ namespace GymPass.Controllers
                     var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
 
                     if (!string.IsNullOrEmpty(filepath))
-                        // Storing Image in Folder  
+                        // Storing Image in Folder - TODO: delete this entry from folder and db when user logs out.
                         storeImageHelper.StoreInFolder(file, filepath);
 
                     var imageBytes = System.IO.File.ReadAllBytes(filepath);
@@ -336,6 +336,11 @@ namespace GymPass.Controllers
                     {
                         _logger.LogInformation(e.Message);
                     }
+
+                    // now delete the file to avoid cluttering (in real world, can possibly keep for logs)
+                    if (!string.IsNullOrEmpty(filepath))
+                        // Storing Image in Folder - TODO: delete this entry from folder and db when user logs out.
+                        storeImageHelper.DeleteFromFolder(filepath);
                 }
             }
         }
