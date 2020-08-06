@@ -55,12 +55,17 @@ namespace GymPass.Controllers
             var user = await _userManager.GetUserAsync(User);
             ViewBag.EstimatedNumberInGym = 0;
             ViewBag.IsOpenDoorRequested = false;
+            //ViewBag.DefaultLat = user.TestDefaultGymLat;
+            //ViewBag.DefaultLong = user.TestDefaultGymLong;
+
 
             // if user does not exist return not found, if id is null, send to login page
             if (user.Id == null) return NotFound();
 
             id = user.DefaultGym; // set the ID to be current user's default gym
             if (id == null) return RedirectToPage("/Identity/Account/Login");
+            // if (!user.isVerifiedUser) return RedirectToPage("/Identity/Account/Login");
+
 
             var facility = await _facilityContext.Facilities.FindAsync(id);
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();

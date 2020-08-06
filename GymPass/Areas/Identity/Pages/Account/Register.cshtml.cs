@@ -15,6 +15,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using System.Net.Mail;
+using GymPass.Data;
+using GymPass.Helpers;
+using System.IO;
+using Amazon.S3.Transfer;
+using Microsoft.AspNetCore.Hosting;
+using Amazon.S3;
 
 namespace GymPass.Areas.Identity.Pages.Account
 {
@@ -25,21 +31,29 @@ namespace GymPass.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly FacilityContext _facilityContext;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private const string bucketName = "gym-user-bucket-i";
+        private readonly IAmazonS3 S3Client;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
+            FacilityContext facilityContext,
             IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _facilityContext = facilityContext;
         }
 
         [BindProperty]
         public InputModel Input { get; set; }
+        [BindProperty]
+        public UsersOutOfGymDetails UsersOutOfGymDetails { get; set; }
 
         public string ReturnUrl { get; set; }
 
@@ -91,7 +105,8 @@ namespace GymPass.Areas.Identity.Pages.Account
                     UserName = Input.Email,
                     Email = Input.Email,
                     FirstName = Input.FirstName,
-                    DefaultGym = 10 // hard code to be default gym for now
+                    DefaultGym = 10, // hard code to be default gym for now
+
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
@@ -115,6 +130,11 @@ namespace GymPass.Areas.Identity.Pages.Account
                     }
                     else
                     {
+                        // Enter facility details and users out of gym details
+                        await AddFacilityDetails(user);
+                        // Create a Target img and save to the S3 bucket, to be used as verification ( email to be sent to admin to approve, or have an admin page to either complete registration or by setting prop isVerifiedUser to true
+                        await AddTargetImage(user);
+                        // now sign in and redirect
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
@@ -124,9 +144,68 @@ namespace GymPass.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+
+        private async Task AddFacilityDetails(ApplicationUser user)
+        {
+            var emptyUserOutOfFacility = new UsersOutOfGymDetails();
+            var entry = _facilityContext.Add(emptyUserOutOfFacility);
+            UsersOutOfGymDetails.EstimatedTimeToCheck = DateTime.Now;
+            UsersOutOfGymDetails.FacilityID = 10;
+            UsersOutOfGymDetails.UniqueEntryID = user.Id;
+            entry.CurrentValues.SetValues(UsersOutOfGymDetails);
+            await _facilityContext.SaveChangesAsync();
+        }
+
+        private async Task AddTargetImage(ApplicationUser user)
+        {
+            String keyName = $"{user.FirstName}_{user.Id}_Target.jpg";
+            var files = HttpContext.Request.Form.Files;
+            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext) { };
+            var fileTransferUtility = new TransferUtility(S3Client);
+
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    // Getting Filename  
+                    var fileName = file.FileName;
+                    // Unique filename "Guid"  
+                    var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                    // Getting Extension  
+                    var fileExtension = Path.GetExtension(fileName);
+                    // Concating filename + fileExtension + a key ID based on userID (unique filename)  
+                    var newFileName = $"{myUniqueFileName}_{keyName}{fileExtension}";
+                    //  Generating Path to store photo   
+                    var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
+
+                    if (!string.IsNullOrEmpty(filepath))
+                        storeImageHelper.StoreInFolder(file, filepath);
+
+                    // Now save this in the S3 bucket to use for facial recognition
+                    try
+                    {
+                        // grab the filePath from the image captured from the camera
+                        using (var fileToUpload =
+                            new FileStream(filepath, FileMode.Open, FileAccess.Read))
+                        {
+                            // upload it (if multiple are taken, they are overriden with the unique userID)
+                            await fileTransferUtility.UploadAsync(fileToUpload,
+                                                       bucketName, keyName);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogInformation(e.Message);
+                    }
+
+                    // now delete the file to avoid cluttering (in real world, can possibly keep for logs)
+                    if (!string.IsNullOrEmpty(filepath))
+                        storeImageHelper.DeleteFromFolder(filepath);
+                }
+            }
         }
     }
 }

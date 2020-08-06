@@ -34,10 +34,7 @@ namespace GymPass.Models
 
         [Display(Name = "User Image")]
         public byte[] UserImage { get; set; }
-
-        // test variables
-        public string TestDefaultGymLat { get; set; }
-        public string TestDefaultGymLong { get; set; }
+        public bool isVerifiedUser { get; set; } // TODO: admin user can view all requests, and save all user registrations - once approved, users can login.
 
     }
 }

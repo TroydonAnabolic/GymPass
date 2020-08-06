@@ -10,6 +10,8 @@
     <Compile Remove="Migrations\20200722043606_system restore.Designer.cs" />
     <Compile Remove="Migrations\Facility\20200728101649_improve estimate time2.cs" />
     <Compile Remove="Migrations\Facility\20200728101649_improve estimate time2.Designer.cs" />
+    <Compile Remove="Migrations\Facility\20200806102826_Initialize default target img.cs" />
+    <Compile Remove="Migrations\Facility\20200806102826_Initialize default target img.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,7 +27,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.5" />
     <PackageReference Include="Microsoft.jQuery.Unobtrusive.Ajax" Version="3.2.6" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>

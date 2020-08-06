@@ -2,6 +2,7 @@
 // for details on configuring this project to bundle and minify static web assets.
 var homePage = 'https://localhost:44314/'; // TODO: Try to use a function to avoid using static
 var homePageClick = 'https://localhost:44314/Home/Index/10'; // TODO: Try to use a function to avoid using static
+var registerPage = 'https://localhost:44314/Identity/Register'; 
 var currentPage = window.location.href;
 
 // Navigation
@@ -17,6 +18,36 @@ function closeNav() {
 function take_snapshot() {
     if (currentPage == homePage || currentPage == homePageClick) {
         // take snapshot and get image data  
+        Webcam.snap(function (data_uri) {
+            // display results in page  
+            document.getElementById('results').innerHTML =
+                '<img id="base64image" src="' +
+                data_uri +
+                '"/>';
+            console.log(data_uri)
+            //      upload webcam api
+            Webcam.upload(data_uri,
+                '/Facilities/Capture',
+                function (code, text) {
+                    console.log('Photo Captured');
+                });
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: '@Url.Action("Capture", "Facilities")', // trying to get: https://localhost:44314/Home/Index/10
+            //    // may need to convert data_uri to string here
+            //    data:{ webcam: data_uri },
+            //    dataType: "text",
+            //    success: function (msg = " Success") {
+            //        console.log(msg);
+            //    },
+            //    error: function (req, status, error) {
+            //        console.log("Error");
+            //    }
+            //});
+        });
+    }
+    else if (currentPage == registerPage) {
         Webcam.snap(function (data_uri) {
             // display results in page  
             document.getElementById('results').innerHTML =
