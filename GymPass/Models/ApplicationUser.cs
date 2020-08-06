@@ -34,5 +34,10 @@ namespace GymPass.Models
 
         [Display(Name = "User Image")]
         public byte[] UserImage { get; set; }
+
+        // test variables
+        public string TestDefaultGymLat { get; set; }
+        public string TestDefaultGymLong { get; set; }
+
     }
 }
