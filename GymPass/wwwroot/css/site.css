@@ -365,7 +365,7 @@ header {
     color: white;
     padding: 1.5rem;
     font-size: 2rem;
-    box-shadow: 5px 10px #888888;
+    /*box-shadow: 5px 10px #888888;*/
 /*    -webkit-filter: drop-shadow(5px 5px 5px #666666);
     filter: drop-shadow(5px 5px 5px #666666);*/
 }
@@ -782,11 +782,16 @@ div#my_camera {
     padding: 1rem;
 }
 
-body > main > div.containerz > div > div > a
-{
-
+/* Register page */
+.center-cam {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+.cam-style-reg {
+    /*padding: 0 1rem;*/
+}
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     .main-gym-icon {

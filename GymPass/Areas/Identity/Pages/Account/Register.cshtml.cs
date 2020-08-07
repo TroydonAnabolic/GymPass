@@ -37,6 +37,8 @@ namespace GymPass.Areas.Identity.Pages.Account
         private readonly IAmazonS3 S3Client;
 
         public RegisterModel(
+            IWebHostEnvironment webHostEnvironment,
+            IAmazonS3 s3Client,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
@@ -47,6 +49,8 @@ namespace GymPass.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _webHostEnvironment = webHostEnvironment;
+            S3Client = s3Client;
             _facilityContext = facilityContext;
         }
 
@@ -79,7 +83,7 @@ namespace GymPass.Areas.Identity.Pages.Account
 
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")] 
             public string ConfirmPassword { get; set; }
 
             // TODO: Option to select default gym on sign up
@@ -87,6 +91,9 @@ namespace GymPass.Areas.Identity.Pages.Account
             [DataType(DataType.Text)]
             [Display(Name = "Select Default Gym")]
             public int SelectDefaultGym { get; set; }
+
+            [Display(Name = "User Image")]
+            public byte[] UserImage { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -106,7 +113,7 @@ namespace GymPass.Areas.Identity.Pages.Account
                     Email = Input.Email,
                     FirstName = Input.FirstName,
                     DefaultGym = 10, // hard code to be default gym for now
-
+                    UserImage = Input.UserImage
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
@@ -133,7 +140,7 @@ namespace GymPass.Areas.Identity.Pages.Account
                         // Enter facility details and users out of gym details
                         await AddFacilityDetails(user);
                         // Create a Target img and save to the S3 bucket, to be used as verification ( email to be sent to admin to approve, or have an admin page to either complete registration or by setting prop isVerifiedUser to true
-                        await AddTargetImage(user);
+                        await AddTargetImageToS3Bucket(user);
                         // now sign in and redirect
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
@@ -159,10 +166,12 @@ namespace GymPass.Areas.Identity.Pages.Account
             await _facilityContext.SaveChangesAsync();
         }
 
-        private async Task AddTargetImage(ApplicationUser user)
+        private async Task AddTargetImageToS3Bucket(ApplicationUser user)
         {
             String keyName = $"{user.FirstName}_{user.Id}_Target.jpg";
-            var files = HttpContext.Request.Form.Files;
+            var files = HttpContext.Request.Form.Files; // this retrieves file from post request
+            //IFormFile file = Request.Form.Files.FirstOrDefault();
+
             StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext) { };
             var fileTransferUtility = new TransferUtility(S3Client);
 

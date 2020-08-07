@@ -2,7 +2,8 @@
 // for details on configuring this project to bundle and minify static web assets.
 var homePage = 'https://localhost:44314/'; // TODO: Try to use a function to avoid using static
 var homePageClick = 'https://localhost:44314/Home/Index/10'; // TODO: Try to use a function to avoid using static
-var registerPage = 'https://localhost:44314/Identity/Register'; 
+var registerPage = 'https://localhost:44314/Identity/Account/Register'; 
+var registerRedirectLink = 'https://localhost:44314/Identity/Account/Register?returnUrl=%2F';
 var currentPage = window.location.href;
 
 // Navigation
@@ -47,36 +48,37 @@ function take_snapshot() {
             //});
         });
     }
-    else if (currentPage == registerPage) {
-        Webcam.snap(function (data_uri) {
-            // display results in page  
-            document.getElementById('results').innerHTML =
-                '<img id="base64image" src="' +
-                data_uri +
-                '"/>';
-            console.log(data_uri)
-            //      upload webcam api
-            Webcam.upload(data_uri,
-                '/Facilities/Capture',
-                function (code, text) {
-                    console.log('Photo Captured');
-                });
+    //else if (currentPage == registerPage) {
+    //    Webcam.snap(function (data_uri) {
+    //        // display results in page  
+    //        document.getElementById('taget-img-results').innerHTML =
+    //            '<img id="base64image" src="' +
+    //            data_uri +
+    //            '"/>';
+    //       // console.log(data_uri)
+    //        //      upload webcam api
+    //        // TODO: Onclick save - run the upload function - otherwise just save the snapshot in webs
+    //        //Webcam.upload(data_uri,
+    //        //    '/Facilities/Capture',
+    //        //    function (code, text) {
+    //        //        console.log('Photo Captured');
+    //        //    });
 
-            //$.ajax({
-            //    type: "POST",
-            //    url: '@Url.Action("Capture", "Facilities")', // trying to get: https://localhost:44314/Home/Index/10
-            //    // may need to convert data_uri to string here
-            //    data:{ webcam: data_uri },
-            //    dataType: "text",
-            //    success: function (msg = " Success") {
-            //        console.log(msg);
-            //    },
-            //    error: function (req, status, error) {
-            //        console.log("Error");
-            //    }
-            //});
-        });
-    }
+    //        $.ajax({
+    //            type: "POST",
+    //            url: registerRedirectLink, // trying to get: https://localhost:44314/Home/Index/10
+    //            // may need to convert data_uri to string here
+    //            data:{ files : data_uri },
+    //            dataType: "text",
+    //            success: function (msg = " Success") {
+    //                console.log(msg);
+    //            },
+    //            error: function (req, status, error) {
+    //                console.log("Error");
+    //            }
+    //        });
+    //    });
+    //}
 }
 
 // submit form for check estimated total with divs instead of submit button -- 
@@ -102,16 +104,29 @@ $(document).ready(function () {
     // ------------------ Webcam Script -----------------------
 
     // only attach camera to home page to avoid error
-    if (currentPage == homePage || currentPage == homePageClick ) {
+    if (currentPage == homePage || currentPage == homePageClick) {
     // set the camera and attach it
     Webcam.set({
         width: 240,
         height: 240,
+        margin: 'auto',
         image_format: 'jpeg',
         jpeg_quality: 90
     });
         Webcam.attach('#my_camera');
     }
+    // TODO: for register page atach this cam
+    //else if (currentPage == registerPage || currentPage == registerRedirectLink) {
+    //    Webcam.set({
+    //        width: 160,
+    //        height: 240,
+    //        margin: 'auto',
+    //        image_format: 'jpeg',
+    //        jpeg_quality: 90
+    //    });
+    //    Webcam.attach('#reg_camera');
+    //}
+
 
     // add style to the inserted id
     $('#my_camera').css("width", "0");
@@ -182,7 +197,7 @@ $(document).ready(function () {
             lng: position.coords.longitude
         };
 
-         console.log("Current cords is: ",pos.lat, pos.lng);
+         // console.log("Current cords is: ",pos.lat, pos.lng);
 
         // Modal animation for map and camera
         // Get the modal
@@ -198,14 +213,17 @@ $(document).ready(function () {
         var span2 = document.getElementsByClassName("close")[1];
 
         // When the user clicks the button, open the modal 
-        mapBtn.onclick = function () {
-            mapModal.style.display = "block";
-            initializeMap()
+        if (mapBtn != null) {
+            mapBtn.onclick = function () {
+                mapModal.style.display = "block";
+                initializeMap()
+            }
         }
-        camBtn.onclick = function () {
-            camModal.style.display = "block";
+        if (camBtn != null) {
+            camBtn.onclick = function () {
+                camModal.style.display = "block";
+            }
         }
-
         // When the user clicks on <span> (x), close the modal
         span.onclick = function () {
             mapModal.style.display = "none";
