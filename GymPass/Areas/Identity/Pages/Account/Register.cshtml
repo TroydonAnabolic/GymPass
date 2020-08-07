@@ -4,17 +4,23 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="container text-center vert-centr">
+<div class="banner">
+    <img src="~/images/gympass-banner-1.png" />
+    <img class="logo" src="~/images/weight-1399281_1280.png" />
+    <h1>
+        @ViewData["Title"]
+    </h1>
+</div>
 
-    <div class="row">
+<div class="container-fluid text-center">
+
+    <div class="row reg">
         <div class="col-md-4">
             <form asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
-                <h4>Join Now!</h4>
-                <hr />
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Input.FirstName"></label>
-                    <input asp-for="Input.FirstName" class="form-control" />
+                    <input asp-for="Input.FirstName" class="form-control input-sm" />
                     <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -22,35 +28,56 @@
                     <input asp-for="Input.Email" class="form-control" />
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Input.Password"></label>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                <div class="row">
+                    <div class="reg-inp-short">
+                        <div class="form-group">
+                            <label asp-for="Input.Password"></label>
+                            <input asp-for="Input.Password" class="form-control" />
+                            <span asp-validation-for="Input.Password" class="text-danger sm-input"></span>
+                        </div>
+                    </div>
+                    <div class="reg-inp-short">
+                        <div class="form-group">
+                            <label asp-for="Input.ConfirmPassword"></label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" />
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger sm-input"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Input.ConfirmPassword"></label>
-                    <input asp-for="Input.ConfirmPassword" class="form-control" />
-                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                <div class="row">
+                    <h5>Enter Gym Co-ordinates</h5>
+                    <p class="note bg-warning">Note: User Co-ordinate and photo entry enabled for testing purposes - Gym co-ordinates are set by registered gym in real-life scenario</p>
+                    <div class="reg-inp-short">
+                        <div class="form-group">
+
+                            <label asp-for="Input.TestLat"></label>
+                            <input asp-for="Input.TestLat" class="form-control" />
+                            <span asp-validation-for="Input.TestLat" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="reg-inp-short">
+                        <div class="form-group">
+
+                            <label asp-for="Input.TestLong"></label>
+                            <input asp-for="Input.TestLong" class="form-control" />
+                            <span asp-validation-for="Input.TestLong" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
                 @* Enter verification photo *@
                 <div class="form-group">
-                    @*<label style="width: 100%;">Verification Image</label>
-                        <button onClick="take_snapshot()">Snap Image</button>
-                        <div class="cam-style-reg">
-                            <div id="reg_camera"></div>
-                                <div id="taget-img-results"> </div>
-                        </div>*@
-                    <div class="form-group">
+                    <div class="row">
                         <label asp-for="Input.UserImage" style="width: 100%;"></label>
 
-                        <img id="profilePicture" style="width:350px;height:350px; object-fit:cover" src="">
                         <input type="file"
                                accept=".png,.jpg,.jpeg,.gif,.tif"
                                asp-for="Input.UserImage"
-                               class=""
+                               class="upload-file"
                                style="border:0px!important;padding: 0px;padding-top: 10px;padding-bottom: 30px;"
                                onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
                         <span asp-validation-for="Input.UserImage" class="text-danger"></span>
+                        <img id="profilePicture" style="width:150px;height:150px;padding-right:1rem; object-fit:cover" src="">
+
                     </div>
                 </div>
                 <button type="submit" class="btn btn-block btn-primary">Register</button>
@@ -86,7 +113,25 @@
                         }
                     }
                 </section>
-            </div>*@
+            </div>*@<div class="col-md-6 col-md-offset-2">
+
+            @*<section>
+                    <h4></h4>
+                    <hr />
+                    <div>
+                        <p>
+                            <a href="https://go.microsoft.com/fwlink/?LinkID=532715"></a>
+                        </p>
+                    </div>
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <div>
+                            <p>
+                                <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account"></button>
+                            </p>
+                        </div>
+                    </form>
+                </section>*@
+        </div>
     </div>
 </div>
 

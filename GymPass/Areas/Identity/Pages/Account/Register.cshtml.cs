@@ -92,6 +92,10 @@ namespace GymPass.Areas.Identity.Pages.Account
             [Display(Name = "Select Default Gym")]
             public int SelectDefaultGym { get; set; }
 
+            [Display(Name = "Test Latitude")]
+            public string TestLat { get; set; }
+            [Display(Name = "Test Longitude")]
+            public string TestLong { get; set; }
             [Display(Name = "User Image")]
             public byte[] UserImage { get; set; }
         }
@@ -113,6 +117,8 @@ namespace GymPass.Areas.Identity.Pages.Account
                     Email = Input.Email,
                     FirstName = Input.FirstName,
                     DefaultGym = 10, // hard code to be default gym for now
+                    TestLat = Input.TestLat,
+                    TestLong = Input.TestLong,
                     UserImage = Input.UserImage
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);

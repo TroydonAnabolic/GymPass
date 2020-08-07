@@ -366,7 +366,7 @@ header {
     padding: 1.5rem;
     font-size: 2rem;
     /*box-shadow: 5px 10px #888888;*/
-/*    -webkit-filter: drop-shadow(5px 5px 5px #666666);
+    /*    -webkit-filter: drop-shadow(5px 5px 5px #666666);
     filter: drop-shadow(5px 5px 5px #666666);*/
 }
 
@@ -412,7 +412,7 @@ header {
     display: none;
 }
 
-.contain-est{
+.contain-est {
     position: relative;
 }
 
@@ -610,13 +610,12 @@ body > main > div.main-gym > div > div.log-workout-home > a {
 
 #camera-img {
     margin-left: 5%;
-
 }
 
-    #map-button > svg, #camera-button > svg {
-        height: 100%;
-        width: 100%;
-    }
+#map-button > svg, #camera-button > svg {
+    height: 100%;
+    width: 100%;
+}
 
 #mapContainer {
     width: 100%;
@@ -716,7 +715,7 @@ body > main > div.main-gym > div > div.log-workout-home > a {
     position: absolute;
     bottom: 0;
     right: 1rem;
-    line-height:0;
+    line-height: 0;
 }
 
 #userDetails {
@@ -783,10 +782,35 @@ div#my_camera {
 }
 
 /* Register page */
-.center-cam {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+.reg {
+    font-size: 0.8rem;
+    margin: 1rem 0;
+}
+
+.note {
+    font-size: 0.7rem;
+}
+
+.reg-inp-short {
+    width: 10rem;
+    margin: 0 1rem;
+}
+
+#Input_Password, #Input_TestLat {
+    margin-right: 0.5rem;
+}
+
+#Input_ConfirmPassword, #Input_TestLong {
+    margin-left: 0.5rem;
+}
+
+.upload-file {
+    float: left;
+}
+
+input#Input_UserImage.upload-file {
+    width: 12rem;
 }
 
 .cam-style-reg {

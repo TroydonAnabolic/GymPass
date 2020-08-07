@@ -55,8 +55,8 @@ namespace GymPass.Controllers
             var user = await _userManager.GetUserAsync(User);
             ViewBag.EstimatedNumberInGym = 0;
             ViewBag.IsOpenDoorRequested = false;
-            //ViewBag.DefaultLat = user.TestDefaultGymLat;
-            //ViewBag.DefaultLong = user.TestDefaultGymLong;
+            ViewBag.DefaultLat = user.TestLat;
+            ViewBag.DefaultLong = user.TestLong;
 
 
             // if user does not exist return not found, if id is null, send to login page
