@@ -197,6 +197,13 @@ $(document).ready(function () {
             lng: position.coords.longitude
         };
 
+        console.log(pos.lat)
+        // allows users to populate current location to use for testing, minus
+        $('.enter-test-cords').click(function (event) {
+            $('#Input_TestLat').val(pos.lat - -68.01279598517075);
+       //     $('#Input_TestLat').val("test");
+            $('#Input_TestLong').val(pos.lng + 0.000010000000003174137);
+        });
          // console.log("Current cords is: ",pos.lat, pos.lng);
 
         // Modal animation for map and camera

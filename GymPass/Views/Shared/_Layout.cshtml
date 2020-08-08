@@ -26,15 +26,13 @@
 </head>
 <body>
     @*<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GYMPass</a>*@
-    <main role="main" class="pb-3">
+    <main role="main" class="">
         <partial name="_NavPartial" />
         @RenderBody()
     </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
+    <footer class="border-top footer text-muted bg-dark">
             &copy; 2020 - GymPass - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

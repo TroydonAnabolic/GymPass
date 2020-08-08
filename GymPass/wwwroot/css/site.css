@@ -789,7 +789,7 @@ div#my_camera {
 }
 
 .note {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
 }
 
 .reg-inp-short {
@@ -824,12 +824,10 @@ input#Input_UserImage.upload-file {
 }
 
 .scroll-profile-options {
-    height: 5rem;
+    height: 4rem;
     overflow: auto;
     width: 100%;
     margin: 0.5rem;
-    overflow: -moz-scrollbars-vertical;
-    overflow-y: scroll;
 }
 
 /* Extra small devices (phones, 600px and down) */
