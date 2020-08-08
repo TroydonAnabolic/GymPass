@@ -190,14 +190,15 @@ $(document).ready(function () {
     /*
     *  ------------------------------------------------ Geolocation Scripts ----------------------------------------------------------------
     */
-    // Assigns pos variable with latitude and longitutude as key value pairs, accessible to any variable within it's scope
+
+    // Assigns pos variable with latitude and longitutude as key value pairs of the current user logged in,
+    // this is where the position of the man icon is determined.
     navigator.geolocation.watchPosition(function (position) {
         var pos = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
         };
 
-        console.log(pos.lat)
         // allows users to populate current location to use for testing, minus
         $('.enter-test-cords').click(function (event) {
             $('#Input_TestLat').val(pos.lat - -68.01279598517075);
@@ -253,11 +254,14 @@ $(document).ready(function () {
             }
         }
 
-        // gets the latitude and longitude for the current user's gym location
+
+
+        // gets the latitude and longitude for the current user's gym location,
+        // using the html we set earlier to determine co-ordinates to where the gym is rendered
         var defaultGymLat = $('#dlat').html();
         var defaultGymLong = $('#dlong').html();
 
-        // Calculate the difference between the gym location in metres
+        // Function defined to Calculate the difference between the gym location in metres and the user
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371000; // Radius of the earth in m
             var dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -275,18 +279,19 @@ $(document).ready(function () {
             return deg * (Math.PI / 180)
         }
 
+        // the function is the executed and the result is stored into this variable
         var differenceBetweenUser = getDistanceFromLatLonInKm(pos.lat, pos.lng, defaultGymLat, defaultGymLong).toFixed(1);
 
         // if the difference is less than 40m then make user location box checked therefore settings isWithin40m to true
         if (differenceBetweenUser < 40) {
+            // set the hidden input box to checked
             $('#user-location').prop('checked', true);
         }
         else {
-            console.log("false");
             $('#user-location').prop('checked', false);
         }
 
-        // Everything below draws the map with HERE API
+        // Everything below renders the map using HERE API, but I am not going to go over it
         //Step 1: initializeMap communication with the platform
         async function initializeMap() {
             var platform = new H.service.Platform({

@@ -197,6 +197,8 @@ namespace GymPass.Controllers
                 if (!user.IsInsideGym) await FacialRecognitionScan(user, currentFacilityDetail);
 
                 // Location scan (results from HERE API using javascript)
+                // when the checkbox's value is checked, this is evaluated to true,
+                // this way we assign user.IsWithin10m as true, satisfying the first requirement to gaining access to the facility
                 if (facilityView.IsWithin10m)
                     user.IsWithin10m = true;
 
