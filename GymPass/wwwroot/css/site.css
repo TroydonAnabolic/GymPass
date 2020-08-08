@@ -813,9 +813,11 @@ input#Input_UserImage.upload-file {
     width: 12rem;
 }
 
-.cam-style-reg {
-    /*padding: 0 1rem;*/
+/* Manage Profile */
+.scroll-profile {
+height: 5rem;
 }
+
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     .main-gym-icon {

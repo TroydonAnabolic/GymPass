@@ -37,6 +37,11 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
 
+            [Display(Name = "Test Latitude")]
+            public string TestLat { get; set; }
+            [Display(Name = "Test Longitude")]
+            public string TestLong { get; set; }
+
             [Display(Name = "User Image")]
             public byte[] UserImage { get; set; }
         }
@@ -46,14 +51,20 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             var userImage = user.UserImage;
+            var testLat = user.TestLat;
+            var tesLong = user.TestLong;
 
             Username = userName;
 
             Input = new InputModel
             {
                 PhoneNumber = phoneNumber,
-                UserImage = userImage
+                UserImage = userImage,
+                TestLat = testLat,
+                TestLong = tesLong,
             };
+
+
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -103,9 +114,21 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
                     await file.CopyToAsync(dataStream);
                     user.UserImage = dataStream.ToArray();
                 }
+
+                var testLat = user.TestLat;
+                var tesLong = user.TestLong;
+
+                if (Input.TestLat != testLat)
+                {
+                    user.TestLat = Input.TestLat;
+                }
+                if (Input.TestLong != tesLong)
+                {
+                    user.TestLong = Input.TestLong;
+                }
+
                 await _userManager.UpdateAsync(user);
             }
-
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
