@@ -1,12 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using GymPass.Data;
+using GymPass.Helpers;
 using GymPass.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace GymPass.Areas.Identity.Pages.Account.Manage
 {
@@ -14,13 +21,27 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private const string bucketName = "gym-user-bucket-i";
+        private readonly IAmazonS3 S3Client;
+        private readonly ILogger<IndexModel> _logger;
+        private readonly FacilityContext _facilityContext;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IWebHostEnvironment webHostEnvironment,
+            IAmazonS3 s3Client,
+            FacilityContext facilityContext,
+            ILogger<IndexModel> logger
+            )
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _webHostEnvironment = webHostEnvironment;
+            S3Client = s3Client;
+            _facilityContext = facilityContext;
+            _logger = logger;
         }
 
         public string Username { get; set; }
@@ -105,34 +126,78 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            // save image. TODO: Only allow an admin user to update the verification pic and store in seperate table
-            if (Request.Form.Files.Count > 0)
+            await AddTargetImageToS3Bucket(user);
+
+            var testLat = user.TestLat;
+            var tesLong = user.TestLong;
+
+            if (Input.TestLat != testLat)
             {
-                IFormFile file = Request.Form.Files.FirstOrDefault();
-                using (var dataStream = new MemoryStream())
-                {
-                    await file.CopyToAsync(dataStream);
-                    user.UserImage = dataStream.ToArray();
-                }
-
-                var testLat = user.TestLat;
-                var tesLong = user.TestLong;
-
-                if (Input.TestLat != testLat)
-                {
-                    user.TestLat = Input.TestLat;
-                }
-                if (Input.TestLong != tesLong)
-                {
-                    user.TestLong = Input.TestLong;
-                }
-
+                user.TestLat = Input.TestLat;
                 await _userManager.UpdateAsync(user);
             }
+            if (Input.TestLong != tesLong)
+            {
+                user.TestLong = Input.TestLong;
+                await _userManager.UpdateAsync(user);
+            }
+
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
+        }
+
+
+        private async Task AddTargetImageToS3Bucket(ApplicationUser user)
+        {
+            String keyName = $"{user.FirstName}_{user.Id}_Target.jpg";
+            var files = HttpContext.Request.Form.Files; // this retrieves file from post request
+            //IFormFile file = Request.Form.Files.FirstOrDefault();
+
+            StoreImageHelper storeImageHelper = new StoreImageHelper(_facilityContext) { };
+            var fileTransferUtility = new TransferUtility(S3Client);
+
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    // Getting Filename  
+                    var fileName = file.FileName;
+                    // Unique filename "Guid"  
+                    var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                    // Getting Extension  
+                    var fileExtension = Path.GetExtension(fileName);
+                    // Concating filename + fileExtension + a key ID based on userID (unique filename)  
+                    var newFileName = $"{myUniqueFileName}_{keyName}{fileExtension}";
+                    //  Generating Path to store photo   
+                    var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
+
+                    if (!string.IsNullOrEmpty(filepath))
+                        storeImageHelper.StoreInFolder(file, filepath);
+
+                    // Now save this in the S3 bucket to use for facial recognition
+                    try
+                    {
+                        // grab the filePath from the image captured from the camera
+                        using (var fileToUpload =
+                            new FileStream(filepath, FileMode.Open, FileAccess.Read))
+                        {
+                            // upload it (if multiple are taken, they are overriden with the unique userID)
+                            await fileTransferUtility.UploadAsync(fileToUpload,
+                                                       bucketName, keyName);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogInformation(e.Message);
+                    }
+
+                    // now delete the file to avoid cluttering (in real world, can possibly keep for logs)
+                    if (!string.IsNullOrEmpty(filepath))
+                        storeImageHelper.DeleteFromFolder(filepath);
+                }
+            }
         }
     }
 }

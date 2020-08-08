@@ -814,8 +814,22 @@ input#Input_UserImage.upload-file {
 }
 
 /* Manage Profile */
-.scroll-profile {
-height: 5rem;
+.prof-head {
+    background-color: #007bff;
+    display: inline-block;
+    margin: auto;
+    padding: 5px;
+    margin-top: 0.2rem;
+    color: #fff;
+}
+
+.scroll-profile-options {
+    height: 5rem;
+    overflow: auto;
+    width: 100%;
+    margin: 0.5rem;
+    overflow: -moz-scrollbars-vertical;
+    overflow-y: scroll;
 }
 
 /* Extra small devices (phones, 600px and down) */
