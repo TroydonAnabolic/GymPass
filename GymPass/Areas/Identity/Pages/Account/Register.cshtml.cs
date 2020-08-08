@@ -21,6 +21,7 @@ using System.IO;
 using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Hosting;
 using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace GymPass.Areas.Identity.Pages.Account
 {
@@ -145,6 +146,9 @@ namespace GymPass.Areas.Identity.Pages.Account
                     {
                         // Enter facility details and users out of gym details
                         await AddFacilityDetails(user);
+
+                        // Ensure no more than 100 S3 object to avoid bill shock
+                       if(!await EnsureMax100ObjectsAsync())
                         // Create a Target img and save to the S3 bucket, to be used as verification ( email to be sent to admin to approve, or have an admin page to either complete registration or by setting prop isVerifiedUser to true
                         await AddTargetImageToS3Bucket(user);
                         // now sign in and redirect
@@ -159,6 +163,41 @@ namespace GymPass.Areas.Identity.Pages.Account
             }
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+
+        private async Task<bool> EnsureMax100ObjectsAsync()
+        {
+            bool reachedMaxedObjects = false;
+            try
+            {
+
+                ListObjectsV2Request request = new ListObjectsV2Request
+                {
+                    BucketName = bucketName,
+                    MaxKeys = 10
+                };
+                ListObjectsV2Response response;
+                do
+                {
+                    response = await S3Client.ListObjectsV2Async(request);
+
+                    // Process the response.
+                    var numberOfS3Objects = response.S3Objects.Count;
+                    reachedMaxedObjects = numberOfS3Objects > 100 ? true : false;
+
+                    request.ContinuationToken = response.NextContinuationToken;
+                } while (response.IsTruncated);
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                _logger.LogInformation("S3 error occurred. Exception: " + amazonS3Exception);
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(e.Message);
+            }
+            return reachedMaxedObjects;
         }
 
         private async Task AddFacilityDetails(ApplicationUser user)

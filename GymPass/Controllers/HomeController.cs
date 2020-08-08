@@ -196,9 +196,9 @@ namespace GymPass.Controllers
                 // perform facial recognition scan if not inside the gym
                 if (!user.IsInsideGym) await FacialRecognitionScan(user, currentFacilityDetail);
 
-                // Location scan (results from HERE API using javascript)
-                // when the checkbox's value is checked, this is evaluated to true,
-                // this way we assign user.IsWithin10m as true, satisfying the first requirement to gaining access to the facility
+                // Location scan (results from HERE API using javascript) is passed to this POST Action Method
+                // when the checkbox's value is checked we assign user.IsWithin10m as true,
+                //  satisfying the first requirement to gaining access to the facility
                 if (facilityView.IsWithin10m)
                     user.IsWithin10m = true;
 
@@ -309,7 +309,6 @@ namespace GymPass.Controllers
                     Key = keyName
                 };
 
-                Console.WriteLine("Deleting an object");
                 await S3Client.DeleteObjectAsync(deleteObjectRequest);
             }
             catch (AmazonS3Exception e)
