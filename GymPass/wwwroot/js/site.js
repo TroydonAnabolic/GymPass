@@ -103,7 +103,8 @@ $(document).ready(function () {
 
     // ------------------ Webcam Script -----------------------
 
-    // only attach camera to home page to avoid error
+    // The webcamera is attached to that my_camera element id using this javascript code
+    // The if condition ensures to only attempt to attach camera to home page to avoid errors
     if (currentPage == homePage || currentPage == homePageClick) {
     // set the camera and attach it
     Webcam.set({
@@ -115,20 +116,7 @@ $(document).ready(function () {
     });
         Webcam.attach('#my_camera');
     }
-    // TODO: for register page atach this cam
-    //else if (currentPage == registerPage || currentPage == registerRedirectLink) {
-    //    Webcam.set({
-    //        width: 160,
-    //        height: 240,
-    //        margin: 'auto',
-    //        image_format: 'jpeg',
-    //        jpeg_quality: 90
-    //    });
-    //    Webcam.attach('#reg_camera');
-    //}
-
-
-    // add style to the inserted id
+    // add style to the div
     $('#my_camera').css("width", "0");
     $('.panel-body').css("text-align", "center");
 
@@ -192,7 +180,7 @@ $(document).ready(function () {
     */
 
     // Assigns pos variable with latitude and longitutude as key value pairs of the current user logged in,
-    // this is where the position of the man icon is determined.
+    // this is where the position of the man icon is determined. It will log the same position that google map shows.
     navigator.geolocation.watchPosition(function (position) {
         var pos = {
             lat: position.coords.latitude,
@@ -201,9 +189,10 @@ $(document).ready(function () {
 
         // allows users to populate current location to use for testing, minus
         $('.enter-test-cords').click(function (event) {
-            $('#Input_TestLat').val(pos.lat - -68.01279598517075);
-       //     $('#Input_TestLat').val("test");
+            $('#Input_TestLat').val(-(pos.lat - -68.01279598517075));
             $('#Input_TestLong').val(pos.lng + 0.000010000000003174137);
+            $('.reg-lat').val(-(pos.lat - -68.01279598517075));
+            $('.reg-long').val(pos.lng + 0.000010000000003174137);
         });
          // console.log("Current cords is: ",pos.lat, pos.lng);
 
@@ -253,8 +242,6 @@ $(document).ready(function () {
                 camModal.style.display = "none";
             }
         }
-
-
 
         // gets the latitude and longitude for the current user's gym location,
         // using the html we set earlier to determine co-ordinates to where the gym is rendered

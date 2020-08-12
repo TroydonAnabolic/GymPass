@@ -270,7 +270,7 @@ namespace GymPass.Controllers
             // if it is not 0 then we can decrement to avoid negatives
             if (facility.NumberOfClientsInGym != 0) facility.NumberOfClientsInGym--;
 
-            // set all will use gym to negative
+            // adjust all variables to update the user to a left gym status
             if (user.WillUseWeightsRoom)
             {
                 facility.NumberOfClientsUsingWeightRoom--;

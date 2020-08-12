@@ -44,15 +44,18 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <h5>Enter Gym Co-ordinates</h5>
-                    <p class="note bg-warning">Note: User Co-ordinate and photo entry enabled for testing purposes - Gym co-ordinates are set by registered gym in real-life scenario.
-                        <a class="enter-test-cords" href="#"> <i class="fas fa-map-marker-alt"></i> Use current cords + 0001 difference</a> </p>
+                    <p class="note bg-warning">
+                        Note: User Co-ordinate and photo entry enabled for testing purposes - Gym co-ordinates are set by registered gym in real-life scenario.
+                        <a class="enter-test-cords" href="#"> <i class="fas fa-map-marker-alt"></i> Use Current cords with 61-21 digit offset</a>
+                    </p>
                     <div class="reg-inp-short">
                         <div class="form-group">
 
                             <label asp-for="Input.TestLat"></label>
-                            <input asp-for="Input.TestLat" class="form-control" />
+                            <input asp-for="Input.TestLat" class="form-control reg-lat" />
                             <span asp-validation-for="Input.TestLat" class="text-danger"></span>
                         </div>
                     </div>
@@ -60,7 +63,7 @@
                         <div class="form-group">
 
                             <label asp-for="Input.TestLong"></label>
-                            <input asp-for="Input.TestLong" class="form-control" />
+                            <input asp-for="Input.TestLong" class="form-control reg-long" />
                             <span asp-validation-for="Input.TestLong" class="text-danger"></span>
                         </div>
                     </div>

@@ -22,8 +22,8 @@ namespace GymPass
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // configure AWS services
-            var options = Configuration.GetAWSOptions("AWSService"); // gets AWSService key value pair from secrets.json
+            // Configure AWS services
+            var options = Configuration.GetAWSOptions("AWSService"); // gets AWSService key value pair from secrets.json that holds username and region
             IAmazonS3 client = options.CreateServiceClient<IAmazonS3>();
             services.AddAWSService<IAmazonS3>();
             services.AddAWSService<IAmazonRekognition>();

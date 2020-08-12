@@ -268,6 +268,10 @@ textarea {
     border-radius: 5%;
 }
 
+.border-nav:hover {
+    background-color: aqua;
+}
+
 .sidenav a:hover {
     color: #f1f1f1;
 }

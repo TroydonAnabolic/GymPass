@@ -283,12 +283,13 @@ namespace GymPass.Controllers
                 return Json(false);
             }
         }
-        // Implements the save/upload image to database and S3 functionality
+        // Implements the save/upload image to the database and uploads to an S3 bucket.
+        // The IformFileCollection paramter retrieves the value posted by the javascript post method
         private async Task SaveImageAsync(IFormFileCollection files, StoreImageHelper storeImageHelper)
         {
             var fileTransferUtility = new TransferUtility(S3Client);
             var user = await _userManager.GetUserAsync(User);
-            // set keyname to be user id, this way we can associate the one being scanned to the user ID to identify which item in the S3 bucket to check
+            // set keyname to be user id, this way we can dynamically associate the one being scanned to the user ID to identify which item in the S3 bucket to check
             string keyName = $"{user.FirstName}_{user.Id}.jpg";
 
             // TODO: Apply the detect faces from video stream here, if a face is detected, then run the below
@@ -304,18 +305,19 @@ namespace GymPass.Controllers
                     var myUniqueFileName = Convert.ToString(Guid.NewGuid());
                     // Getting Extension  
                     var fileExtension = Path.GetExtension(fileName);
-                    // Concating filename + fileExtension + a key ID based on userID (unique filename)  
+                    // Concating filename + dynamic key value + a key ID based on userID (unique filename)  
                     var newFileName = $"{ myUniqueFileName}_{keyName}{fileExtension}";
-                    //  Generating Path to store photo   
+                    //  Generating Path to store photo using the webroot path to get the absolute path of the webservable directory Camera Photos
                     var filepath = Path.Combine(_webHostEnvironment.WebRootPath, "CameraPhotos") + $@"\{newFileName}";
 
                     if (!string.IsNullOrEmpty(filepath))
+                        // run custom store in folder method
                         storeImageHelper.StoreInFolder(file, filepath);
 
                     var imageBytes = System.IO.File.ReadAllBytes(filepath);
                     if (imageBytes != null)
                     {
-                        // Storing Image in Folder  
+                        // Run custom Storing Image in database  
                         await StoreInDatabaseAsync(imageBytes);
                     }
 
@@ -336,7 +338,7 @@ namespace GymPass.Controllers
                         _logger.LogInformation(e.Message);
                     }
 
-                    // now delete the file to avoid cluttering (in real world, can possibly keep for logs)
+                    // now delete the file from the folder to avoid cluttering (in real world, AWS Lambda will log the entry to another S3 bucket)
                     if (!string.IsNullOrEmpty(filepath))
                         // Storing Image in Folder - TODO: delete this entry from folder and db when user logs out.
                         storeImageHelper.DeleteFromFolder(filepath);
