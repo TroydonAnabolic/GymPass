@@ -45,9 +45,9 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="Input.UserImage" style="width: 100%;"></label>
-                    @if (Model.Image != null)
+                    @if (Model.Input.UserImage != null)
                     {
-                        <img style="width:150px;height:150px; object-fit:cover" src="data:image/jpg;charset=utf-8;base64,@(Convert.ToBase64String(Model.Image))">
+                        <img style="width:150px;height:150px; object-fit:cover" src="data:image/jpg;charset=utf-8;base64,@(Convert.ToBase64String(Model.Input.UserImage))">
                     }
                     else
                     {

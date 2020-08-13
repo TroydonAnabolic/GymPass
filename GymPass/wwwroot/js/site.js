@@ -175,9 +175,9 @@ $(document).ready(function () {
 
         // allows users to populate current location to use for testing, minus
         $('.enter-test-cords').click(function (event) {
-            $('#Input_TestLat').val(-(pos.lat - -68.01279598517075));
+            $('#Input_TestLat').val(pos.lat);
             $('#Input_TestLong').val(pos.lng + 0.000010000000003174137);
-            $('.reg-lat').val(-(pos.lat - -68.01279598517075));
+            $('.reg-lat').val(pos.lat);
             $('.reg-long').val(pos.lng + 0.000010000000003174137);
         });
          // console.log("Current cords is: ",pos.lat, pos.lng);

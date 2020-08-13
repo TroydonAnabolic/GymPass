@@ -97,52 +97,9 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-            string keyName = $"{user.FirstName}_{user.Id}_Target.jpg";
-
-            await ReadImageAsync(keyName);
 
             await LoadAsync(user);
             return Page();
-        }
-
-        // method to read image of the user logged in
-        private async Task ReadImageAsync(string keyName)
-        {
-           // string responseBody = "";
-            try
-            {
-                GetObjectRequest request = new GetObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = keyName
-                };
-                using (GetObjectResponse response = await S3Client.GetObjectAsync(request))
-                using (Stream responseStream = response.ResponseStream)
-                
-
-                using (StreamReader reader = new StreamReader(responseStream))
-                {
-                    var FileSize = responseStream.Length;
-                    Image = new byte[(int)FileSize];
-                    //string title = response.Metadata["x-amz-meta-title"]; // Assume you have "title" as medata added to the object.
-                    //string contentType = response.Headers["Content-Type"];
-
-                    //Console.WriteLine("Object metadata, Title: {0}", title);
-                    //Console.WriteLine("Content type: {0}", contentType);
-
-                    //responseBody = reader.ReadToEnd(); // Now you process the response body.
-                }
-
-            }
-            catch (AmazonS3Exception e)
-            {
-                // If bucket or object does not exist
-                _logger.LogInformation("Error encountered ***. Message:'{0}' when reading object", e.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.LogInformation("Unknown encountered on server. Message:'{0}' when reading object", e.Message);
-            }
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -171,6 +128,8 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            await AddImageToDbInByteArr(user);
+
             await AddTargetImageToS3Bucket(user);
 
             var testLat = user.TestLat;
@@ -193,6 +152,19 @@ namespace GymPass.Areas.Identity.Pages.Account.Manage
             return RedirectToPage();
         }
 
+        private async Task AddImageToDbInByteArr(ApplicationUser user)
+        {
+            if (Request.Form.Files.Count > 0)
+            {
+                IFormFile file = Request.Form.Files.FirstOrDefault();
+                using (var dataStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(dataStream);
+                    user.UserImage = dataStream.ToArray();
+                }
+                await _userManager.UpdateAsync(user);
+            }
+        }
 
         private async Task AddTargetImageToS3Bucket(ApplicationUser user)
         {

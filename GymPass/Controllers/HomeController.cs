@@ -108,7 +108,6 @@ namespace GymPass.Controllers
             //if (DateTime.Now > user.TimeLoggedWorkout && user.IsInsideGym)
             //    return RedirectToAction("LogWorkout", "Facilities", new { id = user.DefaultGym });
 
-
             return View(facility);
         }
 
