@@ -9,6 +9,8 @@ namespace GymPass.Helpers
     public class StoreImageHelper
     {
         private readonly FacilityContext _facilityContext;
+        private string keyName;
+
         public StoreImageHelper(FacilityContext facilityContext)
         {
             _facilityContext = facilityContext;

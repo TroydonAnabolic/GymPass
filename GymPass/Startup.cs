@@ -62,7 +62,9 @@ namespace GymPass
             {
                 endpoints.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                 pattern: "{controller=Home}/{action=Index}/{id?}");
+                // pattern: "{controller}/{action}/{id?}");
+
                 endpoints.MapRazorPages();
             });
 

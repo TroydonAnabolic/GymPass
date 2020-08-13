@@ -32,20 +32,6 @@ function take_snapshot() {
                 function (code, text) {
                     console.log('Photo Captured');
                 });
-
-            //$.ajax({
-            //    type: "POST",
-            //    url: '@Url.Action("Capture", "Facilities")', // trying to get: https://localhost:44314/Home/Index/10
-            //    // may need to convert data_uri to string here
-            //    data:{ webcam: data_uri },
-            //    dataType: "text",
-            //    success: function (msg = " Success") {
-            //        console.log(msg);
-            //    },
-            //    error: function (req, status, error) {
-            //        console.log("Error");
-            //    }
-            //});
         });
     }
     //else if (currentPage == registerPage) {

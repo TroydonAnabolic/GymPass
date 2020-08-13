@@ -48,6 +48,8 @@ namespace GymPass.Controllers
 
         // GET: Home/Index/1
         // TODO: We begin using id = 1 for now, later will implement dynamically changing this ID number, if it is null then redirect to action choose gym
+        [HttpGet]
+       //[Route("Home/Index/10")] // TODO: Test
         [Authorize]
         public async Task<IActionResult> Index(int? id)
         {
