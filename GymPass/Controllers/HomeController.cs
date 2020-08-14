@@ -68,7 +68,6 @@ namespace GymPass.Controllers
             if (id == null) return RedirectToPage("/Identity/Account/Login");
             // if (!user.isVerifiedUser) return RedirectToPage("/Identity/Account/Login");
 
-
             var facility = await _facilityContext.Facilities.FindAsync(id);
             var facilityDetails = await _facilityContext.UsersInGymDetails.ToListAsync();
             UsersInGymDetail = await _facilityContext.UsersInGymDetails.Where(f => f.UniqueEntryID == user.Id).FirstOrDefaultAsync();

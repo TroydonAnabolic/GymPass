@@ -379,6 +379,12 @@ namespace GymPass.Controllers
             }
         }
 
+        // TODO: Controller Actions to run tests
+        public async Task<IActionResult> Secret()
+        {
+            return View(await _facilityContext.Facilities.ToListAsync());
+        }
+
         private bool FacilityExists(int id)
         {
             return _facilityContext.Facilities.Any(e => e.FacilityID == id);

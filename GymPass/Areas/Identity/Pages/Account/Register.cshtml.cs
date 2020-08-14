@@ -157,6 +157,7 @@ namespace GymPass.Areas.Identity.Pages.Account
                             await AddTargetImageToS3Bucket(user);
                         // now sign in and redirect
                         await _signInManager.SignInAsync(user, isPersistent: false);
+
                         return LocalRedirect(returnUrl);
                     }
                 }

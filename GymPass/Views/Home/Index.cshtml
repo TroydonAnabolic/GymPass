@@ -4,7 +4,7 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "GYM PASS";
 }
 
 @* Start Navigation *@
@@ -39,7 +39,7 @@
     <div class="@(@UserManager.GetUserAsync(User).Result.IsInsideGym ? " main-gym" : "not-in-use")">
         <div class="main-gym-icon">
             <div class="title-name">
-                GYM PASS
+                @ViewData["Title"]
             </div>
 
             @*if user is in gym then we can go here*@
