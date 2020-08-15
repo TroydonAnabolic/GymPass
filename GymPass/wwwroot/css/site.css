@@ -56,6 +56,17 @@ header, main, footer {
     flex-shrink: 0;
 }
 
+body > footer {
+    position: absolute;
+    bottom: -2rem;
+    padding: 0.3rem;
+    display: block;
+    width: 100%;
+}
+
+.footer-wrapper {
+    padding: 1.5rem;
+}
 
 /*
  * Remove text-shadow in selection highlight:
@@ -328,7 +339,7 @@ header {
     max-width: 100%;
     min-width: 100%;
     height: 5rem;
-    background-color: #032763;
+    background-color: #081e33;
     color: white;
     text-align: center;
     vertical-align: central;
@@ -832,6 +843,10 @@ input#Input_UserImage.upload-file {
     overflow: auto;
     width: 100%;
     margin: 0.5rem;
+}
+
+#profile {
+    margin: 0 2rem;
 }
 
 /* Extra small devices (phones, 600px and down) */

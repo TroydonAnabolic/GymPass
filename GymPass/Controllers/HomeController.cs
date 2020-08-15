@@ -112,6 +112,8 @@ namespace GymPass.Controllers
 
         private DateTime GetEstimatedNumberOfGymUsers(List<UsersInGymDetail> facilityDetails, DateTime estimatedTimeToCheck, DateTime estimatedExitTimeCurrentUser)
         {
+            DateTime defaultValue =  default(DateTime);
+
             // if there are people in the gym
             if (facilityDetails.Count > 0)
             {
@@ -123,6 +125,7 @@ namespace GymPass.Controllers
 
                     // if selected time has a lesser value, training has not finished, so we add to the count of estimated users in the facilities table
                     // somehow get the clicked value to replace this datetime.now. possibly use another action method
+                    if (estimatedTimeToCheck == defaultValue) continue; // skip iteration if the user has never entered gym yet and has the 0 default time
                     if (estimatedTimeToCheck < estimatedExitTimeCurrentUser) //
                     {
                         // if the current user is still within his estimated training time, then add estimated number of gym users list
