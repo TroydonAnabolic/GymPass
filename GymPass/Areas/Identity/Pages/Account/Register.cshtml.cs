@@ -118,7 +118,7 @@ namespace GymPass.Areas.Identity.Pages.Account
                     UserName = Input.Email,
                     Email = Input.Email,
                     FirstName = Input.FirstName,
-                    DefaultGym = 10, // hard code to be default gym for now
+                    DefaultGym = _facilityContext.Facilities.FirstOrDefault().FacilityID, // hard code to be the first gym created
                     TestLat = Input.TestLat,
                     TestLong = Input.TestLong,
                     UserImage = Input.UserImage
@@ -224,7 +224,7 @@ namespace GymPass.Areas.Identity.Pages.Account
             var emptyUserOutOfFacility = new UsersOutOfGymDetails();
             var entry = _facilityContext.Add(emptyUserOutOfFacility);
             UsersOutOfGymDetails.EstimatedTimeToCheck = DateTime.Now;
-            UsersOutOfGymDetails.FacilityID = 10;
+            UsersOutOfGymDetails.FacilityID = _facilityContext.Facilities.FirstOrDefault().FacilityID;
             UsersOutOfGymDetails.UniqueEntryID = user.Id;
             entry.CurrentValues.SetValues(UsersOutOfGymDetails);
             await _facilityContext.SaveChangesAsync();
