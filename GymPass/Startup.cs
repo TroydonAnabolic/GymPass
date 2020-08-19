@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Amazon.S3;
 using Amazon.Rekognition;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Http;
 
 namespace GymPass
 {
@@ -34,6 +36,11 @@ namespace GymPass
 
             services.AddDbContext<FacilityContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("FacilityContext")));
+
+            //services.AddHttpsRedirection(options =>
+            //{
+            //    options.HttpsPort = 443;
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +57,7 @@ namespace GymPass
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

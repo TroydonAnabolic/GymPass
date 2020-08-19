@@ -10,6 +10,8 @@
     <Compile Remove="Migrations\20200722043606_system restore.Designer.cs" />
     <Compile Remove="Migrations\20200816044705_Migrate to AWS.cs" />
     <Compile Remove="Migrations\20200816044705_Migrate to AWS.Designer.cs" />
+    <Compile Remove="Migrations\20200816052441_Test.cs" />
+    <Compile Remove="Migrations\20200816052441_Test.Designer.cs" />
     <Compile Remove="Migrations\Facility\20200728101649_improve estimate time2.cs" />
     <Compile Remove="Migrations\Facility\20200728101649_improve estimate time2.Designer.cs" />
     <Compile Remove="Migrations\Facility\20200806102826_Initialize default target img.cs" />
@@ -41,6 +43,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\Facility\" />
+    <Folder Include=".ebextensions\" />
     <Folder Include="wwwroot\CameraPhotos\" />
   </ItemGroup>
 

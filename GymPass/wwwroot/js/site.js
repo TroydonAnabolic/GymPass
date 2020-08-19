@@ -2,8 +2,16 @@
 // for details on configuring this project to bundle and minify static web assets.
 var homePage = 'https://localhost:44314/'; // TODO: Try to use a function to avoid using static
 var homePageClick = 'https://localhost:44314/Home/Index/10'; // TODO: Try to use a function to avoid using static
-var registerPage = 'https://localhost:44314/Identity/Account/Register'; 
+var homePageLive = 'https://env.mygympass.net/';
+var homePageClickLive = 'https://env.mygympass.net/Home/Index/1'; // TODO: Try to use a function to avoid using static
+var homePageLive2 = 'https://www.mygympass.net/';
+var homePageClickLive2 = 'https://www.mygympass.net/Home/Index/1'; // TODO: Try to use a function to avoid using static
+var registerPage = 'https://localhost:44314/Identity/Account/Register';
 var registerRedirectLink = 'https://localhost:44314/Identity/Account/Register?returnUrl=%2F';
+var registerLive = 'https://env.mygympass.net/Identity/Account/Register';
+var registerRedirectLinkLive = 'https://env.mygympass.net/Identity/Account/Register?returnUrl=%2FHome%2FIndex#';
+var registerLive2 = 'https://www.mygympass.net/Identity/Account/Register';
+var registerRedirectLinkLive2 = 'https://www.mygympass.net/Identity/Account/Register?returnUrl=%2FHome%2FIndex#';
 var currentPage = window.location.href;
 
 // Navigation
@@ -17,7 +25,7 @@ function closeNav() {
 
 // webcam take snapshot
 function take_snapshot() {
-    if (currentPage == homePage || currentPage == homePageClick) {
+    if (currentPage == homePage || currentPage == homePageClick || currentPage == homePageLive || currentPage == homePageClickLive || currentPage == homePageLive2 || currentPage == homePageClickLive2) {
         // take snapshot and get image data  
         Webcam.snap(function (data_uri) {
             // display results in page  
@@ -73,6 +81,12 @@ function submitForm() {
 }
 
 $(document).ready(function () {
+
+    // warn user they are not using optimal browser mode
+    var w = window.innerWidth;
+    if (w > 441) {
+        alert("This app was designed for mobile, please resize browser using Inspector tool -> Toggle Device Toolbar -> Select Responsive. For the best experience")
+    }
     /*
     *  ------------------------------------------------ Navigation Scripts  ----------------------------------------------------------------
     */
@@ -91,15 +105,15 @@ $(document).ready(function () {
 
     // The webcamera is attached to that my_camera element id using this javascript code
     // The if condition ensures to only attempt to attach camera to home page to avoid errors
-    if (currentPage == homePage || currentPage == homePageClick) {
-    // set the camera and attach it
-    Webcam.set({
-        width: 240,
-        height: 240,
-        margin: 'auto',
-        image_format: 'jpeg',
-        jpeg_quality: 90
-    });
+    if (currentPage == homePage || currentPage == homePageClick || currentPage == homePageLive || currentPage == homePageClickLive || currentPage == homePageLive2 || currentPage == homePageClickLive2) {
+        // set the camera and attach it
+        Webcam.set({
+            width: 240,
+            height: 240,
+            margin: 'auto',
+            image_format: 'jpeg',
+            jpeg_quality: 90
+        });
         Webcam.attach('#my_camera');
     }
     // add style to the div
@@ -180,7 +194,7 @@ $(document).ready(function () {
             $('.reg-lat').val(pos.lat);
             $('.reg-long').val(pos.lng + 0.000010000000003174137);
         });
-         // console.log("Current cords is: ",pos.lat, pos.lng);
+        // console.log("Current cords is: ",pos.lat, pos.lng);
 
         // Modal animation for map and camera
         // Get the modal
